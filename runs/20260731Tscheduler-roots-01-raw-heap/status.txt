@@ -1,0 +1,11 @@
+run_id=20260731Tscheduler-roots-01-raw-heap
+session=EAL6_FreeRTOS_V611_Scheduler_Roots
+pid=13380
+quick_and_dirty=false
+timeout_seconds=1200
+timed_out=false
+exit_code=0
+elapsed_seconds=45.959
+stdout_sha256=35A4BA1683867534DADA27AABCDC986F7A4254E7269A456BB7C9E30A16BD1769
+stderr_sha256=7EB70257593DA06F682A3DDDA54A9D260D4FC514F645237F5CA74B08F8DA61A6
+isabelle_home_user=C:\Users\Chengsong\.isabelle\Isabelle2025-2

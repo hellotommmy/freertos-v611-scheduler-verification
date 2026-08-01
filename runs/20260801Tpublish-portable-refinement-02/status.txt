@@ -1,0 +1,11 @@
+run_id=20260801Tpublish-portable-refinement-02
+session=EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Refinement
+pid=12224
+quick_and_dirty=false
+timeout_seconds=900
+timed_out=false
+exit_code=0
+elapsed_seconds=385.146
+stdout_sha256=594A6C89502091A013CB9A6D71EDC6DB1AB76A5C174D869F15DB2687F4B95C89
+stderr_sha256=7EB70257593DA06F682A3DDDA54A9D260D4FC514F645237F5CA74B08F8DA61A6
+isabelle_home_user=C:\Users\Chengsong\.isabelle\Isabelle2025-2

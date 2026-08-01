@@ -1,0 +1,11 @@
+run_id=20260731Tscheduler-relabel-02-intro-disambiguate
+session=EAL6_FreeRTOS_V611_Scheduler_Raw_List_Relabel
+pid=20532
+quick_and_dirty=false
+timeout_seconds=180
+timed_out=false
+exit_code=0
+elapsed_seconds=29.046
+stdout_sha256=BFA0F300C14A813F19F0230776AB787A4AFF3E54D35D51194C6E898A5F31CE6E
+stderr_sha256=7EB70257593DA06F682A3DDDA54A9D260D4FC514F645237F5CA74B08F8DA61A6
+isabelle_home_user=C:\Users\Chengsong\.isabelle\Isabelle2025-2

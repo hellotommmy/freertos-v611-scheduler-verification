@@ -1,0 +1,2409 @@
+{
+  "schema": 1,
+  "title": "Blind FreeRTOS V6.1.1 source-to-ITP mapping",
+  "semantic_slice_manifest": "scope/semantic_slice.json",
+  "source_root": "upstream/FreeRTOSV6.1.1",
+  "provenance": {
+    "construction": "independent_from_official_source",
+    "allowed_inputs": [
+      "scope/semantic_slice.json",
+      "upstream/SHA256SUMS",
+      "upstream/FreeRTOSV6.1.1 source files",
+      "current proof-port configuration",
+      "current Isabelle theories and recorded build status files"
+    ],
+    "original_formalization_consulted": false
+  },
+  "claim_boundary": {
+    "translation_builds_are_not_refinement": true,
+    "abstract_model_proofs_are_not_source_refinement": true,
+    "non_refinement_green_layers_are_not_refinement": true,
+    "source_to_abstract_refinement_theorems": 11,
+    "distinct_source_operations_with_refinement": 8,
+    "sequential_composition_refinement_theorems": 1,
+    "refinement_scope": "three fixed list simulations (empty insert-end, singleton remove, and empty ordered insertion), general-N member removal and fresh insert-end, one general remove-then-insert-end sequential composition, plus quiescent tick-read, suspended switch-context, suspended/no-wrap increment-tick, zero-delay/no-wrap, and suspended/no-delay delay-until scheduler refinements",
+    "general_list_refinement_complete": false,
+    "scheduler_refinement_complete": false,
+    "positive_delay_source_refinement_complete": false,
+    "concrete_p2_preimage_complete": false
+  },
+  "raw_operational_rungs": [
+    {
+      "id": "Raw-R0",
+      "status": "checker_green",
+      "claim": "concrete c_guard facts for list, detached item, and cast sentinel addresses",
+      "theorem": "raw_needle_pointer_guards",
+      "theories": [
+        "theories/list_raw_r0_guards/List_V611_Raw_R0_Guards.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R0_Guards",
+      "run_id": "20260731Tlist-raw-r0-05-guards",
+      "status_file": "runs/20260731Tlist-raw-r0-05-guards/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R1",
+      "status": "checker_green",
+      "claim": "positive vListInitialise execution with exact empty-list fields and a byte frame",
+      "theorems": [
+        "raw_vListInitialise_exact_post",
+        "raw_vListInitialise_canary_frame"
+      ],
+      "theories": [
+        "theories/list_raw_r1_init/List_V611_Raw_R1_Init.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R1_Init",
+      "run_id": "20260731Tlist-raw-r1-05-init",
+      "status_file": "runs/20260731Tlist-raw-r1-05-init/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R2",
+      "status": "checker_green",
+      "claim": "positive vListInitialiseItem execution with exact container update and list/item/byte frames",
+      "theorem": "raw_vListInitialiseItem_exact_post_and_frames",
+      "theories": [
+        "theories/list_raw_r2_init_item/List_V611_Raw_R2_Init_Item.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R2_Init_Item",
+      "run_id": "20260731Tlist-raw-r2-04-init-item",
+      "status_file": "runs/20260731Tlist-raw-r2-04-init-item/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3a",
+      "status": "checker_green",
+      "claim": "raw common-prefix equalities for the embedded sentinel item value, next pointer, and previous pointer",
+      "theorems": [
+        "raw_sentinel_item_value_prefix",
+        "raw_sentinel_next_prefix",
+        "raw_sentinel_previous_prefix"
+      ],
+      "theories": [
+        "theories/list_raw_r3_prefix/List_V611_Raw_R3_Prefix.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Prefix",
+      "run_id": "20260731Tlist-raw-r3a-01-prefix",
+      "status_file": "runs/20260731Tlist-raw-r3a-01-prefix/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3b",
+      "status": "checker_green",
+      "claim": "raw locality and embedded mini-sentinel selector facts for next and previous updates",
+      "theorems": [
+        "raw_sentinel_whole_next_update_tail8",
+        "raw_sentinel_whole_previous_update_tail8",
+        "raw_sentinel_mini_value",
+        "raw_sentinel_whole_next_update_to_list",
+        "raw_sentinel_whole_previous_update_to_list",
+        "raw_sentinel_previous_survives_next_update",
+        "raw_sentinel_next_survives_previous_update"
+      ],
+      "theories": [
+        "theories/list_raw_r3_tail/List_V611_Raw_R3_Tail.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Tail",
+      "run_id": "20260731Tlist-raw-r3b-19-selector-frames",
+      "status_file": "runs/20260731Tlist-raw-r3b-19-selector-frames/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3c",
+      "status": "checker_green",
+      "claim": "one exact raw empty-list and fresh-item prestate witness with ten source fields and preserved heap typing",
+      "theorems": [
+        "raw_insert_end_prestate_heap",
+        "raw_insert_end_prestate_htd",
+        "raw_insert_end_prestate_htd_unchanged",
+        "raw_insert_end_prestate_fields"
+      ],
+      "theories": [
+        "theories/list_raw_r3_prestate/List_V611_Raw_R3_Prestate.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Prestate",
+      "run_id": "20260731Tlist-raw-r3c-06-prestate",
+      "status_file": "runs/20260731Tlist-raw-r3c-06-prestate/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3d",
+      "status": "checker_green",
+      "claim": "positive raw vListInsertEnd execution result at the exact empty-list witness with guard and frame helpers",
+      "theorems": [
+        "raw_item_sentinel_intervals_disjoint",
+        "raw_sentinel_h_val_after_item_update_direct",
+        "raw_sentinel_guard_at_witness",
+        "raw_insert_end_prestate_index",
+        "raw_insert_end_prestate_sentinel_next_raw",
+        "raw_insert_end_prestate_index_guard",
+        "raw_prestate_index_next_guard_after_item_updates",
+        "raw_vListInsertEnd_empty_result"
+      ],
+      "theories": [
+        "theories/list_raw_r3_run/List_V611_Raw_R3_Run.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Run",
+      "run_id": "20260731Tlist-raw-r3d-05-result",
+      "status_file": "runs/20260731Tlist-raw-r3d-05-result/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3e",
+      "status": "checker_green",
+      "claim": "exact raw vListInsertEnd empty-witness result, item count one, and cursor at the inserted item",
+      "theorem": "raw_vListInsertEnd_empty_count_index",
+      "theories": [
+        "theories/list_raw_r3_count_index_post/List_V611_Raw_R3_Count_Index_Post.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Count_Index_Post",
+      "run_id": "20260731Tlist-raw-r3e-04-count-index-post",
+      "status_file": "runs/20260731Tlist-raw-r3e-04-count-index-post/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3f",
+      "status": "checker_green",
+      "claim": "exact singleton topology after raw vListInsertEnd at the empty witness, including sentinel links, item links, and container",
+      "theorems": [
+        "raw_vListInsertEnd_empty_sentinel_links",
+        "raw_vListInsertEnd_empty_item_links",
+        "raw_vListInsertEnd_empty_container"
+      ],
+      "theories": [
+        "theories/list_raw_r3_topology_post/List_V611_Raw_R3_Topology_Post.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Topology_Post",
+      "run_id": "20260731Tlist-raw-r3f-09-container",
+      "status_file": "runs/20260731Tlist-raw-r3f-09-container/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3g",
+      "status": "checker_green",
+      "claim": "raw vListInsertEnd frames the item key and owner, all eight sentinel-tail bytes, a far canary byte, and heap typing",
+      "theorems": [
+        "raw_vListInsertEnd_empty_key_owner",
+        "raw_vListInsertEnd_empty_tail8",
+        "raw_vListInsertEnd_empty_canary",
+        "raw_vListInsertEnd_empty_htd"
+      ],
+      "theories": [
+        "theories/list_raw_r3_frames/List_V611_Raw_R3_Frames.thy",
+        "theories/list_raw_r3_tail_frame_post/List_V611_Raw_R3_Tail_Frame_Post.thy",
+        "theories/list_raw_r3_far_frame/List_V611_Raw_R3_Far_Frame.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Far_Frame",
+      "run_id": "20260731Tlist-raw-r3g-10-canary-htd",
+      "status_file": "runs/20260731Tlist-raw-r3g-10-canary-htd/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R3-master",
+      "status": "checker_green",
+      "claim": "one exact raw vListInsertEnd empty-to-singleton postcondition mechanically conjoining count, topology, ownership, locality, canary, and heap-typing facts",
+      "theorem": "raw_vListInsertEnd_empty_master",
+      "theories": [
+        "theories/list_raw_r3_master/List_V611_Raw_R3_Master.thy"
+      ],
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R3_Master",
+      "run_id": "20260731Tlist-raw-r3-master-01",
+      "status_file": "runs/20260731Tlist-raw-r3-master-01/status.txt",
+      "is_source_to_abstract_refinement": false
+    },
+    {
+      "id": "Raw-R4-master",
+      "status": "checker_green",
+      "scope": "fixed_singleton_to_empty",
+      "general_operation_refinement": false,
+      "claim": "one exact raw vListRemove singleton-to-empty postcondition mechanically conjoining count, cursor repair, topology, detached-item fields, locality, canary, and heap-typing facts",
+      "theorem": "raw_vListRemove_singleton_master",
+      "theories": [
+        "theories/list_raw_r4_master/List_V611_Raw_R4_Master.thy"
+      ],
+      "theory_sha256": "6F7F2107DD62B00D8541DA2E3C449452AD70A5E291DBC31D835B6819EE998E54",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R4_Master",
+      "run_id": "20260731Tlist-raw-r4-master-01",
+      "status_file": "runs/20260731Tlist-raw-r4-master-01/status.txt",
+      "is_source_to_abstract_refinement": false
+    }
+  ],
+  "non_refinement_proof_layers": [
+    {
+      "id": "Raw-R5-cycle",
+      "kind": "raw_representation_lemma_layer",
+      "status": "checker_green",
+      "scope": "arbitrary_address_and_finite_cycle",
+      "claim": "finite-cycle indexing, first-return, injectivity-before-return, and exact reachability consequences of raw_ring_links and raw_xlist_rel",
+      "definitions": [
+        "raw_cycle_nodes",
+        "raw_cycle_targets"
+      ],
+      "theorems": [
+        "raw_ring_links_nth_edge",
+        "raw_next_power_return_after_cycle",
+        "raw_next_power_no_early_return",
+        "raw_next_power_injective_before_return",
+        "raw_next_power_reachable_exact",
+        "raw_xlist_rel_first_return_and_reachability"
+      ],
+      "theory": "theories/list_raw_r5_cycle/List_V611_Raw_R5_Cycle.thy",
+      "theory_sha256": "E4C7B971C69464B29C1ED2EE4B20D0E87B1A329F80E960AAE14A779F442E4F3E",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R5_Cycle",
+      "run_id": "20260731Tlist-raw-r5c-04-nth-append",
+      "status_file": "runs/20260731Tlist-raw-r5c-04-nth-append/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-generic-prefix",
+      "kind": "raw_representation_lemma_layer",
+      "status": "checker_green",
+      "scope": "address_parametric_sentinel_prefix",
+      "claim": "address-parametric common-prefix bridge between the embedded mini-sentinel and the raw full-item view without a full sentinel allocation premise",
+      "definitions": [],
+      "theorems": [
+        "raw_sentinel_item_value_prefix_generic",
+        "raw_sentinel_next_prefix_generic",
+        "raw_sentinel_previous_prefix_generic",
+        "raw_next_at_end_item",
+        "raw_prev_at_end_item"
+      ],
+      "theory": "theories/list_raw_r6_generic_prefix/List_V611_Raw_R6_Generic_Prefix.thy",
+      "theory_sha256": "281703B2FDEDEC5756C5F01127F4DFE4FB367F9E9F7C72CFD7A56FCDE6A1CD85",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Generic_Prefix",
+      "run_id": "20260731Tlist-raw-r6gp-01-generic-prefix",
+      "status_file": "runs/20260731Tlist-raw-r6gp-01-generic-prefix/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-dynamic-guards",
+      "kind": "raw_representation_lemma_layer",
+      "status": "checker_green",
+      "scope": "general_N_guard_interface",
+      "claim": "raw_xlist_rel supplies address-parametric cycle closure and pointer guards required at the entrance to later general-N insert and remove source VCGs",
+      "definitions": [],
+      "theorems": [
+        "raw_xlist_rel_cycle_node_guard",
+        "raw_xlist_rel_index_in_cycle",
+        "raw_ring_links_next_closed",
+        "raw_ring_links_prev_closed",
+        "raw_full_next_is_sentinel_safe",
+        "raw_full_previous_is_sentinel_safe",
+        "raw_vListInsertEnd_dynamic_guards",
+        "raw_vListRemove_dynamic_guards"
+      ],
+      "theory": "theories/list_raw_r6_dynamic_guards/List_V611_Raw_R6_Dynamic_Guards.thy",
+      "theory_sha256": "82D4F9E75A801E4D433346F85B5B32FE59BDE1992F70A2BE67283CC1A68A1758",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Dynamic_Guards",
+      "run_id": "20260731Tlist-raw-r6dg-06-imageI",
+      "status_file": "runs/20260731Tlist-raw-r6dg-06-imageI/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-unlink-locality",
+      "kind": "raw_positive_execution_layer",
+      "status": "checker_green",
+      "scope": "general_N_remove_positive_execution",
+      "claim": "field-precise unlink locality and a positive vListRemove execution from raw_xlist_rel/member assumptions, with postcondition Result only and no abstract poststate relation",
+      "definitions": [
+        "raw_next_field_ptr",
+        "raw_previous_field_ptr",
+        "raw_pointer_field_region"
+      ],
+      "theorems": [
+        "raw_remove_two_unlink_writes_preserve_item",
+        "raw_general_remove_previous_guard_after_first_unlink",
+        "raw_general_remove_container_guard_after_two_unlinks_exact",
+        "raw_vListRemove_general_result"
+      ],
+      "theory": "theories/list_raw_r6_unlink_locality/List_V611_Raw_R6_Unlink_Locality.thy",
+      "theory_sha256": "7EA7C1094272F35FF5D80A58D89D588F180617BF3ED679371CBCEE887A2D3BBF",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Unlink_Locality",
+      "run_id": "20260731Tlist-raw-r6ul-13-general-remove-direct-exact",
+      "status_file": "runs/20260731Tlist-raw-r6ul-13-general-remove-direct-exact/status.txt",
+      "opens_generated_c_body": true,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-relation",
+      "kind": "pure_relation_assembler",
+      "status": "checker_green",
+      "scope": "general_N_remove_postrelation_assembler",
+      "claim": "pure relation-level deletion assembler converting count, cursor, topology, and live-item frame obligations into raw_xlist_rel after list_remove_abs",
+      "definitions": [],
+      "theorems": [
+        "raw_xlist_remove_count_transfer",
+        "raw_xlist_rel_removeI"
+      ],
+      "theory": "theories/list_raw_r6_remove_relation/List_V611_Raw_R6_Remove_Relation.thy",
+      "theory_sha256": "4CE9BE41FC318FCF2919BCAC2F72B7CED73833BA3DC37980D92B827A429687CF",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Relation",
+      "run_id": "20260731Tlist-raw-r6rr-07-count-transfer",
+      "status_file": "runs/20260731Tlist-raw-r6rr-07-count-transfer/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-insert-relation",
+      "kind": "pure_relation_assembler",
+      "status": "checker_green",
+      "scope": "general_N_insert_postrelation_assembler",
+      "claim": "pure relation-level insertion assembler converting count, cursor, topology, new-item payload, and old-item frame obligations into raw_xlist_rel after list_insert_end_abs",
+      "definitions": [],
+      "theorems": [
+        "length_insert_after",
+        "list_insert_end_ring_set",
+        "list_insert_end_ring_length",
+        "raw_xlist_rel_index_eq_cursor_node",
+        "raw_xlist_rel_insert_endI"
+      ],
+      "theory": "theories/list_raw_r6_insert_relation/List_V611_Raw_R6_Insert_Relation.thy",
+      "theory_sha256": "9022271DAB3CE824CBE19C5D2DBB1EF2AC4295D6CFACD0BA6F6E6B3D061A204D",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Insert_Relation",
+      "run_id": "20260731Tlist-raw-r6ir-03-live-cases",
+      "status_file": "runs/20260731Tlist-raw-r6ir-03-live-cases/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-insert-source-effects",
+      "kind": "raw_source_heap_effect_layer",
+      "status": "checker_green",
+      "scope": "general_N_insert_exact_heap_effect",
+      "claim": "single symbolic execution of the generated vListInsertEnd body proving normal return and the exact seven-stage concrete byte-heap transformer under raw_xlist_rel and fresh-item assumptions",
+      "definitions": ["raw_insert_concrete_heap"],
+      "theorems": ["raw_vListInsertEnd_general_heap_effect"],
+      "theory": "theories/list_raw_r6_insert_source_effects/List_V611_Raw_R6_Insert_Source_Effects.thy",
+      "theory_sha256": "38D21F5E8D283FD8938912C23F3D271A8CEFB7FA3640D4EE7CA61A806149BC0D",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Insert_Source_Effects",
+      "run_id": "20260731Tlist-raw-r6ise-01-first",
+      "status_file": "runs/20260731Tlist-raw-r6ise-01-first/status.txt",
+      "opens_generated_c_body": true,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-unlink-projection",
+      "kind": "pure_alias_projection_layer",
+      "status": "checker_green",
+      "scope": "alias_safe_unlink_field_projection",
+      "claim": "pure alias-safe projection and frame lemmas for the two unlink pointer writes, including same-node aliasing, cross-node frames, sentinel observations, and the resulting ring-link deletion; no generated C body or abstract operation is opened",
+      "definitions": [
+        "raw_unlink_first",
+        "raw_unlink_two"
+      ],
+      "theorems": [
+        "raw_next_field_update_to_whole",
+        "raw_previous_field_update_to_whole",
+        "raw_next_at_after_same_node_next_field_update",
+        "raw_prev_at_after_same_node_previous_field_update",
+        "raw_prev_at_survives_same_node_next_field_update",
+        "raw_next_at_survives_same_node_previous_field_update",
+        "raw_pointer_field_update_preserves_disjoint_list",
+        "raw_cycle_observations_survive_other_next_field_update",
+        "raw_cycle_observations_survive_other_previous_field_update",
+        "raw_unlink_two_writes_effect",
+        "raw_unlink_two_writes_ring_links"
+      ],
+      "theory": "theories/list_raw_r6_unlink_projection/List_V611_Raw_R6_Unlink_Projection.thy",
+      "theory_sha256": "8581095989FC3ED46DE8BA4E9A6FFEB12BE0A016E6076313E40699C8C2A62712",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Unlink_Projection",
+      "run_id": "20260731Tlist-raw-r6up-04-two-write-where",
+      "status_file": "runs/20260731Tlist-raw-r6up-04-two-write-where/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-metadata",
+      "kind": "pure_effect_assembler",
+      "status": "checker_green",
+      "scope": "general_N_remove_effect_relation",
+      "claim": "pure concrete-heap effect relation and transfer theorem assembling count, cursor, topology, and surviving-payload obligations into raw_xlist_rel after list_remove_abs",
+      "definitions": ["raw_remove_effect"],
+      "theorems": ["raw_remove_effect_refines"],
+      "theory": "theories/list_raw_r6_remove_metadata/List_V611_Raw_R6_Remove_Metadata.thy",
+      "theory_sha256": "AF30BE7A4A98C4F96D8B564D564B5929C80B926370766D393A06284CC979AEE5",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Metadata",
+      "run_id": "20260731Tlist-raw-r6rm-18-branch-count",
+      "status_file": "runs/20260731Tlist-raw-r6rm-18-branch-count/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-source-effects",
+      "kind": "raw_source_heap_effect_layer",
+      "status": "checker_green",
+      "scope": "general_N_remove_exact_heap_effect",
+      "claim": "single symbolic execution of the generated vListRemove body proving count and exact concrete byte-heap effects under raw_xlist_rel and membership",
+      "definitions": [],
+      "theorems": [
+        "raw_vListRemove_general_count_effect",
+        "raw_vListRemove_general_heap_effect"
+      ],
+      "theory": "theories/list_raw_r6_remove_source_effects/List_V611_Raw_R6_Remove_Source_Effects.thy",
+      "theory_sha256": "E3B1DFB0FE53A6A549CFC74DD84D34B7018DAE3848FA9CCF9ABCB44FEECBEC26",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Source_Effects",
+      "run_id": "20260731Tlist-raw-r6rse-09-exact-heap-let",
+      "status_file": "runs/20260731Tlist-raw-r6rse-09-exact-heap-let/status.txt",
+      "opens_generated_c_body": true,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-index-effect",
+      "kind": "source_effect_projection_layer",
+      "status": "checker_green",
+      "scope": "general_N_remove_index_projection",
+      "claim": "projection of the exact source heap effect to the source index update and abstract cursor repair obligations",
+      "definitions": [],
+      "theorems": [
+        "raw_vListRemove_general_index_effect",
+        "raw_vListRemove_general_cursor_effect"
+      ],
+      "theory": "theories/list_raw_r6_remove_index_effect/List_V611_Raw_R6_Remove_Index_Effect.thy",
+      "theory_sha256": "1ABFC8C67E6B97A396C2318A1FDB3A79DAE01736158CBA0555E856AC2B4F70B4",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Index_Effect",
+      "run_id": "20260731Tlist-raw-r6rie-06-taken-index-def",
+      "status_file": "runs/20260731Tlist-raw-r6rie-06-taken-index-def/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-payload-effect",
+      "kind": "source_effect_projection_layer",
+      "status": "checker_green",
+      "scope": "general_N_remove_payload_projection",
+      "claim": "projection of the exact source heap effect to surviving-item key and container frames",
+      "definitions": [],
+      "theorems": ["raw_vListRemove_general_payload_effect"],
+      "theory": "theories/list_raw_r6_remove_payload_effect/List_V611_Raw_R6_Remove_Payload_Effect.thy",
+      "theory_sha256": "4E299F699558DFB127FB1F14BC6639AF0DAF637786B50718C27F59F437C0F9F2",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Payload_Effect",
+      "run_id": "20260731Tlist-raw-r6rpe-04-heap-projection",
+      "status_file": "runs/20260731Tlist-raw-r6rpe-04-heap-projection/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-remove-topology-effect",
+      "kind": "source_effect_projection_layer",
+      "status": "checker_green",
+      "scope": "general_N_remove_topology_projection",
+      "claim": "projection of the exact source heap effect to raw_ring_links for remove1 of the selected member",
+      "definitions": [],
+      "theorems": ["raw_vListRemove_general_topology_effect"],
+      "theory": "theories/list_raw_r6_remove_topology_effect/List_V611_Raw_R6_Remove_Topology_Effect.thy",
+      "theory_sha256": "5B6FDCEAABDC0B042FB2B65462D98F89BD100C9605238793D81A952DD95999B3",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Topology_Effect",
+      "run_id": "20260731Tlist-raw-r6rte-06-heap-projection",
+      "status_file": "runs/20260731Tlist-raw-r6rte-06-heap-projection/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Raw-R6-ordered-insert-empty-source",
+      "kind": "raw_source_heap_effect_layer",
+      "status": "checker_green",
+      "scope": "restricted_empty_list_ordered_insert_exact_heap_effect",
+      "claim": "source-derived vListInsert on an empty represented list has exact heap transformers for both the max-key special branch and the nonmax loop-free branch; this source-effect layer is not itself a source-to-abstract refinement",
+      "definitions": [
+        "raw_sentinel_max",
+        "raw_ordered_insert_empty_heap",
+        "raw_ordered_empty_effect"
+      ],
+      "theorems": [
+        "raw_ordered_insert_empty_transformer_effect",
+        "raw_vListInsert_ordered_empty_max_heap_effect",
+        "raw_vListInsert_ordered_empty_nonmax_heap_effect",
+        "raw_vListInsert_ordered_empty_heap_effect"
+      ],
+      "theory": "theories/list_raw_r6_ordered_insert_empty_source/List_V611_Raw_R6_Ordered_Insert_Empty_Source.thy",
+      "theory_sha256": "238178DDF2C973ABF1D2B80B98EAA475D39C89B3DEED16F118480F3A82E681C9",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Ordered_Insert_Empty_Source",
+      "run_id": "20260731Tlist-raw-r6ois-18-transformer-end-frame",
+      "development_cost": {
+        "checker_calls": 18,
+        "checker_green": 5,
+        "elapsed_seconds": 534.339,
+        "final_elapsed_seconds": 39.848
+      },
+      "status_file": "runs/20260731Tlist-raw-r6ois-18-transformer-end-frame/status.txt",
+      "status_sha256": "ADE3AAC35F3DCD7FBEE30E12B64AE67009E9E0F7F307FE97AD7D3C708C4AD7FB",
+      "stdout_file": "runs/20260731Tlist-raw-r6ois-18-transformer-end-frame/stdout.log",
+      "stdout_sha256": "823A32FA6F3CC9A1A39B33724AD5AB77D0001A2B65EF1405453995B901480435",
+      "opens_generated_c_body": true,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-ABS",
+      "kind": "pure_abstract_model",
+      "status": "checker_green",
+      "scope": "five_scheduler_endpoint_definitions_and_basic_facts",
+      "claim": "pure endpoint model for the five scheduler roots, including node identity separation, delayed-list roles, invariants, tick wrap, and round-robin selection",
+      "definitions": [
+        "core_wf",
+        "settled_wf",
+        "task_delay_abs",
+        "task_delay_until_abs",
+        "task_get_tick_abs",
+        "task_increment_tick_abs",
+        "task_switch_context_abs"
+      ],
+      "theorems": [
+        "settled_wf_imp_core_wf",
+        "core_wf_current_is_live",
+        "task_get_tick_abs_result",
+        "task_get_tick_abs_frames_state",
+        "task_delay_zero",
+        "task_delay_until_commits_nominal_wake",
+        "task_increment_tick_while_suspended",
+        "task_switch_context_while_suspended"
+      ],
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "theory_sha256": "FE22AA8F2850CDCD777D89E1D6CD3880DCD9D9524A75DCACF97B46839B98D1DE",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+      "run_id": "20260731Tscheduler-abs-05-let-def",
+      "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-P2",
+      "kind": "pure_abstract_model_witness",
+      "status": "checker_green",
+      "scope": "positive_delay_phase_transition_witness_no_source_relation",
+      "claim": "pure P2 witness: task_delay_abs 2 maps a settled prestate to the stated poststate, whose core invariant holds while settled_wf deliberately does not; there is no raw heap, generated C body, or source relation",
+      "definitions": [
+        "p2_idle_ready",
+        "p2_run_ready",
+        "p2_run_delayed",
+        "p2_pre",
+        "p2_post"
+      ],
+      "theorems": [
+        "task_delay_abs_2_p2",
+        "p2_pre_settled",
+        "p2_post_core",
+        "p2_post_phase_observations",
+        "p2_post_not_settled"
+      ],
+      "theory": "theories/scheduler_p2_model/Scheduler_P2_Model.thy",
+      "theory_sha256": "FB03C1FDE6BEC66357F4E7185838423B8867D8999E2CD1422CF2064DC0C48236",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Model",
+      "run_id": "20260731Tscheduler-p2-06-post-witness",
+      "development_cost": {
+        "checker_calls": 6,
+        "checker_green": 2,
+        "elapsed_seconds": 115.266,
+        "final_elapsed_seconds": 12.597
+      },
+      "status_file": "runs/20260731Tscheduler-p2-06-post-witness/status.txt",
+      "status_sha256": "4C0F092CD72DD4C984F8520740D6C0BC71B389244A18104760485E391229F050",
+      "stdout_file": "runs/20260731Tscheduler-p2-06-post-witness/stdout.log",
+      "stdout_sha256": "8CBE80095AD95274AA84A6D0469ABC52F0930A991771C8FA0D623D3878480B76",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-Raw-List-Relabel",
+      "kind": "pure_scheduler_list_relabel_layer",
+      "status": "checker_green",
+      "scope": "raw_pointer_node_ids_to_scheduler_generic_event_node_ids",
+      "claim": "an explicit decoder relabels raw pointer node identities to scheduler Generic/Event identities, with closure, key-agreement, empty, ready-singleton, and ordered-singleton facts; this layer opens no generated C body and executes no source operation",
+      "definitions": [
+        "xlist_relabel",
+        "sched_xlist_rel"
+      ],
+      "theorems": [
+        "list_all2_decoder_left_closed",
+        "list_all2_decoder_right_closed",
+        "xlist_relabel_ring_length",
+        "xlist_relabel_decoder_left_closed",
+        "xlist_relabel_decoder_right_closed",
+        "xlist_relabel_key_agreementD",
+        "xlist_relabel_emptyI",
+        "xlist_relabel_ready_singletonI",
+        "xlist_relabel_ordered_singletonI",
+        "sched_xlist_rel_emptyI",
+        "sched_xlist_rel_ready_singletonI",
+        "sched_xlist_rel_ordered_singletonI"
+      ],
+      "fact_count": 12,
+      "theory": "theories/scheduler_raw_list_relabel/Scheduler_Raw_List_Relabel.thy",
+      "theory_sha256": "3EED28E0FA3ADC44682E4ABE32569A4D2BDC1FA3392F693E7DA07578A2F129AA",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Raw_List_Relabel",
+      "run_id": "20260731Tscheduler-relabel-02-intro-disambiguate",
+      "development_cost": {
+        "checker_calls": 2,
+        "checker_green": 1,
+        "elapsed_seconds": 57.276,
+        "final_elapsed_seconds": 29.046
+      },
+      "status_file": "runs/20260731Tscheduler-relabel-02-intro-disambiguate/status.txt",
+      "status_sha256": "9C719C53CC0169D5C34CC8F3C8BD5C76C95E48E854C77B586FEC0545B8D60DEE",
+      "stdout_file": "runs/20260731Tscheduler-relabel-02-intro-disambiguate/stdout.log",
+      "stdout_sha256": "BFA0F300C14A813F19F0230776AB787A4AFF3E54D35D51194C6E898A5F31CE6E",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-P2-Generated-Layout",
+      "kind": "generated_layout_diagnostic",
+      "status": "checker_green",
+      "scope": "cross_parser_layout_and_type_universe_diagnostic",
+      "claim": "the scheduler and independent raw-list translations share the byte-heap carrier but generate distinct xLIST_C and xLIST_ITEM_C struct universes, so scheduler roots and items cannot be passed directly to raw_xlist_rel; the probe defines no relation and proves no footprint theorem",
+      "definitions": [],
+      "theorems": [],
+      "fact_count": 0,
+      "diagnostics": [
+        "scheduler heap has the common effective carrier 32 word -> 8 word",
+        "scheduler and raw-list xLIST_C pointer types clash",
+        "scheduler and raw-list xLIST_ITEM_C pointer types clash",
+        "function-address all_distinct does not establish scheduler object separation"
+      ],
+      "distinct_generated_struct_universes": true,
+      "common_heap_carrier": "32 word -> 8 word",
+      "direct_scheduler_pointer_reuse": false,
+      "evidence_note": {
+        "path": "notes/SCHEDULER_GENERATED_LAYOUT_PROBE.md",
+        "sha256": "9FCC622B881F1FBAE91E10B0F86CFBEFA42CF8FBB6D644F3C464DC60A866CD49"
+      },
+      "theory": "theories/scheduler_p2_generated_layout_first/Scheduler_P2_Generated_Layout_First.thy",
+      "theory_sha256": "604A4BCCE04F39AFC499A3F58BC9DD65F7E31A57CA8AB526467DB645FFA8F843",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Generated_Layout_First",
+      "run_id": "20260731Tscheduler-p2-layout-first-04-green",
+      "development_cost": {
+        "checker_calls": 4,
+        "checker_green": 1,
+        "elapsed_seconds": 236.199,
+        "final_elapsed_seconds": 58.491
+      },
+      "status_file": "runs/20260731Tscheduler-p2-layout-first-04-green/status.txt",
+      "status_sha256": "E022F1D429064BB06F787D5278660637A1B2A9CAFDA89781F6AA8FDB70AD40E1",
+      "stdout_file": "runs/20260731Tscheduler-p2-layout-first-04-green/stdout.log",
+      "stdout_sha256": "85255AB913C35001C358BED2F1F88DB7849B7C29D3FA1A090D3B55DA19E21249",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-List-ABI-Bridge",
+      "kind": "translation_unit_abi_bridge_layer",
+      "status": "checker_green",
+      "scope": "scheduler_to_raw_list_pointer_region_offset_and_packed_read_compatibility",
+      "claim": "a bounded ABI foundation preserves pointer addresses, equality, NULL, guards, regions, selected root and embedded-item addresses, generated size/alignment and field offsets, and packed h_val reads across the distinct scheduler and raw-list struct universes; it opens no scheduler source body and proves no abstract operation refinement",
+      "definitions": [
+        "abi_list_ptr",
+        "abi_item_ptr",
+        "scheduler_list_region",
+        "scheduler_item_region",
+        "abi_ready_list_root",
+        "abi_delayed_list1_root",
+        "abi_delayed_list2_root",
+        "abi_pending_ready_list_root",
+        "abi_suspended_list_root",
+        "abi_current_delayed_list",
+        "abi_overflow_delayed_list",
+        "abi_generic_list_item_ptr",
+        "abi_event_list_item_ptr"
+      ],
+      "theorems": [
+        "abi_list_ptr_ptr_val",
+        "abi_item_ptr_ptr_val",
+        "abi_list_ptr_eq_iff",
+        "abi_item_ptr_eq_iff",
+        "abi_list_ptr_NULL_iff",
+        "abi_item_ptr_NULL_iff",
+        "abi_list_ptr_NULL",
+        "abi_item_ptr_NULL",
+        "abi_xLIST_C_size",
+        "abi_xLIST_C_align",
+        "abi_xLIST_ITEM_C_size",
+        "abi_xLIST_ITEM_C_align",
+        "abi_xMINI_LIST_ITEM_C_size",
+        "abi_xMINI_LIST_ITEM_C_align",
+        "abi_list_ptr_c_guard",
+        "abi_item_ptr_c_guard",
+        "abi_list_region_eq",
+        "abi_item_region_eq",
+        "abi_ready_list_root_ptr_val",
+        "abi_delayed_list1_root_ptr_val",
+        "abi_delayed_list2_root_ptr_val",
+        "abi_current_delayed_list_ptr_val",
+        "abi_overflow_delayed_list_ptr_val",
+        "abi_generic_list_item_ptr_ptr_val",
+        "abi_event_list_item_ptr_ptr_val",
+        "abi_xLIST_C_uxNumberOfItems_C_offset",
+        "abi_xLIST_C_pxIndex_C_offset",
+        "abi_xLIST_C_xListEnd_C_offset",
+        "abi_xLIST_ITEM_C_xItemValue_C_offset",
+        "abi_xLIST_ITEM_C_pxNext_C_offset",
+        "abi_xLIST_ITEM_C_pxPrevious_C_offset",
+        "abi_xLIST_ITEM_C_pvOwner_C_offset",
+        "abi_xLIST_ITEM_C_pvContainer_C_offset",
+        "abi_sentinel_field_address_commutes",
+        "abi_list_h_val_packed",
+        "abi_item_h_val_packed"
+      ],
+      "fact_count": 36,
+      "design_plan": {
+        "path": "notes/SCHEDULER_TRANSLATION_UNIT_ABI_BRIDGE_PLAN.md",
+        "status": "design_only_static",
+        "sha256": "40B17DFB17C82FEE8869B45679B664CB595B98872E09FA0E8EA55AAC56231F6C",
+        "checker_calls": 0,
+        "is_checker_evidence": false,
+        "is_source_to_abstract_refinement": false
+      },
+      "design_plan_fully_implemented": false,
+      "theory": "theories/scheduler_list_abi_bridge/Scheduler_List_ABI_Bridge.thy",
+      "theory_sha256": "2F9CB0E2D0CE2D99E40AF25C1CDAB75DD8C7FB68018BFBA8E8CD8671427F5434",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_List_ABI_Bridge",
+      "run_id": "20260731Tscheduler-list-abi-03-packed-hval",
+      "development_cost": {
+        "checker_calls": 3,
+        "checker_green": 3,
+        "elapsed_seconds": 112.143,
+        "final_elapsed_seconds": 23.281
+      },
+      "status_file": "runs/20260731Tscheduler-list-abi-03-packed-hval/status.txt",
+      "status_sha256": "42E751C3EDD30D06E436CC6D4B2CC43D620B7669EA6204A15C828E6A1D07993B",
+      "stdout_file": "runs/20260731Tscheduler-list-abi-03-packed-hval/stdout.log",
+      "stdout_sha256": "C1FF414E59EC0AF0C482EE313C48D8AFB2EA1C0DDBAC8C2F3E6EBDDA231097D4",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-List-ABI-Write-Bridge",
+      "kind": "translation_unit_abi_write_bridge_layer",
+      "status": "checker_green",
+      "scope": "scheduler_generic_item_wake_key_field_address_and_write",
+      "claim": "the scheduler nested Generic-list-item key pointer and the corresponding raw-list-view pointer have the same address, so their 32-bit heap updates are equal on every intermediate byte heap; this brick opens no scheduler source body and proves no abstract operation refinement",
+      "definitions": [
+        "scheduler_generic_item_key_ptr",
+        "raw_generic_item_key_ptr"
+      ],
+      "theorems": [
+        "abi_generic_item_key_field_address",
+        "abi_generic_item_key_field_write",
+        "heap_update_pointer_value_coerce",
+        "abi_item_next_field_address",
+        "abi_item_next_field_write",
+        "abi_item_previous_field_address",
+        "abi_item_previous_field_write",
+        "abi_item_container_field_address",
+        "abi_item_container_field_write",
+        "abi_list_index_field_address",
+        "abi_list_index_field_write",
+        "abi_list_count_field_address",
+        "abi_list_count_field_write"
+      ],
+      "fact_count": 13,
+      "arbitrary_intermediate_heap": true,
+      "theory": "theories/scheduler_list_abi_write_bridge/Scheduler_List_ABI_Write_Bridge.thy",
+      "theory_sha256": "C972FA5B4CAFCC230056DBA267EC6581B144E93C4BDFCED7015CDB0399AED76A",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_List_ABI_Write_Bridge",
+      "run_id": "20260731Tscheduler-list-abi-write-02-pointer-fields",
+      "development_cost": {
+        "checker_calls": 2,
+        "checker_green": 2,
+        "elapsed_seconds": 42.023,
+        "final_elapsed_seconds": 20.882
+      },
+      "status_file": "runs/20260731Tscheduler-list-abi-write-02-pointer-fields/status.txt",
+      "status_sha256": "7A80E2B85F3B83249136FB663BE0B21C533A2A65613D77CC6A08F7877292A51B",
+      "stdout_file": "runs/20260731Tscheduler-list-abi-write-02-pointer-fields/stdout.log",
+      "stdout_sha256": "0439D5ECF5683FE44C601B2B3375F667A926DB0B230A97AA7E8F8004469E1ADC",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-P2-Raw-Relation",
+      "kind": "conditional_scheduler_raw_relation_layer",
+      "status": "checker_green",
+      "scope": "layered_scheduler_raw_relation_and_conditional_p2_endpoints",
+      "claim": "a layered relation connects generated scheduler roots, an exact forward/reverse TCB and Generic/Event decoder, eight raw-list views, delayed-list roles, scalar/current/boundary fields, and StableRunning/YieldPending endpoints; its P2 endpoint theorems are conditional introductions only and neither construct a concrete preimage nor execute or refine source vTaskDelay",
+      "records": [
+        "scheduler_decode",
+        "scheduler_roots"
+      ],
+      "datatypes": [
+        "scheduler_phase"
+      ],
+      "definitions": [
+        "generated_scheduler_roots",
+        "scheduler_decode_rel",
+        "scheduler_lists_rel",
+        "scheduler_role_rel",
+        "scheduler_scalar_rel",
+        "scheduler_current_rel",
+        "scheduler_boundary_rel",
+        "raw_scheduler_rel",
+        "yield_pending_wf"
+      ],
+      "functions": [
+        "scheduler_endpoint_rel"
+      ],
+      "theorems": [
+        "generated_scheduler_roots_fields",
+        "scheduler_tcb_decode_iff",
+        "scheduler_node_decode_Generic_iff",
+        "scheduler_node_decode_Event_iff",
+        "raw_scheduler_relI",
+        "sched_xlist_rel_emptyE",
+        "p2_pre_ready2_raw_singletonE",
+        "p2_pre_delayed_a_raw_emptyE",
+        "p2_pre_pending_raw_emptyE",
+        "p2_pre_conditional_endpointI",
+        "p2_post_conditional_endpointI"
+      ],
+      "fact_count": 11,
+      "conditional_endpoint_only": true,
+      "concrete_preimage_complete": false,
+      "source_execution_complete": false,
+      "positive_delay_source_refinement_complete": false,
+      "theory": "theories/scheduler_p2_raw_relation/Scheduler_P2_Raw_Relation.thy",
+      "theory_sha256": "9A153B79D0871D4D96A5DF82299EF0D40AC8F918692FE60934A8245E048510ED",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Raw_Relation",
+      "run_id": "20260731Tscheduler-p2-raw-rel-08-empty-extractors",
+      "development_cost": {
+        "checker_calls": 8,
+        "checker_green": 4,
+        "elapsed_seconds": 251.043,
+        "final_elapsed_seconds": 28.897
+      },
+      "status_file": "runs/20260731Tscheduler-p2-raw-rel-08-empty-extractors/status.txt",
+      "status_sha256": "7A83BA7B439CB940D177F6EADF50AC020CA4DF997B7B95B77A0E6F8373DAE039",
+      "stdout_file": "runs/20260731Tscheduler-p2-raw-rel-08-empty-extractors/stdout.log",
+      "stdout_sha256": "EF920019DA793E1CB1F04430A1CAF807C8EF025BFA3172546A42133914AA4276",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    }
+  ],
+  "non_refinement_translation_gates": [
+    {
+      "id": "Scheduler-Parse",
+      "kind": "cparser_parse_gate",
+      "status": "checker_green",
+      "translation_route": "cparser_unmodified_source_composition_unit",
+      "claim": "CParser accepts the proof-only composition unit containing the unmodified tasks.c and list.c bodies and the named sequential port contract",
+      "covered_operation_ids": [],
+      "generated_definitions": [],
+      "artifacts": ["scheduler_translation_unit.c"],
+      "theory": "theories/scheduler_parse/Scheduler_V611_Parse.thy",
+      "theory_sha256": "BA286C0091DF4BEE9D4DCB8013A5E3903DEE054357E6012968C459D1ED51BA68",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Parse",
+      "run_id": "20260801Tpublish-portable-scheduler-parse-01",
+      "status_file": "runs/20260801Tpublish-portable-scheduler-parse-01/status.txt",
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-Tick-Raw",
+      "kind": "raw_heap_autocorres_translation_gate",
+      "status": "checker_green",
+      "translation_route": "skip_heap_abs",
+      "claim": "raw-heap AutoCorres translation of the critical-section proof-port functions and xTaskGetTickCount",
+      "covered_operation_ids": ["ROOT-GET-TICK"],
+      "generated_definitions": [
+        "eal6_port_enter_critical'_def",
+        "eal6_port_exit_critical'_def",
+        "xTaskGetTickCount'_def"
+      ],
+      "artifacts": [],
+      "theory": "theories/scheduler_tick/Scheduler_V611_Tick_Translation.thy",
+      "theory_sha256": "7299537CA9D94A6B292F308114250F99AF435F3E891CB62407411AE67071E291",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Tick",
+      "run_id": "20260731Tscheduler-tick-02-raw-heap",
+      "status_file": "runs/20260731Tscheduler-tick-02-raw-heap/status.txt",
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-Delay-Raw",
+      "kind": "raw_heap_autocorres_translation_gate",
+      "status": "checker_green",
+      "translation_route": "skip_heap_abs",
+      "claim": "raw-heap AutoCorres translation of vTaskDelay, vTaskIncrementTick, suspend/resume helpers, list support, and the yield proof-port body",
+      "covered_operation_ids": [
+        "ROOT-DELAY",
+        "ROOT-INCREMENT-TICK",
+        "HELPER-SUSPEND-ALL",
+        "HELPER-RESUME-ALL"
+      ],
+      "generated_definitions": [
+        "eal6_port_yield'_def",
+        "vTaskSuspendAll'_def",
+        "vTaskIncrementTick'_def",
+        "xTaskResumeAll'_def",
+        "vTaskDelay'_def"
+      ],
+      "artifacts": [],
+      "theory": "theories/scheduler_delay/Scheduler_V611_Delay_Translation.thy",
+      "theory_sha256": "D34512E4642779C49BF412E7FF05E4FB622EF47E255F152AA1CB765E7EA89A68",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Delay",
+      "run_id": "20260731Tscheduler-delay-01-raw-heap",
+      "status_file": "runs/20260731Tscheduler-delay-01-raw-heap/status.txt",
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    },
+    {
+      "id": "Scheduler-Roots-Raw",
+      "kind": "raw_heap_autocorres_translation_gate",
+      "status": "checker_green",
+      "translation_route": "skip_heap_abs",
+      "claim": "raw-heap AutoCorres translation of the remaining frozen roots vTaskDelayUntil and vTaskSwitchContext",
+      "covered_operation_ids": [
+        "ROOT-DELAY-UNTIL",
+        "ROOT-SWITCH-CONTEXT"
+      ],
+      "generated_definitions": [
+        "vTaskDelayUntil'_def",
+        "vTaskSwitchContext'_def"
+      ],
+      "artifacts": [],
+      "theory": "theories/scheduler_roots/Scheduler_V611_Roots_Translation.thy",
+      "theory_sha256": "B560345AB2B38ADC871060A33E7A850E8603C8CC5DADFD6D1945A2FD2C3A3E7B",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Roots",
+      "run_id": "20260731Tscheduler-roots-01-raw-heap",
+      "status_file": "runs/20260731Tscheduler-roots-01-raw-heap/status.txt",
+      "is_source_to_abstract_refinement": false,
+      "source_to_abstract_refinement_theorem_count_delta": 0
+    }
+  ],
+  "source_to_abstract_refinement_rungs": [
+    {
+      "id": "Raw-R5",
+      "status": "checker_green",
+      "scope": "fixed_empty_to_singleton",
+      "general_operation_refinement": false,
+      "claim": "the source-derived raw vListInsertEnd transition from the fixed related empty witness reaches Result and a raw heap related to list_insert_end_abs",
+      "operation_id": "LIST-INSERT-END",
+      "source_function": "vListInsertEnd'",
+      "model_operation": "list_insert_end_abs",
+      "relation": "raw_xlist_rel",
+      "prestate_relation_theorem": "raw_insert_end_prestate_rep_empty",
+      "theorem": "raw_vListInsertEnd_empty_refines",
+      "theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R5_Relation",
+      "run_id": "20260731Tlist-raw-r5-10-show-thesis",
+      "status_file": "runs/20260731Tlist-raw-r5-10-show-thesis/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R5-remove",
+      "status": "checker_green",
+      "scope": "fixed_singleton_to_empty",
+      "general_operation_refinement": false,
+      "claim": "the source-derived raw vListRemove transition from the fixed related singleton witness reaches Result and a raw heap related to list_remove_abs",
+      "operation_id": "LIST-REMOVE",
+      "source_function": "vListRemove'",
+      "model_operation": "list_remove_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "prestate_relation_theorem": "raw_singleton_prestate_rep",
+      "prestate_theory": "theories/list_raw_r5_remove_prestate/List_V611_Raw_R5_Remove_Prestate.thy",
+      "prestate_theory_sha256": "FE1DF5B644267CD33E6C5E6962144684BDF3EC0A3E3E62DA3701D09AEAF49AF7",
+      "theorem": "raw_vListRemove_singleton_refines",
+      "theory": "theories/list_raw_r5_remove_refinement/List_V611_Raw_R5_Remove_Refinement.thy",
+      "theory_sha256": "4187C45D7E870E77A3EC009B0D1424597BFF9FEBB84A850D59FF4DB6C6FF653F",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R5_Remove_Refinement",
+      "run_id": "20260731Tlist-raw-r5r-02-remove-refinement",
+      "status_file": "runs/20260731Tlist-raw-r5r-02-remove-refinement/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R6-remove-general",
+      "status": "checker_green",
+      "scope": "general_N_member_remove",
+      "general_operation_refinement": true,
+      "claim": "for any raw_xlist_rel state and any selected member p, source-derived vListRemove reaches Result and a concrete heap related to list_remove_abs p xs",
+      "operation_id": "LIST-REMOVE",
+      "source_function": "vListRemove'",
+      "model_operation": "list_remove_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "preconditions": {
+        "membership": "p is in set (ring xs)"
+      },
+      "supporting_layer_ids": [
+        "Raw-R6-remove-metadata",
+        "Raw-R6-remove-source-effects",
+        "Raw-R6-remove-index-effect",
+        "Raw-R6-remove-payload-effect",
+        "Raw-R6-remove-topology-effect"
+      ],
+      "effect_theorem": "raw_vListRemove_general_effect",
+      "theorem": "raw_vListRemove_general_refines",
+      "theory": "theories/list_raw_r6_remove_general_refinement/List_V611_Raw_R6_Remove_General_Refinement.thy",
+      "theory_sha256": "A08443F3DC4B2CB828D8089AC41BC4F59C004C38E98257A07B9B607E2F039B6A",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_General_Refinement",
+      "run_id": "20260731Tlist-raw-r6rgr-01-assemble",
+      "status_file": "runs/20260731Tlist-raw-r6rgr-01-assemble/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-Tick-Read",
+      "status": "checker_green",
+      "scope": "quiescent_tick_read_boundary",
+      "general_operation_refinement": false,
+      "claim": "at a quiescent proof-port boundary, source-derived xTaskGetTickCount returns the committed tick and preserves scheduler_tick_boundary_rel to task_get_tick_abs",
+      "operation_id": "ROOT-GET-TICK",
+      "source_function": "xTaskGetTickCount'",
+      "model_operation": "task_get_tick_abs",
+      "relation": "scheduler_tick_boundary_rel",
+      "boundary_conditions": {
+        "eal6_port_critical_depth_'": 0,
+        "eal6_port_interrupts_disabled_'": 0,
+        "committed_tick_equality": "xTickCount_' = sa_tick",
+        "returned_value": "committed_tick",
+        "excluded_value": "sa_missed_ticks"
+      },
+      "theorem": "xTaskGetTickCount_refines",
+      "theory": "theories/scheduler_tick_refinement/Scheduler_V611_Tick_Read_Refinement.thy",
+      "theory_sha256": "99D46C2193DD213CF6D4645D48A4F93F18B50CA8887BA1ABC74255BF77094BCA",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Tick_Read_Refinement",
+      "run_id": "20260731Tscheduler-tick-refine-03-explicit-model-op",
+      "status_file": "runs/20260731Tscheduler-tick-refine-03-explicit-model-op/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-Switch-Suspended",
+      "status": "checker_green",
+      "scope": "suspended_scheduler_control_boundary",
+      "general_operation_refinement": false,
+      "claim": "when scheduler suspension depth is nonzero, source-derived vTaskSwitchContext sets only the missed-yield request and preserves scheduler_control_rel to task_switch_context_abs",
+      "operation_id": "ROOT-SWITCH-CONTEXT",
+      "source_function": "vTaskSwitchContext'",
+      "model_operation": "task_switch_context_abs",
+      "relation": "scheduler_control_rel",
+      "boundary_conditions": {
+        "sa_suspend_depth": "nonzero",
+        "uxSchedulerSuspended_'": "nonzero",
+        "source_effect": "xMissedYield_' := 1",
+        "abstract_effect": "sa_missed_yield := True",
+        "ready_list_access": false,
+        "proof_port_yield": false
+      },
+      "prestate_relation_theorem": "scheduler_control_rel_suspended_witness",
+      "theorem": "vTaskSwitchContext_suspended_refines",
+      "theory": "theories/scheduler_switch_suspended_refinement/Scheduler_V611_Switch_Suspended_Refinement.thy",
+      "theory_sha256": "E6907500EEE776183F11178EEDDC095E6DE92E14CB7C23A8F382C2B16C685D4A",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Switch_Suspended_Refinement",
+      "run_id": "20260731Tscheduler-switch-suspended-01",
+      "status_file": "runs/20260731Tscheduler-switch-suspended-01/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-Increment-Tick-Suspended",
+      "status": "checker_green",
+      "scope": "suspended_no_wrap_scheduler_control_boundary",
+      "general_operation_refinement": false,
+      "claim": "when scheduler suspension depth is nonzero and the concrete missed-tick word does not wrap, source-derived vTaskIncrementTick increments only missed-tick debt and preserves scheduler_control_rel to task_increment_tick_abs",
+      "operation_id": "ROOT-INCREMENT-TICK",
+      "source_function": "vTaskIncrementTick'",
+      "model_operation": "task_increment_tick_abs",
+      "relation": "scheduler_control_rel",
+      "relation_theory": "theories/scheduler_switch_suspended_refinement/Scheduler_V611_Switch_Suspended_Refinement.thy",
+      "relation_theory_sha256": "E6907500EEE776183F11178EEDDC095E6DE92E14CB7C23A8F382C2B16C685D4A",
+      "boundary_conditions": {
+        "sa_suspend_depth": "nonzero",
+        "uxSchedulerSuspended_'": "nonzero",
+        "scheduler_missed_tick_no_wrap": true,
+        "source_effect": "uxMissedTicks_' := uxMissedTicks_' + 1",
+        "abstract_effect": "sa_missed_ticks := Suc sa_missed_ticks",
+        "committed_tick_changed": false,
+        "delayed_list_access": false
+      },
+      "prestate_relation_theorem": "scheduler_increment_tick_suspended_pre_witness",
+      "theorem": "vTaskIncrementTick_suspended_refines",
+      "theory": "theories/scheduler_increment_tick_suspended_refinement/Scheduler_V611_Increment_Tick_Suspended_Refinement.thy",
+      "theory_sha256": "06077C3FCD1F17C07694437957C7D4AA5CB94D68C056B3BC80B9E3B73F60F098",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Increment_Tick_Suspended_Refinement",
+      "run_id": "20260731Tscheduler-increment-tick-suspended-01",
+      "status_file": "runs/20260731Tscheduler-increment-tick-suspended-01/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-Delay-Zero",
+      "status": "checker_green",
+      "scope": "zero_delay_no_wrap_scheduler_control_boundary",
+      "general_operation_refinement": false,
+      "claim": "for delay argument exactly zero and a non-wrapping proof-port yield counter, source-derived vTaskDelay performs one yield request and preserves scheduler_control_rel to task_delay_abs 0",
+      "operation_id": "ROOT-DELAY",
+      "source_function": "vTaskDelay'",
+      "model_operation": "task_delay_abs",
+      "relation": "scheduler_control_rel",
+      "relation_theory": "theories/scheduler_switch_suspended_refinement/Scheduler_V611_Switch_Suspended_Refinement.thy",
+      "relation_theory_sha256": "E6907500EEE776183F11178EEDDC095E6DE92E14CB7C23A8F382C2B16C685D4A",
+      "boundary_conditions": {
+        "delay_argument": 0,
+        "scheduler_yield_count_no_wrap": true,
+        "source_effect": "eal6_port_yield_count_' := eal6_port_yield_count_' + 1",
+        "abstract_effect": "sa_yield_count := Suc sa_yield_count",
+        "scheduler_suspend_protocol": false,
+        "current_tcb_access": false,
+        "list_access": false
+      },
+      "prestate_relation_theorem": "scheduler_delay_zero_pre_witness",
+      "theorem": "vTaskDelay_zero_refines",
+      "theory": "theories/scheduler_delay_zero_refinement/Scheduler_V611_Delay_Zero_Refinement.thy",
+      "theory_sha256": "A77DE8F4215AF1EE592858B9232FD8F3EF068D5A2C12C4912C99028FE525D9E4",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement",
+      "run_id": "20260731Tscheduler-delay-zero-02-vcg-solved",
+      "status_file": "runs/20260731Tscheduler-delay-zero-02-vcg-solved/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-Delay-Until-Suspended-No-Delay",
+      "status": "checker_green",
+      "scope": "suspended_no_delay_scheduler_boundary",
+      "general_operation_refinement": false,
+      "claim": "with source suspension depth exactly one, quiescent proof-port controls, a guarded previous-wake pointer, the no-delay arithmetic branch, and non-wrapping yield count, source-derived vTaskDelayUntil commits the nominal wake and refines task_delay_until_abs without blocking or list migration",
+      "operation_id": "ROOT-DELAY-UNTIL",
+      "source_function": "vTaskDelayUntil'",
+      "model_operation": "task_delay_until_abs",
+      "relation": "scheduler_control_rel",
+      "relation_theory": "theories/scheduler_switch_suspended_refinement/Scheduler_V611_Switch_Suspended_Refinement.thy",
+      "relation_theory_sha256": "E6907500EEE776183F11178EEDDC095E6DE92E14CB7C23A8F382C2B16C685D4A",
+      "boundary_conditions": {
+        "source_suspend_depth": 1,
+        "internal_suspend_resume_depth": "1 -> 2 -> 1",
+        "eal6_port_critical_depth_'": 0,
+        "eal6_port_interrupts_disabled_'": 0,
+        "previous_pointer_guard": true,
+        "should_delay_until": false,
+        "scheduler_yield_count_no_wrap": true,
+        "abstract_wake_result": "previous + increment",
+        "abstract_state_effect": "sa_yield_count := Suc sa_yield_count",
+        "current_task_blocked": false,
+        "list_migration": false,
+        "proof_port_yield_count_increment": 1
+      },
+      "exact_source_theorem": "vTaskDelayUntil_suspended_no_delay_result",
+      "exact_source_first_green_run_id": "20260731Tscheduler-delay-until-nodelay-05-all-method",
+      "exact_source_first_green_status_file": "runs/20260731Tscheduler-delay-until-nodelay-05-all-method/status.txt",
+      "theorem": "vTaskDelayUntil_suspended_no_delay_refines",
+      "theory": "theories/scheduler_delay_until_no_delay_refinement/Scheduler_V611_Delay_Until_No_Delay_Refinement.thy",
+      "theory_sha256": "44C6CF2B014D9BB9D2F47D4770246457DD0EFCB3850FB2D52B6301FAF19A51EB",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Until_No_Delay_Refinement",
+      "run_id": "20260731Tscheduler-delay-until-nodelay-08-readback",
+      "status_file": "runs/20260731Tscheduler-delay-until-nodelay-08-readback/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R6-insert-general",
+      "status": "checker_green",
+      "scope": "general_N_fresh_insert_end",
+      "general_operation_refinement": true,
+      "claim": "for any raw_xlist_rel state, any fresh insert item, and a non-wrapping list count, source-derived vListInsertEnd reaches Result and a concrete heap related to list_insert_end_abs",
+      "operation_id": "LIST-INSERT-END",
+      "source_function": "vListInsertEnd'",
+      "model_operation": "list_insert_end_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "preconditions": {
+        "freshness": "raw_fresh_for_insert lp (ring xs) p",
+        "count_increment": "raw_count_can_increment xs"
+      },
+      "supporting_layer_ids": [
+        "Raw-R6-insert-relation",
+        "Raw-R6-insert-source-effects"
+      ],
+      "exact_heap_transformer_layer_id": "Raw-R6-insert-source-effects",
+      "exact_heap_transformer_theorem": "raw_vListInsertEnd_general_heap_effect",
+      "effect_theorem": "raw_insert_concrete_heap_refines",
+      "theorem": "raw_vListInsertEnd_general_refines_via_transformer",
+      "theory": "theories/list_raw_r6_insert_post_transformer/List_V611_Raw_R6_Insert_Post_Transformer.thy",
+      "theory_sha256": "E83219F8F59CBF18A6BB4050A3E8F380F586BD5B237AD0EE2857D7635846959C",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Insert_Post_Transformer",
+      "run_id": "20260731Tlist-raw-r6ipt-04-where-spacing",
+      "status_file": "runs/20260731Tlist-raw-r6ipt-04-where-spacing/status.txt",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R6-remove-insert-sequence",
+      "kind": "sequential_composition_refinement",
+      "status": "checker_green",
+      "scope": "general_N_member_remove_then_insert_end",
+      "general_operation_refinement": true,
+      "sequential_composition_refinement": true,
+      "distinct_operation_count_delta": 0,
+      "claim": "for any raw_xlist_rel state and selected member p, the sequential source computation vListRemove followed by vListInsertEnd of that same item reaches Result and a concrete heap related to list_insert_end_abs applied after list_remove_abs, preserving the original item key",
+      "operation_id": "LIST-REMOVE",
+      "composed_operation_ids": ["LIST-REMOVE", "LIST-INSERT-END"],
+      "source_function": "vListRemove'",
+      "composed_source_function": "vListInsertEnd'",
+      "model_operation": "list_remove_abs",
+      "composed_model_operation": "list_insert_end_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "preconditions": {
+        "membership": "p is in set (ring xs)"
+      },
+      "supporting_rung_ids": [
+        "Raw-R6-remove-general",
+        "Raw-R6-insert-general"
+      ],
+      "bridge_obligations": {
+        "freshness": "raw_remove_post_fresh_for_insert",
+        "count_headroom": "raw_remove_post_count_can_increment",
+        "key_preservation": "raw_remove_concrete_heap_preserves_item_key"
+      },
+      "intermediate_theorems": [
+        "raw_vListRemove_general_sequence_ready",
+        "raw_vListInsertEnd_sequence_continuation",
+        "raw_vListInsertEnd_sequence_continuation_res"
+      ],
+      "theorem": "raw_vListRemove_insert_end_general_refines",
+      "theory": "theories/list_raw_r6_remove_insert_sequence/List_V611_Raw_R6_Remove_Insert_Sequence.thy",
+      "theory_sha256": "E12FDC4BA9A08F62C2C8F0C8493657CECE41FEE88D8B14F11360738E65B85A9D",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Insert_Sequence",
+      "run_id": "20260731Tlist-raw-r6ris-07-bind-weaken",
+      "status_file": "runs/20260731Tlist-raw-r6ris-07-bind-weaken/status.txt",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R6-ordered-insert-empty",
+      "status": "checker_green",
+      "scope": "restricted_empty_list_ordered_insert",
+      "general_operation_refinement": false,
+      "claim": "for any empty raw_xlist_rel state, fresh item, and maximum-key sentinel, source-derived vListInsert reaches Result and a heap related to list_insert_ordered_abs; ordered-relation and maximum-item-key corollaries remain restricted to the empty-list branch",
+      "operation_id": "LIST-INSERT-ORDERED",
+      "source_function": "vListInsert'",
+      "model_operation": "list_insert_ordered_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "preconditions": {
+        "empty_ring": "ring xs = []",
+        "freshness": "raw_fresh_for_insert lp (ring xs) p",
+        "sentinel_key": "raw_sentinel_max (hrs_mem (t_hrs_' s)) lp"
+      },
+      "supporting_layer_ids": [
+        "Raw-R6-ordered-insert-empty-source"
+      ],
+      "source_effect_theorem": "raw_vListInsert_ordered_empty_heap_effect",
+      "theorem": "raw_vListInsert_ordered_empty_refines",
+      "corollaries": [
+        "raw_vListInsert_ordered_empty_refines_ordered",
+        "raw_vListInsert_ordered_empty_max_refines"
+      ],
+      "theory": "theories/list_raw_r6_ordered_insert_empty_refinement/List_V611_Raw_R6_Ordered_Insert_Empty_Refinement.thy",
+      "theory_sha256": "8319D39955FACD488B1409C1CFABBC021E8332A3A3F52645C4A88BDE50413806",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Ordered_Insert_Empty_Refinement",
+      "run_id": "20260731Tlist-raw-r6oier-03-key-let",
+      "development_cost": {
+        "checker_calls": 3,
+        "checker_green": 1,
+        "elapsed_seconds": 167.993,
+        "final_elapsed_seconds": 89.835
+      },
+      "status_file": "runs/20260731Tlist-raw-r6oier-03-key-let/status.txt",
+      "status_sha256": "69B11F9B55CF4518EC6B570D5F085C81AC7629E0CABB6118E935A9B3EBCBC265",
+      "stdout_file": "runs/20260731Tlist-raw-r6oier-03-key-let/stdout.log",
+      "stdout_sha256": "91801D97F2C08C506E3BC75753C3AADE4846B5902DEB05D2DD77BCC497F8F0CB",
+      "is_source_to_abstract_refinement": true
+    }
+  ],
+  "official_source_hashes": {
+    "Source/tasks.c": "0A5B6C12AEA6FAE2A951C0E80BDC301C646EF8C6360D574A2C4699D4C33A45BF",
+    "Source/list.c": "EEAD2C4F6AEB2DA0CF4A5606EC4A213EF492B09C12DF1A0097B6442688C82ABB",
+    "Source/include/list.h": "3187F4C359EB301A1FE55B449979CEF6053B4AA984F033CE17B8C1EA0BBA7306",
+    "Source/include/task.h": "BE6492FB22F656DEE420F130F177E38F919D879BF22697E7C645A83714CEB24D",
+    "Source/include/FreeRTOS.h": "A7C648098F7E872070ED798060BC2049AB921094424508D0D07EC9D43F1AFB23",
+    "Source/include/portable.h": "403DD8519478C8D43E8D5EF2C83D118B2CB1813403A65EDEF2B79E5B5C47DF61",
+    "Source/include/mpu_wrappers.h": "33FB90D4DA3C4A06C1DFEBED02AA0383BE3DD7206563CCE1040AC35C7BE282E0",
+    "Source/include/projdefs.h": "5541E1DF93C679BBEBF89FA503D45F639E8D01C6FF9379FE40CB5464B41AC1E8",
+    "Source/include/StackMacros.h": "AA011C72331CFB782964EF5749492D91FFD7F230EC2B8A028E90958A2F9005DE"
+  },
+  "active_configuration": {
+    "semantic_slice": {
+      "INCLUDE_vTaskDelayUntil": 1,
+      "INCLUDE_vTaskDelay": 1,
+      "configUSE_TRACE_FACILITY": 0,
+      "configGENERATE_RUN_TIME_STATS": 0,
+      "configCHECK_FOR_STACK_OVERFLOW": 0,
+      "configUSE_TICK_HOOK": 0,
+      "portUSING_MPU_WRAPPERS": 0,
+      "configUSE_16_BIT_TICKS": 0
+    },
+    "proof_environment_additions": {
+      "configUSE_PREEMPTION": {
+        "value": 1,
+        "evidence_file": "proof_port/scheduler/FreeRTOSConfig.h"
+      },
+      "configMAX_PRIORITIES": {
+        "value": 4,
+        "evidence_file": "proof_port/scheduler/FreeRTOSConfig.h"
+      }
+    }
+  },
+  "required_operation_sets": {
+    "frozen_roots": [
+      "vTaskDelayUntil",
+      "vTaskDelay",
+      "vTaskIncrementTick",
+      "vTaskSwitchContext",
+      "xTaskGetTickCount"
+    ],
+    "internal_helpers": [
+      "vTaskSuspendAll",
+      "xTaskResumeAll"
+    ],
+    "list_operations": [
+      "vListInitialise",
+      "vListInitialiseItem",
+      "vListInsertEnd",
+      "vListInsert",
+      "vListRemove"
+    ]
+  },
+  "macro_catalog": {
+    "MAC-PORT-MAX-DELAY": {
+      "name": "portMAX_DELAY",
+      "active_effect": "32-bit tick maximum 0xffffffffUL",
+      "evidence": {
+        "file": "proof_port/scheduler/portmacro.h",
+        "line_range": "16-20"
+      }
+    },
+    "MAC-PORT-ENTER": {
+      "name": "portENTER_CRITICAL",
+      "active_effect": "call eal6_port_enter_critical",
+      "evidence": {
+        "file": "proof_port/scheduler/portmacro.h",
+        "line_range": "35"
+      }
+    },
+    "MAC-PORT-EXIT": {
+      "name": "portEXIT_CRITICAL",
+      "active_effect": "call eal6_port_exit_critical",
+      "evidence": {
+        "file": "proof_port/scheduler/portmacro.h",
+        "line_range": "36"
+      }
+    },
+    "MAC-PORT-YIELD-WITHIN-API": {
+      "name": "portYIELD_WITHIN_API",
+      "active_effect": "portYIELD, mapped by the scheduler proof port to eal6_port_yield",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "413-415"
+      }
+    },
+    "MAC-PORT-YIELD": {
+      "name": "portYIELD",
+      "active_effect": "call eal6_port_yield",
+      "evidence": {
+        "file": "proof_port/scheduler/portmacro.h",
+        "line_range": "39"
+      }
+    },
+    "MAC-LIST-SET-VALUE": {
+      "name": "listSET_LIST_ITEM_VALUE",
+      "active_effect": "write xItemValue",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/list.h",
+        "line_range": "142"
+      }
+    },
+    "MAC-LIST-HEAD-OWNER": {
+      "name": "listGET_OWNER_OF_HEAD_ENTRY",
+      "active_effect": "read the owner of sentinel-next, or NULL for an empty list",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/list.h",
+        "line_range": "217"
+      }
+    },
+    "MAC-LIST-IS-EMPTY": {
+      "name": "listLIST_IS_EMPTY",
+      "active_effect": "compare uxNumberOfItems with zero",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/list.h",
+        "line_range": "161"
+      }
+    },
+    "MAC-LIST-NEXT-OWNER": {
+      "name": "listGET_OWNER_OF_NEXT_ENTRY",
+      "active_effect": "advance pxIndex past the sentinel and return the selected owner",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/list.h",
+        "line_range": "187-198"
+      }
+    },
+    "MAC-ADD-READY": {
+      "name": "prvAddTaskToReadyQueue",
+      "active_effect": "insert a TCB generic item at the end of its priority ready list",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/tasks.c",
+        "line_range": "250-257"
+      }
+    },
+    "MAC-CHECK-DELAYED": {
+      "name": "prvCheckDelayedTasks",
+      "active_effect": "remove every expired delayed item and append its TCB to a ready list",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/tasks.c",
+        "line_range": "268-286"
+      }
+    },
+    "MAC-TRACE-DELAY-UNTIL": {
+      "name": "traceTASK_DELAY_UNTIL",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "355-357"
+      }
+    },
+    "MAC-TRACE-DELAY": {
+      "name": "traceTASK_DELAY",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "359-361"
+      }
+    },
+    "MAC-TRACE-INCREMENT": {
+      "name": "traceTASK_INCREMENT_TICK",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "379-381"
+      }
+    },
+    "MAC-TRACE-SWITCH-IN": {
+      "name": "traceTASK_SWITCHED_IN",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "229-233"
+      }
+    },
+    "MAC-TRACE-SWITCH-OUT": {
+      "name": "traceTASK_SWITCHED_OUT",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+        "line_range": "235-239"
+      }
+    },
+    "MAC-TRACE-BUFFER": {
+      "name": "vWriteTraceToBuffer",
+      "active_effect": "empty because configUSE_TRACE_FACILITY=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/tasks.c",
+        "line_range": "212-240"
+      }
+    },
+    "MAC-STACK-CHECK-FIRST": {
+      "name": "taskFIRST_CHECK_FOR_STACK_OVERFLOW",
+      "active_effect": "empty because configCHECK_FOR_STACK_OVERFLOW=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/StackMacros.h",
+        "line_range": "73-79"
+      }
+    },
+    "MAC-STACK-CHECK-SECOND": {
+      "name": "taskSECOND_CHECK_FOR_STACK_OVERFLOW",
+      "active_effect": "empty because configCHECK_FOR_STACK_OVERFLOW=0",
+      "evidence": {
+        "file": "upstream/FreeRTOSV6.1.1/Source/include/StackMacros.h",
+        "line_range": "73-79"
+      }
+    }
+  },
+  "abstract_operation_catalog": {
+    "list_insert_end_abs": {
+      "theory": "theories/model/XList_Model_Definitions.thy",
+      "meaning": "insert after the cursor and move the cursor to the inserted item"
+    },
+    "list_insert_ordered_abs": {
+      "theory": "theories/model/XList_Model_Definitions.thy",
+      "meaning": "stable nondecreasing insertion from the sentinel view"
+    },
+    "list_remove_abs": {
+      "theory": "theories/model/XList_Model_Definitions.thy",
+      "meaning": "remove one item and repair the cursor with its predecessor"
+    },
+    "task_delay_until_abs": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "pure quiescent endpoint model for periodic delay at the nominal wake time"
+    },
+    "task_delay_abs": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "pure quiescent endpoint model for relative task delay"
+    },
+    "task_increment_tick_abs": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "pure tick endpoint model including delayed-role swap on wrap"
+    },
+    "task_switch_context_abs": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "pure priority selection and cursor-relative round-robin endpoint model"
+    },
+    "task_get_tick_abs": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "pure tick query returning the current tick without changing state"
+    }
+  },
+  "invariant_catalog": {
+    "xlist_wf": {
+      "theory": "theories/model/XList_Model_Definitions.thy",
+      "meaning": "ring identifiers are distinct and an item cursor belongs to the ring"
+    },
+    "ordered_keys": {
+      "theory": "theories/model/XList_Model_Invariants.thy",
+      "meaning": "the sentinel-view item-key sequence is nondecreasing"
+    },
+    "core_wf": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "conjunction of scheduler ring shape, delayed-role, membership, time, ready-cache, and current-task invariants"
+    },
+    "settled_wf": {
+      "theory": "theories/scheduler_abs_model/Scheduler_Abstract_Model.thy",
+      "meaning": "core scheduler invariant strengthened with no pending-ready or missed-tick debt at an API boundary"
+    }
+  },
+  "operations": [
+    {
+      "id": "ROOT-DELAY-UNTIL",
+      "name": "vTaskDelayUntil",
+      "role": "frozen_root",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "604-674",
+        "enclosing_slice_range": "602-676"
+      },
+      "active_configuration": [
+        "INCLUDE_vTaskDelayUntil",
+        "configUSE_TRACE_FACILITY",
+        "configUSE_16_BIT_TICKS"
+      ],
+      "active_macros": [
+        "MAC-TRACE-DELAY-UNTIL",
+        "MAC-LIST-SET-VALUE",
+        "MAC-PORT-YIELD-WITHIN-API",
+        "MAC-PORT-YIELD"
+      ],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vTaskDelayUntil'_def",
+          "theories": ["theories/scheduler_roots/Scheduler_V611_Roots_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Roots",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-roots-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-roots-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "model_scope": "pure_endpoint_definition_no_source_relation",
+          "operation_ids": ["task_delay_until_abs"],
+          "invariant_ids": [],
+          "theorems": ["task_delay_until_commits_nominal_wake"],
+          "theories": ["theories/scheduler_abs_model/Scheduler_Abstract_Model.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tscheduler-abs-05-let-def",
+            "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "suspended_no_delay_scheduler_boundary",
+          "general_operation_refinement": false,
+          "relation_ids": ["scheduler_control_rel"],
+          "theorems": ["vTaskDelayUntil_suspended_no_delay_refines"],
+          "theories": [
+            "theories/scheduler_delay_until_no_delay_refinement/Scheduler_V611_Delay_Until_No_Delay_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Until_No_Delay_Refinement",
+          "boundary_conditions": {
+            "source_suspend_depth": 1,
+            "internal_suspend_resume_depth": "1 -> 2 -> 1",
+            "eal6_port_critical_depth_'": 0,
+            "eal6_port_interrupts_disabled_'": 0,
+            "previous_pointer_guard": true,
+            "should_delay_until": false,
+            "scheduler_yield_count_no_wrap": true,
+            "abstract_wake_result": "previous + increment",
+            "abstract_state_effect": "sa_yield_count := Suc sa_yield_count",
+            "current_task_blocked": false,
+            "list_migration": false,
+            "proof_port_yield_count_increment": 1
+          },
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tscheduler-delay-until-nodelay-08-readback",
+            "status_file": "runs/20260731Tscheduler-delay-until-nodelay-08-readback/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "ROOT-DELAY",
+      "name": "vTaskDelay",
+      "role": "frozen_root",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "681-735",
+        "enclosing_slice_range": "679-737"
+      },
+      "active_configuration": [
+        "INCLUDE_vTaskDelay",
+        "configUSE_TRACE_FACILITY",
+        "configUSE_16_BIT_TICKS"
+      ],
+      "active_macros": [
+        "MAC-TRACE-DELAY",
+        "MAC-LIST-SET-VALUE",
+        "MAC-PORT-YIELD-WITHIN-API",
+        "MAC-PORT-YIELD"
+      ],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vTaskDelay'_def",
+          "theories": ["theories/scheduler_delay/Scheduler_V611_Delay_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-delay-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-delay-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "model_scope": "pure_endpoint_definition_no_source_relation",
+          "operation_ids": ["task_delay_abs"],
+          "invariant_ids": [],
+          "theorems": ["task_delay_zero"],
+          "supporting_layer_ids": ["Scheduler-P2"],
+          "theories": ["theories/scheduler_abs_model/Scheduler_Abstract_Model.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tscheduler-abs-05-let-def",
+            "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "zero_delay_no_wrap_scheduler_control_boundary",
+          "general_operation_refinement": false,
+          "relation_ids": ["scheduler_control_rel"],
+          "theorems": ["vTaskDelay_zero_refines"],
+          "theories": [
+            "theories/scheduler_delay_zero_refinement/Scheduler_V611_Delay_Zero_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement",
+          "boundary_conditions": {
+            "delay_argument": 0,
+            "scheduler_yield_count_no_wrap": true,
+            "source_effect": "eal6_port_yield_count_' := eal6_port_yield_count_' + 1",
+            "abstract_effect": "sa_yield_count := Suc sa_yield_count",
+            "scheduler_suspend_protocol": false,
+            "current_tcb_access": false,
+            "list_access": false
+          },
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tscheduler-delay-zero-02-vcg-solved",
+            "status_file": "runs/20260731Tscheduler-delay-zero-02-vcg-solved/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "ROOT-INCREMENT-TICK",
+      "name": "vTaskIncrementTick",
+      "role": "frozen_root",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "1397-1450",
+        "enclosing_slice_range": "1397-1450"
+      },
+      "active_configuration": [
+        "configUSE_TICK_HOOK",
+        "configUSE_TRACE_FACILITY",
+        "configUSE_16_BIT_TICKS"
+      ],
+      "active_macros": [
+        "MAC-CHECK-DELAYED",
+        "MAC-TRACE-INCREMENT"
+      ],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vTaskIncrementTick'_def",
+          "theories": ["theories/scheduler_delay/Scheduler_V611_Delay_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-delay-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-delay-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "model_scope": "pure_endpoint_definition_no_source_relation",
+          "operation_ids": ["task_increment_tick_abs"],
+          "invariant_ids": [],
+          "theorems": ["task_increment_tick_while_suspended"],
+          "theories": ["theories/scheduler_abs_model/Scheduler_Abstract_Model.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tscheduler-abs-05-let-def",
+            "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "suspended_no_wrap_scheduler_control_boundary",
+          "general_operation_refinement": false,
+          "relation_ids": ["scheduler_control_rel"],
+          "theorems": ["vTaskIncrementTick_suspended_refines"],
+          "theories": [
+            "theories/scheduler_increment_tick_suspended_refinement/Scheduler_V611_Increment_Tick_Suspended_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Increment_Tick_Suspended_Refinement",
+          "boundary_conditions": {
+            "sa_suspend_depth": "nonzero",
+            "uxSchedulerSuspended_'": "nonzero",
+            "scheduler_missed_tick_no_wrap": true,
+            "source_effect": "uxMissedTicks_' := uxMissedTicks_' + 1",
+            "abstract_effect": "sa_missed_ticks := Suc sa_missed_ticks",
+            "committed_tick_changed": false,
+            "delayed_list_access": false
+          },
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tscheduler-increment-tick-suspended-01",
+            "status_file": "runs/20260731Tscheduler-increment-tick-suspended-01/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "ROOT-SWITCH-CONTEXT",
+      "name": "vTaskSwitchContext",
+      "role": "frozen_root",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "1593-1640",
+        "enclosing_slice_range": "1593-1640"
+      },
+      "active_configuration": [
+        "configUSE_TRACE_FACILITY",
+        "configGENERATE_RUN_TIME_STATS",
+        "configCHECK_FOR_STACK_OVERFLOW",
+        "configMAX_PRIORITIES"
+      ],
+      "active_macros": [
+        "MAC-TRACE-SWITCH-OUT",
+        "MAC-TRACE-SWITCH-IN",
+        "MAC-TRACE-BUFFER",
+        "MAC-STACK-CHECK-FIRST",
+        "MAC-STACK-CHECK-SECOND",
+        "MAC-LIST-IS-EMPTY",
+        "MAC-LIST-NEXT-OWNER"
+      ],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vTaskSwitchContext'_def",
+          "theories": ["theories/scheduler_roots/Scheduler_V611_Roots_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Roots",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-roots-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-roots-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "model_scope": "pure_endpoint_definition_no_source_relation",
+          "operation_ids": ["task_switch_context_abs"],
+          "invariant_ids": [],
+          "theorems": ["task_switch_context_while_suspended"],
+          "theories": ["theories/scheduler_abs_model/Scheduler_Abstract_Model.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tscheduler-abs-05-let-def",
+            "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "suspended_scheduler_control_boundary",
+          "general_operation_refinement": false,
+          "relation_ids": ["scheduler_control_rel"],
+          "theorems": ["vTaskSwitchContext_suspended_refines"],
+          "theories": [
+            "theories/scheduler_switch_suspended_refinement/Scheduler_V611_Switch_Suspended_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Switch_Suspended_Refinement",
+          "boundary_conditions": {
+            "sa_suspend_depth": "nonzero",
+            "uxSchedulerSuspended_'": "nonzero",
+            "source_effect": "xMissedYield_' := 1",
+            "abstract_effect": "sa_missed_yield := True",
+            "ready_list_access": false,
+            "proof_port_yield": false
+          },
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tscheduler-switch-suspended-01",
+            "status_file": "runs/20260731Tscheduler-switch-suspended-01/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "ROOT-GET-TICK",
+      "name": "xTaskGetTickCount",
+      "role": "frozen_root",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "1188-1200",
+        "enclosing_slice_range": "1188-1200"
+      },
+      "active_configuration": ["configUSE_16_BIT_TICKS"],
+      "active_macros": ["MAC-PORT-ENTER", "MAC-PORT-EXIT"],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "xTaskGetTickCount'_def",
+          "theories": ["theories/scheduler_tick/Scheduler_V611_Tick_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Tick",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-tick-02-raw-heap",
+            "status_file": "runs/20260731Tscheduler-tick-02-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "model_scope": "pure_endpoint_definition_no_source_relation",
+          "operation_ids": ["task_get_tick_abs"],
+          "invariant_ids": [],
+          "theorems": [
+            "task_get_tick_abs_result",
+            "task_get_tick_abs_frames_state"
+          ],
+          "theories": ["theories/scheduler_abs_model/Scheduler_Abstract_Model.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Abstract_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tscheduler-abs-05-let-def",
+            "status_file": "runs/20260731Tscheduler-abs-05-let-def/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "quiescent_tick_read_boundary",
+          "general_operation_refinement": false,
+          "relation_ids": ["scheduler_tick_boundary_rel"],
+          "theorems": ["xTaskGetTickCount_refines"],
+          "theories": [
+            "theories/scheduler_tick_refinement/Scheduler_V611_Tick_Read_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Tick_Read_Refinement",
+          "boundary_conditions": {
+            "eal6_port_critical_depth_'": 0,
+            "eal6_port_interrupts_disabled_'": 0,
+            "committed_tick_equality": "xTickCount_' = sa_tick",
+            "returned_value": "committed_tick",
+            "excluded_value": "sa_missed_ticks"
+          },
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tscheduler-tick-refine-03-explicit-model-op",
+            "status_file": "runs/20260731Tscheduler-tick-refine-03-explicit-model-op/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "HELPER-SUSPEND-ALL",
+      "name": "vTaskSuspendAll",
+      "role": "internal_helper",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "1098-1103",
+        "enclosing_slice_range": "1098-1103"
+      },
+      "active_configuration": [],
+      "active_macros": [],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vTaskSuspendAll'_def",
+          "theories": ["theories/scheduler_delay/Scheduler_V611_Delay_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-delay-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-delay-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "not_modelled",
+          "operation_ids": [],
+          "invariant_ids": [],
+          "theorems": [],
+          "evidence": null
+        },
+        "refined": {
+          "status": "not_started",
+          "relation_ids": [],
+          "theorems": [],
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "HELPER-RESUME-ALL",
+      "name": "xTaskResumeAll",
+      "role": "internal_helper",
+      "source": {
+        "file": "Source/tasks.c",
+        "definition_range": "1106-1175",
+        "enclosing_slice_range": "1106-1175"
+      },
+      "active_configuration": [
+        "configUSE_PREEMPTION",
+        "configMAX_PRIORITIES"
+      ],
+      "active_macros": [
+        "MAC-PORT-ENTER",
+        "MAC-PORT-EXIT",
+        "MAC-LIST-HEAD-OWNER",
+        "MAC-ADD-READY",
+        "MAC-PORT-YIELD-WITHIN-API",
+        "MAC-PORT-YIELD"
+      ],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "xTaskResumeAll'_def",
+          "theories": ["theories/scheduler_delay/Scheduler_V611_Delay_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_Scheduler_Delay",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tscheduler-delay-01-raw-heap",
+            "status_file": "runs/20260731Tscheduler-delay-01-raw-heap/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "not_modelled",
+          "operation_ids": [],
+          "invariant_ids": [],
+          "theorems": [],
+          "evidence": null
+        },
+        "refined": {
+          "status": "not_started",
+          "relation_ids": [],
+          "theorems": [],
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "LIST-INITIALISE",
+      "name": "vListInitialise",
+      "role": "list_operation",
+      "source": {
+        "file": "Source/list.c",
+        "definition_range": "63-80",
+        "enclosing_slice_range": "63-80"
+      },
+      "active_configuration": ["configUSE_16_BIT_TICKS"],
+      "active_macros": ["MAC-PORT-MAX-DELAY"],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vListInitialise'_def",
+          "theories": ["theories/list_smoke/List_V611_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_List_Smoke",
+          "warnings": ["field_lvalue was not eliminated; translation may be unprovable"],
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tlist-smoke-12-final",
+            "status_file": "runs/20260731Tlist-smoke-12-final/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "not_modelled",
+          "operation_ids": [],
+          "invariant_ids": [],
+          "theorems": [],
+          "evidence": null
+        },
+        "refined": {
+          "status": "not_started",
+          "relation_ids": [],
+          "theorems": [],
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "LIST-INITIALISE-ITEM",
+      "name": "vListInitialiseItem",
+      "role": "list_operation",
+      "source": {
+        "file": "Source/list.c",
+        "definition_range": "83-87",
+        "enclosing_slice_range": "83-87"
+      },
+      "active_configuration": [],
+      "active_macros": [],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vListInitialiseItem'_def",
+          "theories": ["theories/list_smoke/List_V611_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_List_Smoke",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tlist-smoke-12-final",
+            "status_file": "runs/20260731Tlist-smoke-12-final/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "not_modelled",
+          "operation_ids": [],
+          "invariant_ids": [],
+          "theorems": [],
+          "evidence": null
+        },
+        "refined": {
+          "status": "not_started",
+          "relation_ids": [],
+          "theorems": [],
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "LIST-INSERT-END",
+      "name": "vListInsertEnd",
+      "role": "list_operation",
+      "source": {
+        "file": "Source/list.c",
+        "definition_range": "90-110",
+        "enclosing_slice_range": "90-110"
+      },
+      "active_configuration": [],
+      "active_macros": [],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vListInsertEnd'_def",
+          "theories": ["theories/list_smoke/List_V611_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_List_Smoke",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tlist-smoke-12-final",
+            "status_file": "runs/20260731Tlist-smoke-12-final/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "operation_ids": ["list_insert_end_abs"],
+          "invariant_ids": ["xlist_wf"],
+          "theorems": ["list_insert_end_preserves_wf"],
+          "theories": [
+            "theories/model/XList_Model_Definitions.thy",
+            "theories/model/XList_Model_Invariants.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tmodel-13-sequential",
+            "status_file": "runs/20260731Tmodel-13-sequential/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "general_N_fresh_insert_end",
+          "general_operation_refinement": true,
+          "relation_ids": ["raw_xlist_rel"],
+          "theorems": [
+            "raw_vListInsertEnd_empty_refines",
+            "raw_vListInsertEnd_general_refines_via_transformer"
+          ],
+          "theories": [
+            "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+            "theories/list_raw_r6_insert_source_effects/List_V611_Raw_R6_Insert_Source_Effects.thy",
+            "theories/list_raw_r6_insert_post_transformer/List_V611_Raw_R6_Insert_Post_Transformer.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Insert_Post_Transformer",
+          "refinement_cases": [
+            {
+              "rung_id": "Raw-R5",
+              "scope": "fixed_empty_to_singleton",
+              "general_operation_refinement": false,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R5_Relation",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tlist-raw-r5-10-show-thesis",
+                "status_file": "runs/20260731Tlist-raw-r5-10-show-thesis/status.txt"
+              }
+            },
+            {
+              "rung_id": "Raw-R6-insert-general",
+              "scope": "general_N_fresh_insert_end",
+              "general_operation_refinement": true,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Insert_Post_Transformer",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tlist-raw-r6ipt-04-where-spacing",
+                "status_file": "runs/20260731Tlist-raw-r6ipt-04-where-spacing/status.txt"
+              }
+            }
+          ],
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tlist-raw-r6ipt-04-where-spacing",
+            "status_file": "runs/20260731Tlist-raw-r6ipt-04-where-spacing/status.txt"
+          },
+          "blocked_encoding_routes": [
+            {
+              "encoding_route": "split_heap",
+              "theorems": [
+                "m0_vListInsertEnd_at_sentinel_runs_to_top",
+                "m0_vListInsertEnd_at_sentinel_has_no_run"
+              ],
+              "theories": ["theories/m0_bridge/M0_List_Bridge.thy"],
+              "session": "EAL6_FreeRTOS_V611_M0_Bridge",
+              "run_id": "20260731Tm0-bridge-07-operational-top",
+              "status_file": "runs/20260731Tm0-bridge-07-operational-top/status.txt"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "LIST-INSERT-ORDERED",
+      "name": "vListInsert",
+      "role": "list_operation",
+      "source": {
+        "file": "Source/list.c",
+        "definition_range": "113-167",
+        "enclosing_slice_range": "113-167"
+      },
+      "active_configuration": ["configUSE_16_BIT_TICKS"],
+      "active_macros": ["MAC-PORT-MAX-DELAY"],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vListInsert'_def",
+          "theories": ["theories/list_smoke/List_V611_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_List_Smoke",
+          "warnings": ["field_lvalue was not eliminated; translation may be unprovable"],
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tlist-smoke-12-final",
+            "status_file": "runs/20260731Tlist-smoke-12-final/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "operation_ids": ["list_insert_ordered_abs"],
+          "invariant_ids": ["xlist_wf", "ordered_keys"],
+          "theorems": [
+            "list_insert_ordered_preserves_wf",
+            "list_insert_ordered_is_sorted"
+          ],
+          "theories": [
+            "theories/model/XList_Model_Definitions.thy",
+            "theories/model/XList_Model_Invariants.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tmodel-13-sequential",
+            "status_file": "runs/20260731Tmodel-13-sequential/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "restricted_empty_list_ordered_insert",
+          "general_operation_refinement": false,
+          "relation_ids": ["raw_xlist_rel", "raw_ordered_xlist_rel"],
+          "theorems": ["raw_vListInsert_ordered_empty_refines"],
+          "corollaries": [
+            "raw_vListInsert_ordered_empty_refines_ordered",
+            "raw_vListInsert_ordered_empty_max_refines"
+          ],
+          "theories": [
+            "theories/list_raw_r6_ordered_insert_empty_source/List_V611_Raw_R6_Ordered_Insert_Empty_Source.thy",
+            "theories/list_raw_r6_ordered_insert_empty_refinement/List_V611_Raw_R6_Ordered_Insert_Empty_Refinement.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Ordered_Insert_Empty_Refinement",
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tlist-raw-r6oier-03-key-let",
+            "status_file": "runs/20260731Tlist-raw-r6oier-03-key-let/status.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "LIST-REMOVE",
+      "name": "vListRemove",
+      "role": "list_operation",
+      "source": {
+        "file": "Source/list.c",
+        "definition_range": "170-189",
+        "enclosing_slice_range": "170-189"
+      },
+      "active_configuration": [],
+      "active_macros": [],
+      "stages": {
+        "translated": {
+          "status": "checker_green",
+          "generated_definition": "vListRemove'_def",
+          "theories": ["theories/list_smoke/List_V611_Translation.thy"],
+          "session": "EAL6_FreeRTOS_V611_List_Smoke",
+          "evidence": {
+            "kind": "translation_smoke",
+            "run_id": "20260731Tlist-smoke-12-final",
+            "status_file": "runs/20260731Tlist-smoke-12-final/status.txt"
+          }
+        },
+        "abstract_model": {
+          "status": "checker_green",
+          "operation_ids": ["list_remove_abs"],
+          "invariant_ids": ["xlist_wf"],
+          "theorems": ["list_remove_preserves_wf"],
+          "theories": [
+            "theories/model/XList_Model_Definitions.thy",
+            "theories/model/XList_Model_Invariants.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_Model",
+          "evidence": {
+            "kind": "abstract_model_proof",
+            "run_id": "20260731Tmodel-13-sequential",
+            "status_file": "runs/20260731Tmodel-13-sequential/status.txt"
+          }
+        },
+        "refined": {
+          "status": "checker_green",
+          "encoding_route": "raw_heap_skip_heap_abs",
+          "scope": "general_N_member_remove",
+          "general_operation_refinement": true,
+          "relation_ids": ["raw_xlist_rel"],
+          "theorems": [
+            "raw_vListRemove_singleton_refines",
+            "raw_vListRemove_general_refines",
+            "raw_vListRemove_insert_end_general_refines"
+          ],
+          "theories": [
+            "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+            "theories/list_raw_r5_remove_prestate/List_V611_Raw_R5_Remove_Prestate.thy",
+            "theories/list_raw_r5_remove_refinement/List_V611_Raw_R5_Remove_Refinement.thy",
+            "theories/list_raw_r6_remove_general_refinement/List_V611_Raw_R6_Remove_General_Refinement.thy",
+            "theories/list_raw_r6_remove_insert_sequence/List_V611_Raw_R6_Remove_Insert_Sequence.thy"
+          ],
+          "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_General_Refinement",
+          "refinement_cases": [
+            {
+              "rung_id": "Raw-R5-remove",
+              "scope": "fixed_singleton_to_empty",
+              "general_operation_refinement": false,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R5_Remove_Refinement",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tlist-raw-r5r-02-remove-refinement",
+                "status_file": "runs/20260731Tlist-raw-r5r-02-remove-refinement/status.txt"
+              }
+            },
+            {
+              "rung_id": "Raw-R6-remove-general",
+              "scope": "general_N_member_remove",
+              "general_operation_refinement": true,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_General_Refinement",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tlist-raw-r6rgr-01-assemble",
+                "status_file": "runs/20260731Tlist-raw-r6rgr-01-assemble/status.txt"
+              }
+            },
+            {
+              "rung_id": "Raw-R6-remove-insert-sequence",
+              "scope": "general_N_member_remove_then_insert_end",
+              "general_operation_refinement": true,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Insert_Sequence",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tlist-raw-r6ris-07-bind-weaken",
+                "status_file": "runs/20260731Tlist-raw-r6ris-07-bind-weaken/status.txt"
+              }
+            }
+          ],
+          "evidence": {
+            "kind": "refinement_proof",
+            "run_id": "20260731Tlist-raw-r6rgr-01-assemble",
+            "status_file": "runs/20260731Tlist-raw-r6rgr-01-assemble/status.txt"
+          }
+        }
+      }
+    }
+  ],
+  "status_summary": {
+    "translated": {
+      "checker_green": 12
+    },
+    "abstract_model": {
+      "checker_green": 8,
+      "not_modelled": 4
+    },
+    "refined": {
+      "checker_green": 8,
+      "not_started": 4
+    }
+  }
+}

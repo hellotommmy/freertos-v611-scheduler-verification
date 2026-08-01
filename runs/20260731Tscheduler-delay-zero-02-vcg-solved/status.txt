@@ -1,0 +1,11 @@
+run_id=20260731Tscheduler-delay-zero-02-vcg-solved
+session=EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement
+pid=47372
+quick_and_dirty=false
+timeout_seconds=240
+timed_out=false
+exit_code=0
+elapsed_seconds=20.619
+stdout_sha256=A89AD8E92D02B0C8353DD35E1BBC3EEC017EAB5944A6A706C860783E7DCB9EF5
+stderr_sha256=7EB70257593DA06F682A3DDDA54A9D260D4FC514F645237F5CA74B08F8DA61A6
+isabelle_home_user=C:\Users\Chengsong\.isabelle\Isabelle2025-2

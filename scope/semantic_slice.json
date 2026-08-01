@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "status": "conditional_freeze_pending_autocorres_needle",
+  "source_root": "upstream/FreeRTOSV6.1.1",
+  "roots": [
+    "vTaskDelayUntil",
+    "vTaskDelay",
+    "vTaskIncrementTick",
+    "vTaskSwitchContext",
+    "xTaskGetTickCount"
+  ],
+  "internal_closure": [
+    "vTaskSuspendAll",
+    "xTaskResumeAll"
+  ],
+  "configuration": {
+    "INCLUDE_vTaskDelayUntil": 1,
+    "INCLUDE_vTaskDelay": 1,
+    "configUSE_TRACE_FACILITY": 0,
+    "configGENERATE_RUN_TIME_STATS": 0,
+    "configCHECK_FOR_STACK_OVERFLOW": 0,
+    "configUSE_TICK_HOOK": 0,
+    "portUSING_MPU_WRAPPERS": 0,
+    "configUSE_16_BIT_TICKS": 0
+  },
+  "files": {
+    "Source/tasks.c": [
+      "55-57", "62-68", "79-117", "129", "133-138", "154-155",
+      "157", "159-162", "212-240", "250-257", "268-286", "602-676",
+      "679-737", "1098-1103", "1106-1175", "1188-1200", "1397-1450",
+      "1593-1640"
+    ],
+    "Source/list.c": [
+      "55-57", "63-80", "83-87", "90-110", "113-167", "170-189"
+    ],
+    "Source/include/list.h": [
+      "98-124", "142", "152", "161", "187-198", "217", "241", "252",
+      "265", "286", "298"
+    ],
+    "Source/include/task.h": [
+      "64-65", "485", "544", "895", "947", "973", "1172", "1235"
+    ],
+    "Source/include/FreeRTOS.h": [
+      "61", "64", "67", "70", "229-233", "235-239", "355-357",
+      "359-361", "379-381", "413-415"
+    ],
+    "Source/include/portable.h": ["306-308", "338"],
+    "Source/include/mpu_wrappers.h": ["59", "125-131"],
+    "Source/include/projdefs.h": ["60-61"],
+    "Source/include/StackMacros.h": ["73-79"]
+  },
+  "expected_totals": {
+    "physical": 670,
+    "nonblank": 587,
+    "nonblank_noncomment": 458
+  },
+  "separate_whole_tu_footprint": {
+    "physical": 5603,
+    "nonblank": 4660,
+    "nonblank_noncomment": 2274,
+    "system_headers_included": false
+  }
+}

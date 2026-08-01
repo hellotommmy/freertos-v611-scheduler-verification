@@ -1,0 +1,11 @@
+run_id=20260731Tscheduler-abs-05-let-def
+session=EAL6_FreeRTOS_V611_Scheduler_Abstract_Model
+pid=9992
+quick_and_dirty=false
+timeout_seconds=180
+timed_out=false
+exit_code=0
+elapsed_seconds=45.724
+stdout_sha256=CB700CCD88C4901A5E69694C1D2072C0D6A9FE39CF70A7C98C3559CDAB8FAD72
+stderr_sha256=7EB70257593DA06F682A3DDDA54A9D260D4FC514F645237F5CA74B08F8DA61A6
+isabelle_home_user=C:\Users\Chengsong\.isabelle\Isabelle2025-2
