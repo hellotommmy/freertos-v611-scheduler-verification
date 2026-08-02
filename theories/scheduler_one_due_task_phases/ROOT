@@ -1,0 +1,38 @@
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base in "base" =
+  EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+    EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold
+  theories
+    Scheduler_One_Due_Task_Phases_Base
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry in "entry" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Entry
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post in "post" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Post
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated in "generated" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Generated
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases in "." =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases

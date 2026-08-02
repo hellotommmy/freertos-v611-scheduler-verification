@@ -760,6 +760,54 @@ session EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel in "scheduler_task_obs
   theories
     Scheduler_Task_Observation_Rel
 
+session EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold in "scheduler_unlocked_tick_scaffold" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General
+  theories
+    Scheduler_Unlocked_Tick_Scaffold
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base in "scheduler_one_due_task_phases/base" =
+  EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+    EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold
+  theories
+    Scheduler_One_Due_Task_Phases_Base
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry in "scheduler_one_due_task_phases/entry" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Entry
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post in "scheduler_one_due_task_phases/post" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Post
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated in "scheduler_one_due_task_phases/generated" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases_Generated
+
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases in "scheduler_one_due_task_phases" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_One_Due_Task_Phases
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Source in "scheduler_p2_delay_source" = EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   theories
