@@ -1,4 +1,4 @@
-session EAL6_FreeRTOS_V611_List_Smoke in "list_smoke" = AutoCorres2_Main +
+session EAL6_FreeRTOS_V611_List_Smoke in "list_smoke" = AutoCorres2_P2_Layout_Main +
   options [quick_and_dirty = false, timeout = 300]
   theories
     List_V611_Translation
@@ -20,7 +20,7 @@ session EAL6_FreeRTOS_V611_M0_Bridge in "m0_bridge" = EAL6_FreeRTOS_V611_List_Sm
   theories
     M0_List_Bridge
 
-session EAL6_FreeRTOS_V611_List_Raw_Skip in "list_raw_skip" = AutoCorres2_Main +
+session EAL6_FreeRTOS_V611_List_Raw_Skip in "list_raw_skip" = AutoCorres2_P2_Layout_Main +
   options [quick_and_dirty = false, timeout = 300]
   theories
     List_V611_Raw_Skip_Translation
@@ -313,12 +313,12 @@ session EAL6_FreeRTOS_V611_List_Raw_R5_Remove_Refinement in "list_raw_r5_remove_
   theories
     List_V611_Raw_R5_Remove_Refinement
 
-session EAL6_FreeRTOS_V611_List_Raw_Per_Function in "list_raw_per_function" = AutoCorres2_Main +
+session EAL6_FreeRTOS_V611_List_Raw_Per_Function in "list_raw_per_function" = AutoCorres2_P2_Layout_Main +
   options [quick_and_dirty = false, timeout = 300]
   theories
     List_V611_Raw_Per_Function_Translation
 
-session EAL6_FreeRTOS_V611_Scheduler_Parse in "scheduler_parse" = AutoCorres2_Main +
+session EAL6_FreeRTOS_V611_Scheduler_Parse in "scheduler_parse" = AutoCorres2_P2_Layout_Main +
   options [quick_and_dirty = false, timeout = 300]
   theories
     Scheduler_V611_Parse
@@ -480,3 +480,44 @@ session EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Refinement in "scheduler_p2_delay_
     EAL6_FreeRTOS_V611_Scheduler_P2_Post_Relation
   theories
     Scheduler_P2_Delay_Refinement
+
+session EAL6_FreeRTOS_V611_Scheduler_P2_Layout_No_Go in "scheduler_p2_layout_no_go" = EAL6_FreeRTOS_V611_Scheduler_P2_Source_Footprint +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_P2_Layout_No_Go
+
+session EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Root_Probe in "scheduler_p2_frozen_root_probe" = EAL6_FreeRTOS_V611_Scheduler_P2_Generated_Layout_First +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_P2_Frozen_Root_Probe
+
+session EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout in "scheduler_p2_frozen_static_layout" = EAL6_FreeRTOS_V611_Scheduler_P2_Source_Footprint +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Root_Probe
+  theories
+    Scheduler_P2_Frozen_Static_Layout
+
+session EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Dynamic_Geometry in "scheduler_p2_frozen_dynamic_geometry" = EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_P2_Frozen_Dynamic_Geometry
+
+session EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Preimage in "scheduler_p2_frozen_preimage" = EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Dynamic_Geometry +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 180]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Refinement
+  theories
+    Scheduler_P2_Frozen_Preimage
+
+session EAL6_FreeRTOS_V611_List_Raw_R6_Initialise_Insert_Remove_Sequence in "list_raw_r6_initialise_insert_remove_sequence" = EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Insert_Sequence +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    List_V611_Raw_R6_Initialise_Insert_Remove_Sequence
+
+session EAL6_FreeRTOS_V611_Capstone_Assumption_Audit in "capstone_assumption_audit" = EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Preimage +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_List_Raw_R6_Initialise_Insert_Remove_Sequence
+  theories
+    Capstone_Assumption_Audit

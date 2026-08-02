@@ -1,0 +1,372 @@
+
+Merging object attributes
+
+
+Discarded input sections
+
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .note.GNU-stack
+                0x00000000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .group         0x00000000        0xc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000      0x928 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0x46 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0xd0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0x1e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000      0x131 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0x42 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000000       0x56 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .note.GNU-stack
+                0x00000000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00100000                        . = 0x100000
+
+.text           0x00100000     0x14db
+ *(.text)
+ .text          0x00100000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text          0x00100000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ *(SORT_BY_NAME(.text.*))
+ .text.eal6_frozen_entry
+                0x00100000       0x12 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x00100000                eal6_frozen_entry
+ .text.eal6_port_clear_interrupt_mask_from_isr
+                0x00100012        0xe /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100012                eal6_port_clear_interrupt_mask_from_isr
+ .text.eal6_port_disable_interrupts
+                0x00100020       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100020                eal6_port_disable_interrupts
+ .text.eal6_port_enable_interrupts
+                0x00100030       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100030                eal6_port_enable_interrupts
+ .text.eal6_port_enter_critical
+                0x00100040       0x1d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100040                eal6_port_enter_critical
+ .text.eal6_port_exit_critical
+                0x0010005d       0x2f /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010005d                eal6_port_exit_critical
+ .text.eal6_port_set_interrupt_mask_from_isr
+                0x0010008c       0x1d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010008c                eal6_port_set_interrupt_mask_from_isr
+ .text.eal6_port_yield
+                0x001000a9       0x13 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001000a9                eal6_port_yield
+ .text.memset   0x001000bc       0x33 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x001000bc                memset
+ .text.prvAllocateTCBAndStack
+                0x001000ef       0x90 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.prvCheckTasksWaitingTermination
+                0x0010017f       0x9c /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.prvDeleteTCB
+                0x0010021b       0x29 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.prvIdleTask
+                0x00100244       0x1c /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.prvInitialiseTCBVariables
+                0x00100260       0x8a /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.prvInitialiseTaskLists
+                0x001002ea       0x9e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .text.pvPortMalloc
+                0x00100388        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x00100388                pvPortMalloc
+ .text.pxPortInitialiseStack
+                0x00100392        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x00100392                pxPortInitialiseStack
+ .text.strncpy  0x0010039c       0x61 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x0010039c                strncpy
+ .text.uxTaskGetNumberOfTasks
+                0x001003fd        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001003fd                uxTaskGetNumberOfTasks
+ .text.uxTaskPriorityGet
+                0x00100407       0x34 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100407                uxTaskPriorityGet
+ .text.vListInitialise
+                0x0010043b       0x3d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010043b                vListInitialise
+ .text.vListInitialiseItem
+                0x00100478       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100478                vListInitialiseItem
+ .text.vListInsert
+                0x00100488       0x83 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100488                vListInsert
+ .text.vListInsertEnd
+                0x0010050b       0x5e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010050b                vListInsertEnd
+ .text.vListRemove
+                0x00100569       0x5e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100569                vListRemove
+ .text.vPortEndScheduler
+                0x001005c7        0x6 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x001005c7                vPortEndScheduler
+ .text.vPortFree
+                0x001005cd        0x6 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x001005cd                vPortFree
+ .text.vPortInitialiseBlocks
+                0x001005d3        0x6 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x001005d3                vPortInitialiseBlocks
+ .text.vTaskCleanUpResources
+                0x001005d9      0x1ff /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001005d9                vTaskCleanUpResources
+ .text.vTaskDelay
+                0x001007d8       0x9b /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001007d8                vTaskDelay
+ .text.vTaskDelayUntil
+                0x00100873       0xe9 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100873                vTaskDelayUntil
+ .text.vTaskDelete
+                0x0010095c       0xad /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010095c                vTaskDelete
+ .text.vTaskEndScheduler
+                0x00100a09       0x1d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100a09                vTaskEndScheduler
+ .text.vTaskIncrementTick
+                0x00100a26      0x100 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100a26                vTaskIncrementTick
+ .text.vTaskMissedYield
+                0x00100b26       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100b26                vTaskMissedYield
+ .text.vTaskPlaceOnEventList
+                0x00100b36       0xae /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100b36                vTaskPlaceOnEventList
+ .text.vTaskPrioritySet
+                0x00100be4      0x11c /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100be4                vTaskPrioritySet
+ .text.vTaskResume
+                0x00100d00       0xad /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100d00                vTaskResume
+ .text.vTaskSetTimeOutState
+                0x00100dad       0x1d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100dad                vTaskSetTimeOutState
+ .text.vTaskStartScheduler
+                0x00100dca       0x51 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100dca                vTaskStartScheduler
+ .text.vTaskSuspend
+                0x00100e1b       0xb0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100e1b                vTaskSuspend
+ .text.vTaskSuspendAll
+                0x00100ecb       0x13 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100ecb                vTaskSuspendAll
+ .text.vTaskSwitchContext
+                0x00100ede       0x99 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100ede                vTaskSwitchContext
+ .text.xPortGetFreeHeapSize
+                0x00100f77        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x00100f77                xPortGetFreeHeapSize
+ .text.xPortStartScheduler
+                0x00100f81        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                0x00100f81                xPortStartScheduler
+ .text.xTaskCheckForTimeOut
+                0x00100f8b       0x9f /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00100f8b                xTaskCheckForTimeOut
+ .text.xTaskGenericCreate
+                0x0010102a      0x189 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010102a                xTaskGenericCreate
+ .text.xTaskGetTickCount
+                0x001011b3       0x1d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001011b3                xTaskGetTickCount
+ .text.xTaskGetTickCountFromISR
+                0x001011d0        0xa /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001011d0                xTaskGetTickCountFromISR
+ .text.xTaskIsTaskSuspended
+                0x001011da       0x43 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001011da                xTaskIsTaskSuspended
+ .text.xTaskRemoveFromEventList
+                0x0010121d       0xd4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010121d                xTaskRemoveFromEventList
+ .text.xTaskResumeAll
+                0x001012f1      0x12e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x001012f1                xTaskResumeAll
+ .text.xTaskResumeFromISR
+                0x0010141f       0xbc /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010141f                xTaskResumeFromISR
+
+.iplt           0x001014db        0x0
+ .iplt          0x001014db        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+
+.rodata         0x001014e0        0x5
+ *(.rodata)
+ .rodata        0x001014e0        0x5 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ *(SORT_BY_NAME(.rodata.*))
+
+.note.gnu.build-id
+                0x001014e8       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x001014e8       0x24 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+
+.rel.dyn        0x0010150c        0x0
+ .rel.got       0x0010150c        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .rel.iplt      0x0010150c        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00102000                        . = ALIGN (0x1000)
+
+.data           0x00102000        0x0
+ *(.data)
+ .data          0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .data          0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ *(SORT_BY_NAME(.data.*))
+
+.got            0x00102000        0x0
+ .got           0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+
+.got.plt        0x00102000        0x0
+ .got.plt       0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+
+.igot.plt       0x00102000        0x0
+ .igot.plt      0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+
+.bss            0x00102000      0x100
+                0x00102000                        __eal6_bss_start = .
+ *(.bss)
+ .bss           0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss           0x00102000        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ *(SORT_BY_NAME(.bss.*))
+ .bss.eal6_frozen_entry_sink
+                0x00102000        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .bss.eal6_port_critical_depth
+                0x00102004        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00102004                eal6_port_critical_depth
+ .bss.eal6_port_interrupts_disabled
+                0x00102008        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00102008                eal6_port_interrupts_disabled
+ .bss.eal6_port_yield_count
+                0x0010200c        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x0010200c                eal6_port_yield_count
+ .bss.pxCurrentTCB
+                0x00102010        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                0x00102010                pxCurrentTCB
+ .bss.pxDelayedTaskList
+                0x00102014        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.pxOverflowDelayedTaskList
+                0x00102018        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ *fill*         0x0010201c        0x4 
+ .bss.pxReadyTasksLists
+                0x00102020       0x50 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxCurrentNumberOfTasks
+                0x00102070        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxMissedTicks
+                0x00102074        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxSchedulerSuspended
+                0x00102078        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxTaskNumber
+                0x0010207c        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxTasksDeleted
+                0x00102080        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxTopReadyPriority
+                0x00102084        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.uxTopUsedPriority
+                0x00102088        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xDelayedTaskList1
+                0x0010208c       0x14 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xDelayedTaskList2
+                0x001020a0       0x14 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xMissedYield
+                0x001020b4        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xNumOfOverflows
+                0x001020b8        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xPendingReadyList
+                0x001020bc       0x14 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xSchedulerRunning
+                0x001020d0        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xSuspendedTaskList
+                0x001020d4       0x14 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xTasksWaitingTermination
+                0x001020e8       0x14 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .bss.xTickCount
+                0x001020fc        0x4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ *(COMMON)
+                0x00102100                        __eal6_bss_end = .
+
+.debug_aranges  0x00000000      0x1d8
+ *(.debug_aranges .debug_aranges.*)
+ .debug_aranges
+                0x00000000      0x170 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_aranges
+                0x00000170       0x68 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.debug_info     0x00000000     0x1590
+ *(.debug_info .debug_info.*)
+ .debug_info    0x00000000     0x1043 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_info    0x00001043      0x54d /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.debug_abbrev   0x00000000      0x495
+ *(.debug_abbrev .debug_abbrev.*)
+ .debug_abbrev  0x00000000      0x300 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_abbrev  0x00000300      0x195 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.debug_line     0x00000000     0x10c3
+ *(.debug_line .debug_line.*)
+ .debug_line    0x00000000      0xda4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_line    0x00000da4      0x31f /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.debug_str      0x00000000     0x55e9
+ *(.debug_str .debug_str.*)
+ .debug_str     0x00000000     0x55e9 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+                               0x54d2 (size before relaxing)
+ .debug_str     0x000055e9        0x0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+                               0x4a6f (size before relaxing)
+
+.debug_loc
+ *(.debug_loc .debug_loc.*)
+
+.debug_ranges   0x00000000      0x1b8
+ *(.debug_ranges .debug_ranges.*)
+ .debug_ranges  0x00000000      0x160 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_ranges  0x00000160       0x58 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.debug_macro    0x00000000      0xf16
+ *(.debug_macro .debug_macro.*)
+ .debug_macro   0x00000000       0xc4 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x000000c4      0x928 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x000009ec       0x10 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x000009fc       0x46 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000a42       0xd0 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000b12       0x94 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000ba6       0x1e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000bc4      0x131 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000cf5       0x42 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000d37       0x56 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000d8d       0x16 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000da3       0x4f /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_macro   0x00000df2       0x96 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+ .debug_macro   0x00000e88       0x8e /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+
+.comment
+ *(.comment)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.eh_frame)
+ *(.eh_frame.*)
+                0x00000001                        ASSERT (((ADDR (.text) & 0xf) == 0x0), text must be 16-byte aligned)
+                0x00000001                        ASSERT (((ADDR (.data) & 0xf) == 0x0), data must be 16-byte aligned)
+                0x00000001                        ASSERT (((ADDR (.bss) & 0xf) == 0x0), bss must be 16-byte aligned)
+LOAD /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+LOAD /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o
+OUTPUT(/workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/frozen_p2_layout.repro.elf elf32-i386)
+
+.debug_frame    0x00000000      0x6c0
+ .debug_frame   0x00000000      0x574 /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/scheduler_translation_unit.o
+ .debug_frame   0x00000574      0x14c /workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/link_stubs.o

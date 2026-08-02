@@ -10,6 +10,48 @@ not mistake paper-derived hints for independent discoveries.
 
 No item below comes from the supplementary proof artifact.
 
+## Final sealed design instance (2026-08-01)
+
+The blind design is instantiated for the frozen ELF/layout/configuration
+identity
+`DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A` /
+`CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02` /
+`27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712`.
+The resulting geometry is exact: six addressed C bases, nine static list
+regions, and eight P2 relation roots.  The two TCBs are fresh logical runtime
+heap objects, not ELF symbols, and their Generic/Event item regions are
+separate from every one of the nine static list regions.
+
+The final scheduler witness connects `StableRunning` to the artifact-specialized generated
+`vTaskDelay' (2 :: 32 word)` exact source state and ends at `YieldPending`,
+matching `task_delay_abs 2 p2_pre`.  This phase boundary preserves the design
+choice learned from the executable trace: requesting a yield is not itself a
+context switch.
+
+The hard construction design is a literal source-monad chain:
+
+```text
+vListInitialise' -> vListInitialiseItem' ->
+vListInsertEnd'  -> vListRemove'
+```
+
+Its theorem has no assumptions and exactly three `runs_to_bind` composition
+steps.  It uses checked list relations rather than adding an unnecessary
+`tail8` postcondition; no trailing-eight-byte frame is claimed by this final
+chain.
+
+The final accounting is 13 source-to-abstract refinement theorems, 8 distinct
+operations, and 2 sequential compositions.  This closes the prior
+layout/preimage and construction gates only at the stated source/HOL boundary.
+It does not cover allocator or boot reachability, execution of the pending
+context switch, compiler or machine-code correctness, binary/source
+equivalence, or full-scheduler correctness.
+
+The rest of this ledger is retained chronologically.  Occurrences of
+"provisional", "pending", or "open" below record the state when that design
+entry was written; the final instance above states which of those gates are
+now closed.
+
 ## Concrete observations
 
 | ID | Class | Observation | Consequence |
@@ -60,7 +102,7 @@ and separation from unrelated nodes.
 The view is selected by a scheduler role (ready/delayed/pending), not by a
 ghost type stored in upstream C.
 
-### R3: scheduler relation — provisional
+### R3: scheduler relation — historically provisional, now instantiated for P2
 
 The abstract state will contain task IDs, priority, ready FIFOs by priority,
 the running task, logical tick/epoch, current and overflow delayed ordered

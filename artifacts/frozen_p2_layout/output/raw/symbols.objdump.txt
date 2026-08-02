@@ -1,0 +1,87 @@
+
+/workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/frozen_p2_layout.elf:     file format elf32-i386
+
+SYMBOL TABLE:
+00000000 l    df *ABS*	00000000 scheduler_translation_unit.c
+00102020 l     O .bss	00000050 pxReadyTasksLists
+0010208c l     O .bss	00000014 xDelayedTaskList1
+001020a0 l     O .bss	00000014 xDelayedTaskList2
+00102014 l     O .bss	00000004 pxDelayedTaskList
+00102018 l     O .bss	00000004 pxOverflowDelayedTaskList
+001020bc l     O .bss	00000014 xPendingReadyList
+001020e8 l     O .bss	00000014 xTasksWaitingTermination
+00102080 l     O .bss	00000004 uxTasksDeleted
+001020d4 l     O .bss	00000014 xSuspendedTaskList
+00102070 l     O .bss	00000004 uxCurrentNumberOfTasks
+001020fc l     O .bss	00000004 xTickCount
+00102088 l     O .bss	00000004 uxTopUsedPriority
+00102084 l     O .bss	00000004 uxTopReadyPriority
+001020d0 l     O .bss	00000004 xSchedulerRunning
+00102078 l     O .bss	00000004 uxSchedulerSuspended
+00102074 l     O .bss	00000004 uxMissedTicks
+001020b4 l     O .bss	00000004 xMissedYield
+001020b8 l     O .bss	00000004 xNumOfOverflows
+0010207c l     O .bss	00000004 uxTaskNumber
+001000ef l     F .text	00000090 prvAllocateTCBAndStack
+00100260 l     F .text	0000008a prvInitialiseTCBVariables
+001002ea l     F .text	0000009e prvInitialiseTaskLists
+00100244 l     F .text	0000001c prvIdleTask
+0010021b l     F .text	00000029 prvDeleteTCB
+0010017f l     F .text	0000009c prvCheckTasksWaitingTermination
+00000000 l    df *ABS*	00000000 link_stubs.c
+00102000 l     O .bss	00000004 eal6_frozen_entry_sink
+00100f77 g     F .text	0000000a xPortGetFreeHeapSize
+00100407 g     F .text	00000034 uxTaskPriorityGet
+00102004 g     O .bss	00000004 eal6_port_critical_depth
+00102010 g     O .bss	00000004 pxCurrentTCB
+00100be4 g     F .text	0000011c vTaskPrioritySet
+0010008c g     F .text	0000001d eal6_port_set_interrupt_mask_from_isr
+00100f81 g     F .text	0000000a xPortStartScheduler
+00100a09 g     F .text	0000001d vTaskEndScheduler
+00100b36 g     F .text	000000ae vTaskPlaceOnEventList
+0010102a g     F .text	00000189 xTaskGenericCreate
+001011da g     F .text	00000043 xTaskIsTaskSuspended
+001005cd g     F .text	00000006 vPortFree
+00102000 g       .bss	00000000 __eal6_bss_start
+0010050b g     F .text	0000005e vListInsertEnd
+00100569 g     F .text	0000005e vListRemove
+0010141f g     F .text	000000bc xTaskResumeFromISR
+00100478 g     F .text	00000010 vListInitialiseItem
+0010200c g     O .bss	00000004 eal6_port_yield_count
+00100388 g     F .text	0000000a pvPortMalloc
+001005c7 g     F .text	00000006 vPortEndScheduler
+0010043b g     F .text	0000003d vListInitialise
+001011b3 g     F .text	0000001d xTaskGetTickCount
+00102100 g       .bss	00000000 __eal6_bss_end
+0010005d g     F .text	0000002f eal6_port_exit_critical
+0010121d g     F .text	000000d4 xTaskRemoveFromEventList
+0010095c g     F .text	000000ad vTaskDelete
+00100f8b g     F .text	0000009f xTaskCheckForTimeOut
+00100ecb g     F .text	00000013 vTaskSuspendAll
+001011d0 g     F .text	0000000a xTaskGetTickCountFromISR
+0010039c g     F .text	00000061 strncpy
+00100d00 g     F .text	000000ad vTaskResume
+00100ede g     F .text	00000099 vTaskSwitchContext
+001005d9 g     F .text	000001ff vTaskCleanUpResources
+00100040 g     F .text	0000001d eal6_port_enter_critical
+00100e1b g     F .text	000000b0 vTaskSuspend
+001003fd g     F .text	0000000a uxTaskGetNumberOfTasks
+00100a26 g     F .text	00000100 vTaskIncrementTick
+001000bc g     F .text	00000033 memset
+00100030 g     F .text	00000010 eal6_port_enable_interrupts
+00100488 g     F .text	00000083 vListInsert
+00100873 g     F .text	000000e9 vTaskDelayUntil
+001012f1 g     F .text	0000012e xTaskResumeAll
+00100dca g     F .text	00000051 vTaskStartScheduler
+00100000 g     F .text	00000012 eal6_frozen_entry
+00100b26 g     F .text	00000010 vTaskMissedYield
+001005d3 g     F .text	00000006 vPortInitialiseBlocks
+001000a9 g     F .text	00000013 eal6_port_yield
+001007d8 g     F .text	0000009b vTaskDelay
+00102008 g     O .bss	00000004 eal6_port_interrupts_disabled
+00100392 g     F .text	0000000a pxPortInitialiseStack
+00100dad g     F .text	0000001d vTaskSetTimeOutState
+00100020 g     F .text	00000010 eal6_port_disable_interrupts
+00100012 g     F .text	0000000e eal6_port_clear_interrupt_mask_from_isr
+
+

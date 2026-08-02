@@ -1,11 +1,64 @@
 # Proof-port contract ledger
 
-Status: `LIST_C_SPLIT_HEAP_BLOCKED__RAW_R5_FIXED_INSERT_REFINEMENT_GREEN__SCHEDULER_TRACE_REPRO_GREEN__GENERAL_N_REMOVE_SCHEDULER_REFINEMENT_PENDING`
+Status: `SEALED_PROOF_PORT__EXACT_REFINEMENTS_13__DISTINCT_OPERATIONS_8__SEQUENTIAL_COMPOSITIONS_2__ARTIFACT_BOUND_P2_GREEN__FOUR_CALL_GREEN`
 
 This directory supplies configuration and port headers needed to preprocess
 the unmodified upstream `Source/list.c`.  The headers are an explicit proof
 environment contract.  They are not a claim that a particular hardware port
 or deployed FreeRTOS configuration has been verified.
+
+## Final proof-port seal (2026-08-01)
+
+The proof environment is sealed against the portable identity
+
+- frozen ELF: `DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A`;
+- layout ledger: `CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02`;
+- generated addressed-global configuration:
+  `27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712`.
+
+The builder/generator pipeline externally extracts, relink-checks, and
+hash-locks the ELF-to-ledger-to-configuration link.  Isabelle starts from the
+generated addressed-global definitions; no Isabelle theorem establishes that
+evidence link or source-to-binary correspondence.
+
+The exact addressed-global map contains six C bases and derives nine static
+`xLIST` regions.  The scheduler P2 relation uses eight; the termination-wait
+list is the ninth exact-map region.  Two fresh logical runtime TCBs supply the
+P2_IDLE and P2_RUN objects and are separated from all nine static regions.
+
+Theorem `frozen_p2_artifact_bound_seal` now supplies the concrete logical P2
+preimage and composes the artifact-specialized generated `vTaskDelay' 2` execution with
+`task_delay_abs 2 p2_pre`, ending at `YieldPending`.  Separately,
+`raw_vListInitialise_insert_end_remove_refines` checks the literal four-call
+source chain with no assumptions and exactly three `runs_to_bind` nodes.  No
+`tail8` frame is claimed for that chain.
+
+This raises the final ledger to **13 source-to-abstract refinements, 8
+distinct operations, and 2 sequential compositions**.  The final portable
+replays are `20260801Tseal-scheduler-parse-01-portable` (23.566 s),
+`20260801Tseal-p2-layout-no-go-01-portable` (33.162 s),
+`20260801Tseal-p2-static-nine-01-portable` (27.701 s),
+`20260801Tseal-p2-dynamic-all-nine-01-portable` (27.467 s),
+`20260801Tseal-p2-preimage-06-parenthesised-seal` (120.854 s),
+`20260801Tseal-list-four-call-01-portable` (32.338 s),
+`20260801Tseal-list-smoke-01-portable` (67.973 s), and
+`20260801Tseal-list-raw-skip-01-portable` (22.551 s), followed by
+`20260801Tseal-assumption-audit-01-portable` (137.387 s).  Every replay exited 0,
+did not time out, and recorded `quick_and_dirty=false`.
+
+The final leaf audit inspects the kernel theorem objects for the two four-call
+capstones and three frozen-P2 capstones.  All five have zero rule premises,
+context hypotheses, proposition implications, sort hypotheses, and extra sort
+hypotheses.  They therefore retain no function-address, addressed-data-global,
+or generated `G`/`S` locale premise.
+
+Allocator/boot reachability, task construction, context-switch execution,
+compiler or machine-code correctness, binary/source equivalence, and full
+scheduler verification remain outside this proof-port contract.
+
+Later sections retain the chronological audit.  Their statements that the P2
+preimage or layout was open describe an earlier checkpoint and are now closed
+by this seal.
 
 ## Upstream integrity
 
@@ -102,7 +155,7 @@ in external allocation prototypes whose bodies are absent and never called by
 `scripts/cpp-wsl.sh` is copied byte-for-byte from the generic ABAV toolchain
 helper at:
 
-`C:\Users\Chengsong\Downloads\abav_staircase_starter\abav_staircase_starter\artifacts\autocorres2\toolchain\cpp-wsl.sh`
+`%USERPROFILE%\Downloads\abav_staircase_starter\abav_staircase_starter\artifacts\autocorres2\toolchain\cpp-wsl.sh`
 
 Source SHA-256:
 `E1BA42D5D3DD658DE01859A874A3C4CDCA7BB4102C1B0E0EC9AEC093EE95C13B`.
@@ -256,9 +309,9 @@ the executable proof-port boundary and generate scheduler invariant
 candidates; they are neither an Isabelle checker result nor a
 source-to-abstract scheduler refinement theorem.
 
-## Conditional positive-delay P2 source refinement (2026-08-01)
+## Historical conditional positive-delay P2 source refinement (superseded)
 
-The real generated `vTaskDelay' 2` path is now checker-green through three
+The artifact-specialized generated `vTaskDelay' 2` path is now checker-green through three
 separate layers:
 
 1. `Scheduler_P2_Delay_Source` composes exact suspend, remove, generated
@@ -267,7 +320,7 @@ separate layers:
    physical list roots, including both root and P2_IDLE item framing for the
    nonempty ready0 list;
 3. `Scheduler_P2_Delay_Refinement` proves the remaining endpoint fields and
-   relates the real source result to `task_delay_abs 2 p2_pre`.
+   relates the generated source result to `task_delay_abs 2 p2_pre`.
 
 The final runs were respectively
 `20260801Tscheduler-p2-delay-source-09-canonical-states` (35.056 s),
@@ -278,8 +331,8 @@ with `quick_and_dirty=false`.  Their theory hashes are respectively
 `CF5CCB728150BC4B185CEAE448E9E2FAB0C9C88E1CCBCDA1F79E2A67AD7375B8`,
 and `43BC41254C609DF8302F38113F662912E2FD99C72D0A612E5A72925E5AA1C9E7`.
 
-This raises the conditional source-to-abstract theorem count to twelve.  It is
-not yet a deployment-instance theorem: the addressed scheduler data globals
-still need a checked layout certificate and concrete P2 preimage for one
-frozen ELF.  AutoCorres2 already supplies symbolic execution and VCG; SMT or a
-second executor would not provide those missing linker-layout facts.
+At that checkpoint this raised the conditional source-to-abstract theorem
+count to twelve.  The addressed-global layout and concrete P2 preimage were
+then still open; the final seal above closes them for one frozen artifact.
+AutoCorres2 already supplied symbolic execution and VCG, so neither SMT nor a
+second executor was needed to close the linker-layout obligation.

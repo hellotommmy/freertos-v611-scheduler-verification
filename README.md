@@ -1,15 +1,91 @@
 # Blind reconstruction: FreeRTOS V6.1.1 scheduler
 
-Status: `CONDITIONAL_TARGET_FREEZE__SPLIT_HEAP_BLOCKED__RAW_HEAP_SCHEDULER_TRANSLATIONS_GREEN__SCHEDULER_LIST_ABI_FOUNDATION_GREEN__EXACT_REFINEMENTS_12__GENERAL_INSERT_REMOVE_GREEN__ORDERED_EMPTY_REFINEMENT_GREEN__REMOVE_INSERT_SEQUENCE_GREEN__SCHEDULER_ROOTS_5_OF_5_RESTRICTED__P2_POSITIVE_DELAY_CONDITIONAL_REFINEMENT_GREEN__FROZEN_BUILD_LAYOUT_NONVACUITY_OPEN`
+Status: `SEALED_BLIND_MILESTONE__EXACT_REFINEMENTS_13__DISTINCT_OPERATIONS_8__SEQUENTIAL_COMPOSITIONS_2__FROZEN_P2_PREIMAGE_GREEN__FOUR_CALL_HARD_GATE_GREEN`
 
-This experiment independently reconstructs a source-to-Isabelle refinement of
-the scheduler-related slice of FreeRTOS V6.1.1.  The original VCC annotations,
+This experiment independently reconstructs an artifact-specialized
+CParser/AutoCorres2 generated-source refinement of a scheduler-related slice of
+FreeRTOS V6.1.1.  The original VCC annotations,
 Z models, abstraction relations, invariants, and proof scripts remain sealed
 until a checker-green blind result has been committed and hashed.
 
-## Current P2 positive-delay milestone (2026-08-01)
+## Sealed blind milestone (2026-08-01)
 
-The real generated `vTaskDelay' (2 :: 32 word)` body now has a checker-green
+The formerly open frozen-layout/non-vacuity gate is now closed for one exact
+artifact-bound P2 witness.  The portable identity is:
+
+| Evidence object | SHA-256 |
+|---|---|
+| frozen ELF32/i386 artifact | `DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A` |
+| extracted layout ledger | `CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02` |
+| generated addressed-global configuration | `27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712` |
+
+The artifact builder extracts and independently relink-checks the ledger, and
+the generator validates the configuration against that ledger.  Isabelle then
+consumes the six addresses as CParser definitions.  This ELF-to-ledger-to-
+configuration correspondence is a hash-locked external evidence check, not an
+Isabelle theorem or a source-to-binary proof.
+
+Exactly six addressed-data bases derive nine pairwise separate static
+`xLIST` regions: four ready-array elements and five standalone lists.  The P2
+relation uses eight roots; the ninth termination-wait region remains in the
+exact CParser address map and separation proof.  The P2_IDLE and P2_RUN TCBs
+are fresh logical runtime heap objects, separated from all nine static
+regions.  They are not fixed-address ELF symbols and make no allocator or boot
+reachability claim.
+
+`frozen_p2_artifact_bound_seal` constructs a concrete logical preimage at
+`StableRunning` and composes it with the artifact-specialized generated
+`vTaskDelay' (2 :: 32 word)` result.  The checked endpoint is
+`YieldPending`, related to `task_delay_abs 2 p2_pre`; the exact-state path is
+suspend, ready-list removal, wake-key write to 7, delayed-list insertion,
+quiet resume, and one proof-port yield request.
+
+The literal hard-gate chain is also closed.  Theorem
+`raw_vListInitialise_insert_end_remove_refines` executes
+`vListInitialise' -> vListInitialiseItem' -> vListInsertEnd' ->
+vListRemove'` with no theorem assumptions and exactly three
+`runs_to_bind` compositions.  Its final state refines remove-after-insert from
+an initial empty abstract list; the clean corollary returns to an empty
+relation.  This theorem deliberately makes no eight-byte trailing-frame
+(`tail8`) claim.
+
+The sealed count is **13 source-to-abstract refinement theorems, 8 distinct
+source operations, and 2 sequential compositions**.  The final portable
+replays all used `quick_and_dirty=false`, exited 0, and did not time out:
+
+| Gate | Run | Seconds |
+|---|---|---:|
+| artifact-specialized scheduler parse | `20260801Tseal-scheduler-parse-01-portable` | 23.566 |
+| ordinary split-heap no-go | `20260801Tseal-p2-layout-no-go-01-portable` | 33.162 |
+| nine-region static geometry | `20260801Tseal-p2-static-nine-01-portable` | 27.701 |
+| runtime-TCB dynamic geometry | `20260801Tseal-p2-dynamic-all-nine-01-portable` | 27.467 |
+| concrete P2 preimage and seal | `20260801Tseal-p2-preimage-06-parenthesised-seal` | 120.854 |
+| literal four-call list chain | `20260801Tseal-list-four-call-01-portable` | 32.338 |
+| stock list translation smoke | `20260801Tseal-list-smoke-01-portable` | 67.973 |
+| raw `skip_heap_abs` list translation | `20260801Tseal-list-raw-skip-01-portable` | 22.551 |
+| capstone theorem-object assumption audit | `20260801Tseal-assumption-audit-01-portable` | 137.387 |
+
+A dedicated leaf session audits the five capstone theorem objects.  Each has
+empty `Thm.prems_of` and `Thm.hyps_of`, no `Pure.imp` or `HOL.implies` anywhere
+in its proposition, and zero sort hypotheses.  Thus the sealed capstones retain
+no function-address, addressed-data-global, or generated `G`/`S` locale
+premises.  The fail-closed method and exact hashes are in
+[`ASSUMPTION_AUDIT.md`](ASSUMPTION_AUDIT.md).
+
+The milestone does not establish allocator correctness, boot or
+scheduler-start reachability, context-switch execution after the pending yield,
+compiler correctness, machine-code correctness, binary/source equivalence,
+or full-scheduler functional correctness.
+
+## Historical progress record
+
+The chronology below is retained as an audit trail.  Statements that a frozen
+layout, concrete P2 preimage, or four-call construction was "open" describe
+their checkpoint at that time; the sealed evidence above supersedes them.
+
+### Former conditional P2 positive-delay checkpoint (superseded)
+
+The artifact-specialized generated `vTaskDelay' (2 :: 32 word)` body now has a checker-green
 exact-state theorem.  It composes exact suspend, singleton ready-list removal,
 the generated wake-key write to 7, delayed-A ordered insertion, quiet resume
 returning 0, and the proof-port yield.  Run
@@ -46,7 +122,7 @@ no timeout, and `quick_and_dirty=false`.  Its status and stdout SHA-256 values
 are `6D45F563CB84212812C59F5A723DD17177E03FF36328D6FFAF96AAA3FAB78B5E`
 and `594A6C89502091A013CB9A6D71EDC6DB1AB76A5C174D869F15DB2687F4B95C89`.
 
-This is a conditional real-source functional-correctness theorem.  Its
+This is a conditional generated-source refinement theorem.  Its
 `scheduler_endpoint_rel + p2_source_footprint` precondition is not yet tied to
 one frozen linked FreeRTOS build.  The addressed data-global constants remain
 unconstrained by the current translation's function-address locale, so a

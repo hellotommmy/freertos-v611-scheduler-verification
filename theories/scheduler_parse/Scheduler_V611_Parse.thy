@@ -1,5 +1,5 @@
 theory Scheduler_V611_Parse
-  imports "AutoCorres2_Main.AutoCorres_Main"
+  imports "AutoCorres2_P2_Layout_Main.AutoCorres_Main"
 begin
 
 text \<open>
@@ -14,6 +14,22 @@ setup \<open>fn thy =>
       Path.explode "../../scripts/cpp-wsl.sh"
     val _ = File.check_file cpp
   in Config.put_global IsarInstall.cpp_path (File.standard_path cpp) thy end\<close>
+
+text \<open>
+  The build wrapper regenerates this ML manifest only after rebuilding and
+  checking the frozen ELF with independent readelf/nm paths, exact input and
+  evidence hashes, DWARF sizes, symbol completeness, and the pinned ELF hash.
+  The patched CParser declares ordinary definitions for exactly the six data
+  globals in that manifest while retaining its stock path when no manifest is
+  configured.
+\<close>
+
+ML_file "../../build/generated/P2_Root_Address_Config.ML"
+
+setup \<open>
+  Config.put_global CalculateState.addressed_global_definitions
+    P2_Root_Address_Config.configuration
+\<close>
 
 include_C_file "../../proof_port/scheduler/FreeRTOSConfig.h"
   for "scheduler_translation_unit.c"

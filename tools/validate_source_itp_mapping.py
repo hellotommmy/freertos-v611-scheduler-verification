@@ -32,11 +32,13 @@ REFINEMENT_RUNG_SCOPES = {
     "Raw-R6-insert-general": "general_N_fresh_insert_end",
     "Raw-R6-remove-insert-sequence": "general_N_member_remove_then_insert_end",
     "Raw-R6-ordered-insert-empty": "restricted_empty_list_ordered_insert",
+    "Raw-R6-initialise-item-insert-remove-sequence": "fixed_initialise_item_insert_end_remove_roundtrip",
     "Scheduler-Tick-Read": "quiescent_tick_read_boundary",
     "Scheduler-Switch-Suspended": "suspended_scheduler_control_boundary",
     "Scheduler-Increment-Tick-Suspended": "suspended_no_wrap_scheduler_control_boundary",
     "Scheduler-Delay-Zero": "zero_delay_no_wrap_scheduler_control_boundary",
     "Scheduler-Delay-Until-Suspended-No-Delay": "suspended_no_delay_scheduler_boundary",
+    "Scheduler-P2-Frozen-Preimage": "artifact_bound_frozen_p2_positive_delay",
 }
 REFINEMENT_RUNG_RESULT_FRAGMENTS = {
     "Raw-R5": "Result ()",
@@ -45,11 +47,13 @@ REFINEMENT_RUNG_RESULT_FRAGMENTS = {
     "Raw-R6-insert-general": "Result ()",
     "Raw-R6-remove-insert-sequence": "Result ()",
     "Raw-R6-ordered-insert-empty": "Result ()",
+    "Raw-R6-initialise-item-insert-remove-sequence": "Result ()",
     "Scheduler-Tick-Read": "Result (fst (task_get_tick_abs a))",
     "Scheduler-Switch-Suspended": "Result ()",
     "Scheduler-Increment-Tick-Suspended": "Result ()",
     "Scheduler-Delay-Zero": "Result ()",
     "Scheduler-Delay-Until-Suspended-No-Delay": "Result ()",
+    "Scheduler-P2-Frozen-Preimage": "Result ()",
 }
 REFINEMENT_RUNG_GENERALITY = {
     "Raw-R5": False,
@@ -58,11 +62,13 @@ REFINEMENT_RUNG_GENERALITY = {
     "Raw-R6-insert-general": True,
     "Raw-R6-remove-insert-sequence": True,
     "Raw-R6-ordered-insert-empty": False,
+    "Raw-R6-initialise-item-insert-remove-sequence": False,
     "Scheduler-Tick-Read": False,
     "Scheduler-Switch-Suspended": False,
     "Scheduler-Increment-Tick-Suspended": False,
     "Scheduler-Delay-Zero": False,
     "Scheduler-Delay-Until-Suspended-No-Delay": False,
+    "Scheduler-P2-Frozen-Preimage": False,
 }
 GENERAL_REMOVE_PRECONDITIONS = {"membership": "p is in set (ring xs)"}
 GENERAL_REMOVE_SUPPORTING_LAYERS = (
@@ -106,6 +112,73 @@ REMOVE_INSERT_SEQUENCE_INTERMEDIATE_THEOREMS = (
     "raw_vListRemove_general_sequence_ready",
     "raw_vListInsertEnd_sequence_continuation",
     "raw_vListInsertEnd_sequence_continuation_res",
+)
+FOUR_CALL_SEQUENCE_OPERATION_IDS = (
+    "LIST-INITIALISE",
+    "LIST-INITIALISE-ITEM",
+    "LIST-INSERT-END",
+    "LIST-REMOVE",
+)
+FOUR_CALL_SEQUENCE_SOURCE_FUNCTIONS = (
+    "vListInitialise'",
+    "vListInitialiseItem'",
+    "vListInsertEnd'",
+    "vListRemove'",
+)
+FOUR_CALL_SEQUENCE_SUPPORTING_RUNGS = (
+    "Raw-R6-insert-general",
+    "Raw-R6-remove-general",
+)
+FOUR_CALL_SEQUENCE_DEFINITION = "raw_initialise_insert_remove_needle'"
+FOUR_CALL_SEQUENCE_COROLLARY = (
+    "raw_vListInitialise_insert_end_remove_empty_refines"
+)
+SCHEDULER_P2_FROZEN_BOUNDARY_CONDITIONS = {
+    "delay_argument": 2,
+    "pre_phase": "StableRunning",
+    "post_phase": "YieldPending",
+    "prestate": "p2_pre",
+    "poststate": "task_delay_abs 2 p2_pre",
+    "runtime_tcb_addresses": "fresh logical witnesses",
+    "allocator_boot_reachability": False,
+}
+FROZEN_MAPPED_BASES = (
+    ("pxReadyTasksLists", "0x00102020", 80),
+    ("xDelayedTaskList1", "0x0010208c", 20),
+    ("xDelayedTaskList2", "0x001020a0", 20),
+    ("xPendingReadyList", "0x001020bc", 20),
+    ("xSuspendedTaskList", "0x001020d4", 20),
+    ("xTasksWaitingTermination", "0x001020e8", 20),
+)
+FROZEN_STATIC_XLIST_REGIONS = (
+    ("ready[0]", "0x00102020"),
+    ("ready[1]", "0x00102034"),
+    ("ready[2]", "0x00102048"),
+    ("ready[3]", "0x0010205c"),
+    ("delayed-A", "0x0010208c"),
+    ("delayed-B", "0x001020a0"),
+    ("pending-ready", "0x001020bc"),
+    ("suspended", "0x001020d4"),
+    ("termination-wait", "0x001020e8"),
+)
+FROZEN_P2_RELATION_ROOTS = FROZEN_STATIC_XLIST_REGIONS[:8]
+FROZEN_ELF_SHA256 = (
+    "DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A"
+)
+FROZEN_LEDGER_SHA256 = (
+    "CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02"
+)
+FROZEN_ADDRESS_CONFIG_SHA256 = (
+    "27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712"
+)
+ADDRESSED_GLOBAL_PATCH_SHA256 = (
+    "44160F97B133D0A66E515E505636D641907DC14811D43DA071EA15C706C8E604"
+)
+UPSTREAM_CALCULATE_STATE_SHA256 = (
+    "EA51ECAA01947E53AD38A684B0E97ED360339363A75C6AE16DCFBA7713562898"
+)
+PATCHED_CALCULATE_STATE_SHA256 = (
+    "FD244D8228E79EC3626A5CE312446CE49DF550970B758B68D3BBE953CAC8CFA9"
 )
 SCHEDULER_TICK_BOUNDARY_CONDITIONS = {
     "eal6_port_critical_depth_'": 0,
@@ -192,6 +265,8 @@ HASHED_RUN_EVIDENCE_IDS = {
     "Scheduler-List-ABI-Bridge",
     "Scheduler-List-ABI-Write-Bridge",
     "Scheduler-P2-Raw-Relation",
+    "Raw-R6-initialise-item-insert-remove-sequence",
+    "Scheduler-P2-Frozen-Preimage",
 }
 EXPECTED_DEVELOPMENT_COSTS = {
     "Raw-R6-ordered-insert-empty-source": {
@@ -499,6 +574,339 @@ def _validate_run_artifact_hashes(
                 errors.append(f"{prefix}: stdout_sha256 disagrees with status contents")
 
 
+def _validate_portable_artifact_identity(
+    errors: list[str], prefix: str, status: dict[str, str]
+) -> None:
+    """Require a run to belong to the current portable frozen-artifact universe."""
+
+    for status_key, expected, label in (
+        ("frozen_layout_elf_sha256", FROZEN_ELF_SHA256, "ELF"),
+        ("frozen_layout_ledger_sha256", FROZEN_LEDGER_SHA256, "ledger"),
+        (
+            "generated_address_config_sha256",
+            FROZEN_ADDRESS_CONFIG_SHA256,
+            "generated config",
+        ),
+    ):
+        if status.get(status_key) != expected:
+            errors.append(f"{prefix} {label} identity drifted")
+
+
+def _validate_frozen_artifact_binding(
+    errors: list[str], project_root: Path, manifest: dict[str, Any]
+) -> None:
+    """Validate the six-base -> nine-region -> eight-P2-root evidence ledger."""
+
+    prefix = "frozen_artifact_binding"
+    binding = manifest.get(prefix)
+    if not isinstance(binding, dict):
+        errors.append(f"{prefix} must be an object")
+        return
+    if binding.get("status") != "checker_green":
+        errors.append(f"{prefix}.status must be 'checker_green'")
+
+    def checked_file(record_name: str, expected_digest: str | None = None) -> Path | None:
+        record = binding.get(record_name)
+        record_prefix = f"{prefix}.{record_name}"
+        if not isinstance(record, dict):
+            errors.append(f"{record_prefix} must be an object")
+            return None
+        relative = record.get("path")
+        digest = record.get("sha256")
+        if not isinstance(relative, str) or not relative:
+            errors.append(f"{record_prefix}.path must be a non-empty string")
+            return None
+        path = project_root / relative
+        if not path.is_file():
+            errors.append(f"{record_prefix}: missing file {relative}")
+            return None
+        actual = hashlib.sha256(path.read_bytes()).hexdigest().upper()
+        if digest != actual:
+            errors.append(f"{record_prefix}.sha256 disagrees with file")
+        if expected_digest is not None and digest != expected_digest:
+            errors.append(f"{record_prefix}.sha256 disagrees with frozen identity")
+        return path
+
+    elf_path = checked_file("elf", FROZEN_ELF_SHA256)
+    ledger_path = checked_file("ledger", FROZEN_LEDGER_SHA256)
+    if elf_path is not None and ledger_path is not None:
+        try:
+            ledger = _read_json(ledger_path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            errors.append(f"{prefix}.ledger is not valid JSON: {exc}")
+            ledger = {}
+        artifact = ledger.get("artifact", {})
+        if str(artifact.get("sha256", "")).upper() != FROZEN_ELF_SHA256:
+            errors.append(f"{prefix}.ledger artifact hash disagrees with frozen ELF")
+        if artifact.get("deterministic_relink_sha256_match") is not True:
+            errors.append(f"{prefix}.ledger does not certify deterministic relinking")
+
+        ledger_bases = tuple(
+            (entry.get("symbol"), entry.get("address_hex"), entry.get("size"))
+            for entry in ledger.get("base_symbols", [])
+            if isinstance(entry, dict)
+        )
+        if ledger_bases != FROZEN_MAPPED_BASES:
+            errors.append(f"{prefix}.ledger does not contain the exact six mapped bases")
+        ledger_roots = tuple(
+            (entry.get("logical_name"), entry.get("address_hex"))
+            for entry in ledger.get("physical_roots", [])
+            if isinstance(entry, dict)
+        )
+        if ledger_roots != FROZEN_P2_RELATION_ROOTS:
+            errors.append(f"{prefix}.ledger does not contain the exact eight P2 roots")
+
+    mapped_bases = tuple(
+        (entry.get("symbol"), entry.get("address_hex"), entry.get("size"))
+        for entry in binding.get("mapped_bases", [])
+        if isinstance(entry, dict)
+    )
+    if mapped_bases != FROZEN_MAPPED_BASES:
+        errors.append(f"{prefix}.mapped_bases must record the exact six ELF bases")
+    static_regions = tuple(
+        (entry.get("logical_name"), entry.get("address_hex"))
+        for entry in binding.get("static_xlist_regions", [])
+        if isinstance(entry, dict)
+    )
+    if static_regions != FROZEN_STATIC_XLIST_REGIONS:
+        errors.append(f"{prefix}.static_xlist_regions must record the exact nine regions")
+    p2_roots = tuple(
+        (entry.get("logical_name"), entry.get("address_hex"))
+        for entry in binding.get("p2_relation_roots", [])
+        if isinstance(entry, dict)
+    )
+    if p2_roots != FROZEN_P2_RELATION_ROOTS:
+        errors.append(f"{prefix}.p2_relation_roots must record the exact eight roots")
+    if binding.get("counts") != {
+        "mapped_bases": 6,
+        "static_xlist_regions": 9,
+        "p2_relation_roots": 8,
+    }:
+        errors.append(f"{prefix}.counts must be exactly six/nine/eight")
+    if binding.get("runtime_tcb_policy") != "fresh_logical_witness_addresses":
+        errors.append(f"{prefix}.runtime_tcb_policy must keep TCBs logical")
+
+    parser = binding.get("patched_parser")
+    if not isinstance(parser, dict):
+        errors.append(f"{prefix}.patched_parser must be an object")
+    else:
+        patch_name = parser.get("patch_path")
+        patch_path = project_root / patch_name if isinstance(patch_name, str) else None
+        if patch_path is None or not patch_path.is_file():
+            errors.append(f"{prefix}.patched_parser patch is missing")
+        elif hashlib.sha256(patch_path.read_bytes()).hexdigest().upper() != parser.get(
+            "patch_sha256"
+        ):
+            errors.append(f"{prefix}.patched_parser patch_sha256 disagrees with file")
+        if parser.get("patch_sha256") != ADDRESSED_GLOBAL_PATCH_SHA256:
+            errors.append(f"{prefix}.patched_parser patch identity is not pinned")
+        if parser.get("upstream_calculate_state_sha256") != UPSTREAM_CALCULATE_STATE_SHA256:
+            errors.append(f"{prefix}.patched_parser upstream calculate_state hash is wrong")
+        if parser.get("staged_calculate_state_sha256") != PATCHED_CALCULATE_STATE_SHA256:
+            errors.append(f"{prefix}.patched_parser staged calculate_state hash is wrong")
+        if parser.get("generated_address_config_sha256") != FROZEN_ADDRESS_CONFIG_SHA256:
+            errors.append(f"{prefix}.patched_parser generated config hash is wrong")
+        if parser.get("config_option") != "c_parser_addressed_global_definitions":
+            errors.append(f"{prefix}.patched_parser config option is wrong")
+
+        parser_theory_name = parser.get("theory")
+        parser_theory = (
+            project_root / parser_theory_name
+            if isinstance(parser_theory_name, str)
+            else None
+        )
+        if parser_theory is None or not parser_theory.is_file():
+            errors.append(f"{prefix}.patched_parser theory is missing")
+        else:
+            actual = hashlib.sha256(parser_theory.read_bytes()).hexdigest().upper()
+            if parser.get("theory_sha256") != actual:
+                errors.append(f"{prefix}.patched_parser theory_sha256 disagrees with file")
+            parser_text = parser_theory.read_text(encoding="utf-8")
+            for needle in (
+                "P2_Root_Address_Config.configuration",
+                "CalculateState.addressed_global_definitions",
+            ):
+                if needle not in parser_text:
+                    errors.append(f"{prefix}.patched_parser theory omits {needle!r}")
+
+        generated = project_root / "build/generated/P2_Root_Address_Config.ML"
+        if generated.is_file():
+            actual = hashlib.sha256(generated.read_bytes()).hexdigest().upper()
+            if actual != FROZEN_ADDRESS_CONFIG_SHA256:
+                errors.append(f"{prefix}.patched_parser generated config bytes drifted")
+
+        parser_evidence = parser.get("evidence")
+        parser_prefix = f"{prefix}.patched_parser.evidence"
+        if not isinstance(parser_evidence, dict):
+            errors.append(f"{parser_prefix} must be an object")
+        else:
+            _validate_run_artifact_hashes(
+                errors, project_root, parser_prefix, parser_evidence
+            )
+            expected_session = "EAL6_FreeRTOS_V611_Scheduler_Parse"
+            if parser_evidence.get("session") != expected_session:
+                errors.append(f"{parser_prefix} session is wrong")
+            run_id = parser_evidence.get("run_id")
+            status_name = parser_evidence.get("status_file")
+            expected_status = (
+                f"runs/{run_id}/status.txt" if isinstance(run_id, str) else None
+            )
+            if (
+                not isinstance(status_name, str)
+                or status_name.replace("\\", "/") != expected_status
+            ):
+                errors.append(f"{parser_prefix} status path disagrees with run_id")
+            else:
+                status_path = project_root / status_name
+                if not status_path.is_file():
+                    errors.append(f"{parser_prefix} status file is missing")
+                else:
+                    status = _parse_status(status_path)
+                    if status.get("run_id") != run_id:
+                        errors.append(f"{parser_prefix} run_id disagrees with status")
+                    if status.get("session") != expected_session:
+                        errors.append(f"{parser_prefix} session disagrees with status")
+                    if (
+                        status.get("exit_code") != "0"
+                        or status.get("quick_and_dirty") != "false"
+                        or status.get("timed_out") != "false"
+                    ):
+                        errors.append(f"{parser_prefix} is not kernel-green")
+                    _validate_portable_artifact_identity(
+                        errors, parser_prefix, status
+                    )
+
+    geometry = binding.get("static_geometry")
+    if not isinstance(geometry, dict):
+        errors.append(f"{prefix}.static_geometry must be an object")
+    else:
+        theory_name = geometry.get("theory")
+        if geometry.get("theorem") != "frozen_addressed_xlist_geometry":
+            errors.append(f"{prefix}.static_geometry theorem is wrong")
+        if geometry.get("p2_projection_theorem") != "frozen_p2_static_root_geometry":
+            errors.append(f"{prefix}.static_geometry P2 projection theorem is wrong")
+        theory_path = project_root / theory_name if isinstance(theory_name, str) else None
+        if theory_path is None or not theory_path.is_file():
+            errors.append(f"{prefix}.static_geometry theory is missing")
+        else:
+            actual = hashlib.sha256(theory_path.read_bytes()).hexdigest().upper()
+            if geometry.get("theory_sha256") != actual:
+                errors.append(f"{prefix}.static_geometry theory_sha256 disagrees with file")
+            theory_text = theory_path.read_text(encoding="utf-8")
+            for fact in (
+                "frozen_addressed_global_pointers",
+                "frozen_addressed_xlist_roots_exact",
+                "frozen_addressed_xlist_geometry",
+                "frozen_p2_static_root_geometry",
+            ):
+                if not _declares_isabelle_fact(theory_text, fact):
+                    errors.append(f"{prefix}.static_geometry omits fact {fact!r}")
+
+    evidence = binding.get("binding_evidence")
+    if not isinstance(evidence, dict):
+        errors.append(f"{prefix}.binding_evidence must be an object")
+    else:
+        _validate_run_artifact_hashes(errors, project_root, f"{prefix}.binding_evidence", evidence)
+        if evidence.get("session") != (
+            "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout"
+        ):
+            errors.append(f"{prefix}.binding_evidence must check the static layout session")
+        run_id = evidence.get("run_id")
+        status_name = evidence.get("status_file")
+        expected_status = f"runs/{run_id}/status.txt" if isinstance(run_id, str) else None
+        if not isinstance(status_name, str) or status_name.replace("\\", "/") != expected_status:
+            errors.append(f"{prefix}.binding_evidence status path disagrees with run_id")
+        else:
+            status_path = project_root / status_name
+            if not status_path.is_file():
+                errors.append(f"{prefix}.binding_evidence status file is missing")
+            else:
+                status = _parse_status(status_path)
+                if status.get("session") != evidence.get("session"):
+                    errors.append(f"{prefix}.binding_evidence session disagrees with status")
+                if (
+                    status.get("exit_code") != "0"
+                    or status.get("quick_and_dirty") != "false"
+                    or status.get("timed_out") != "false"
+                ):
+                    errors.append(f"{prefix}.binding_evidence is not kernel-green")
+                _validate_portable_artifact_identity(
+                    errors, f"{prefix}.binding_evidence", status
+                )
+
+    for record_name, expected_session, expected_facts, require_frozen_hashes in (
+        (
+            "stock_layout_no_go",
+            "EAL6_FreeRTOS_V611_Scheduler_P2_Layout_No_Go",
+            ("p2_source_footprint_delayed_alias_no_go",),
+            True,
+        ),
+        (
+            "dynamic_geometry",
+            "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Dynamic_Geometry",
+            (
+                "frozen_p2_tcb_addressed_xlist_separation",
+                "frozen_p2_nonheap_geometry",
+            ),
+            True,
+        ),
+    ):
+        record_prefix = f"{prefix}.{record_name}"
+        record = binding.get(record_name)
+        if not isinstance(record, dict):
+            errors.append(f"{record_prefix} must be an object")
+            continue
+        theory_name = record.get("theory")
+        theory_path = project_root / theory_name if isinstance(theory_name, str) else None
+        if theory_path is None or not theory_path.is_file():
+            errors.append(f"{record_prefix} theory is missing")
+        else:
+            actual = hashlib.sha256(theory_path.read_bytes()).hexdigest().upper()
+            if record.get("theory_sha256") != actual:
+                errors.append(f"{record_prefix} theory_sha256 disagrees with file")
+            theory_text = theory_path.read_text(encoding="utf-8")
+            for fact in expected_facts:
+                if not _declares_isabelle_fact(theory_text, fact):
+                    errors.append(f"{record_prefix} omits fact {fact!r}")
+        if record.get("theorem") != expected_facts[-1]:
+            errors.append(f"{record_prefix} principal theorem is wrong")
+        if record_name == "dynamic_geometry":
+            if record.get("tcb_separation_theorem") != expected_facts[0]:
+                errors.append(f"{record_prefix} TCB separation theorem is wrong")
+            if record.get("separated_static_region_count") != 9:
+                errors.append(f"{record_prefix} must separate TCBs from all nine regions")
+
+        record_evidence = record.get("evidence")
+        if not isinstance(record_evidence, dict):
+            errors.append(f"{record_prefix}.evidence must be an object")
+            continue
+        _validate_run_artifact_hashes(
+            errors, project_root, f"{record_prefix}.evidence", record_evidence
+        )
+        if record_evidence.get("session") != expected_session:
+            errors.append(f"{record_prefix}.evidence session is wrong")
+        status_name = record_evidence.get("status_file")
+        status_path = project_root / status_name if isinstance(status_name, str) else None
+        if status_path is None or not status_path.is_file():
+            errors.append(f"{record_prefix}.evidence status file is missing")
+            continue
+        status = _parse_status(status_path)
+        if status.get("run_id") != record_evidence.get("run_id"):
+            errors.append(f"{record_prefix}.evidence run_id disagrees with status")
+        if status.get("session") != expected_session:
+            errors.append(f"{record_prefix}.evidence session disagrees with status")
+        if (
+            status.get("exit_code") != "0"
+            or status.get("quick_and_dirty") != "false"
+            or status.get("timed_out") != "false"
+        ):
+            errors.append(f"{record_prefix}.evidence is not kernel-green")
+        if require_frozen_hashes:
+            _validate_portable_artifact_identity(
+                errors, f"{record_prefix}.evidence", status
+            )
+
+
 def _validate_green_evidence(
     errors: list[str],
     project_root: Path,
@@ -607,7 +1015,8 @@ def _declares_isabelle_definition(theory_text: str, constant_name: str) -> bool:
     """Recognise a named Isabelle definition, not an incidental text mention."""
 
     declaration = re.compile(
-        rf"^\s*(?:definition|abbreviation)\s+{re.escape(constant_name)}(?:\s|$)",
+        rf"^\s*(?:definition|abbreviation|fun|function|primrec)\s+"
+        rf"{re.escape(constant_name)}(?:\s|$)",
         flags=re.MULTILINE,
     )
     return declaration.search(theory_text) is not None
@@ -1529,6 +1938,11 @@ def _validate_source_to_abstract_refinement_rungs(
                 ("model operation", model_operation),
                 ("relation", relation),
             ):
+                if (
+                    rung_id == "Raw-R6-initialise-item-insert-remove-sequence"
+                    and label == "source function"
+                ):
+                    continue
                 if not isinstance(needle, str) or needle not in theorem_statement:
                     errors.append(f"{prefix}: theorem statement omits {label}")
             result_fragment = REFINEMENT_RUNG_RESULT_FRAGMENTS.get(rung_id)
@@ -1972,6 +2386,153 @@ def _validate_source_to_abstract_refinement_rungs(
                         f"{prefix}: sequential theory reopens generated body {generated_body!r}"
                     )
 
+        if rung_id == "Raw-R6-initialise-item-insert-remove-sequence":
+            if rung.get("kind") != "sequential_composition_refinement":
+                errors.append(
+                    f"{prefix}: kind must be 'sequential_composition_refinement'"
+                )
+            if rung.get("sequential_composition_refinement") is not True:
+                errors.append(
+                    f"{prefix}: sequential_composition_refinement must be exactly true"
+                )
+            if rung.get("distinct_operation_count_delta") != 0:
+                errors.append(
+                    f"{prefix}: distinct_operation_count_delta must be exactly zero"
+                )
+            if tuple(rung.get("composed_operation_ids", ())) != FOUR_CALL_SEQUENCE_OPERATION_IDS:
+                errors.append(
+                    f"{prefix}: composed_operation_ids must record the literal four-call order"
+                )
+            if tuple(rung.get("source_functions", ())) != FOUR_CALL_SEQUENCE_SOURCE_FUNCTIONS:
+                errors.append(
+                    f"{prefix}: source_functions must record the literal four-call order"
+                )
+            if rung.get("source_sequence_definition") != FOUR_CALL_SEQUENCE_DEFINITION:
+                errors.append(f"{prefix}: source_sequence_definition is wrong")
+            if tuple(rung.get("supporting_rung_ids", ())) != FOUR_CALL_SEQUENCE_SUPPORTING_RUNGS:
+                errors.append(
+                    f"{prefix}: supporting_rung_ids must record insert and remove refinements"
+                )
+            else:
+                for supporting_id in FOUR_CALL_SEQUENCE_SUPPORTING_RUNGS:
+                    supporting = rung_by_id.get(supporting_id)
+                    if not isinstance(supporting, dict) or supporting.get(
+                        "is_source_to_abstract_refinement"
+                    ) is not True:
+                        errors.append(
+                            f"{prefix}: supporting rung {supporting_id!r} is not checked"
+                        )
+            if rung.get("corollary") != FOUR_CALL_SEQUENCE_COROLLARY:
+                errors.append(f"{prefix}: empty-roundtrip corollary is wrong")
+            elif not _declares_isabelle_fact(theory_text, FOUR_CALL_SEQUENCE_COROLLARY):
+                errors.append(f"{prefix}: empty-roundtrip corollary is not declared")
+            if rung.get("fixed_addresses") != {
+                "list": "0x00001000",
+                "item": "0x00002000",
+                "sentinel": "0x00001008",
+            }:
+                errors.append(f"{prefix}: fixed addresses must record 0x1000/0x2000/0x1008")
+            if rung.get("opens_generated_c_body") is not False:
+                errors.append(f"{prefix}: opens_generated_c_body must be exactly false")
+
+            definition_start = theory_text.find(
+                f"definition {FOUR_CALL_SEQUENCE_DEFINITION}"
+            )
+            theorem_start = theory_text.find(
+                "theorem raw_vListInitialise_insert_end_remove_refines",
+                max(definition_start, 0),
+            )
+            if definition_start < 0 or theorem_start < 0:
+                errors.append(f"{prefix}: literal source-monad definition is absent")
+            else:
+                definition_text = theory_text[definition_start:theorem_start]
+                positions = [
+                    definition_text.find(source_function)
+                    for source_function in FOUR_CALL_SEQUENCE_SOURCE_FUNCTIONS
+                ]
+                if any(position < 0 for position in positions) or positions != sorted(positions):
+                    errors.append(f"{prefix}: source calls are not in the literal required order")
+                if definition_text.count("bind (") != 3:
+                    errors.append(f"{prefix}: literal four-call chain must contain exactly three binds")
+            if theorem_statement is not None:
+                for needle in (
+                    FOUR_CALL_SEQUENCE_DEFINITION,
+                    "Result ()",
+                    "raw_xlist_rel",
+                    "list_insert_end_abs",
+                    "list_remove_abs",
+                ):
+                    if needle not in theorem_statement:
+                        errors.append(f"{prefix}: four-call theorem omits {needle!r}")
+                if "assumes" in theorem_statement:
+                    errors.append(f"{prefix}: literal four-call theorem must have no assumptions")
+            for operation_name in FOUR_CALL_SEQUENCE_OPERATION_IDS:
+                operation_entry = operation_by_id.get(operation_name, {})
+                if operation_entry.get("stages", {}).get("translated", {}).get(
+                    "status"
+                ) != "checker_green":
+                    errors.append(
+                        f"{prefix}: source operation {operation_name!r} is not translation-green"
+                    )
+            for generated_body in (
+                "vListInitialise'_def",
+                "vListInitialiseItem'_def",
+                "vListInsertEnd'_def",
+                "vListRemove'_def",
+            ):
+                if generated_body in theory_text:
+                    errors.append(
+                        f"{prefix}: four-call theory reopens generated body {generated_body!r}"
+                    )
+
+        if rung_id == "Scheduler-P2-Frozen-Preimage":
+            if rung.get("boundary_conditions") != SCHEDULER_P2_FROZEN_BOUNDARY_CONDITIONS:
+                errors.append(
+                    f"{prefix}: boundary_conditions must record the exact frozen P2 delay-2 boundary"
+                )
+            if rung.get("artifact_binding") != "frozen_artifact_binding":
+                errors.append(f"{prefix}: artifact_binding is not the sealed frozen ledger")
+            if rung.get("preimage_theorem") != "frozen_p2_preimage_nonempty":
+                errors.append(f"{prefix}: preimage theorem is wrong")
+            if rung.get("seal_theorem") != "frozen_p2_artifact_bound_seal":
+                errors.append(f"{prefix}: seal theorem is wrong")
+            if rung.get("supporting_refinement_theorem") != (
+                "scheduler_vTaskDelay_2_p2_refines_task_delay_abs"
+            ):
+                errors.append(f"{prefix}: supporting delay-2 refinement theorem is wrong")
+            for fact_name in (
+                "frozen_p2_endpoint",
+                "frozen_p2_preimage_nonempty",
+                "frozen_p2_artifact_bound_vTaskDelay_2_refinement",
+                "frozen_p2_artifact_bound_seal",
+            ):
+                if not _declares_isabelle_fact(theory_text, fact_name):
+                    errors.append(f"{prefix}: frozen P2 fact {fact_name!r} is not declared")
+            if theorem_statement is not None:
+                for needle in (
+                    "vTaskDelay' (2 :: 32 word)",
+                    "frozen_p2_globals",
+                    "Result ()",
+                    "scheduler_endpoint_rel YieldPending",
+                    "task_delay_abs 2 p2_pre",
+                ):
+                    if needle not in theorem_statement:
+                        errors.append(f"{prefix}: artifact-bound theorem omits {needle!r}")
+                if "assumes" in theorem_statement:
+                    errors.append(f"{prefix}: artifact-bound theorem must have no assumptions")
+            seal_statement = _isabelle_fact_statement(
+                theory_text, "frozen_p2_artifact_bound_seal"
+            )
+            if seal_statement is not None:
+                for needle in (
+                    r"\<exists>D R c.",
+                    "p2_source_footprint",
+                    "vTaskDelay' (2 :: 32 word)",
+                    "task_delay_abs 2 p2_pre",
+                ):
+                    if needle not in seal_statement:
+                        errors.append(f"{prefix}: seal theorem omits {needle!r}")
+
         session = rung.get("session")
         if not isinstance(session, str) or f"session {session} " not in root_text:
             errors.append(f"{prefix}: session is absent from theories/ROOT")
@@ -2003,6 +2564,11 @@ def _validate_source_to_abstract_refinement_rungs(
                     errors.append(
                         f"{prefix}: evidence timed out or omits timed_out=false"
                     )
+                if rung_id in {
+                    "Scheduler-P2-Frozen-Preimage",
+                    "Raw-R6-initialise-item-insert-remove-sequence",
+                }:
+                    _validate_portable_artifact_identity(errors, prefix, status)
                 if rung_id in HASHED_RUN_EVIDENCE_IDS:
                     _validate_run_artifact_hashes(errors, project_root, prefix, rung)
 
@@ -2081,12 +2647,14 @@ def validate_mapping(manifest: dict[str, Any], project_root: Path) -> list[str]:
         errors.append(
             "claim_boundary must exclude non-refinement green layers from refinement"
         )
-    if claim_boundary.get("positive_delay_source_refinement_complete") is not False:
+    if claim_boundary.get("positive_delay_source_refinement_complete") is not True:
         errors.append(
-            "claim_boundary must keep positive-delay source refinement open"
+            "claim_boundary must record the checked positive-delay source refinement"
         )
-    if claim_boundary.get("concrete_p2_preimage_complete") is not False:
-        errors.append("claim_boundary must keep the concrete P2 preimage open")
+    if claim_boundary.get("concrete_p2_preimage_complete") is not True:
+        errors.append("claim_boundary must record the checked concrete P2 preimage")
+
+    _validate_frozen_artifact_binding(errors, project_root, manifest)
 
     semantic_name = manifest.get("semantic_slice_manifest")
     if not isinstance(semantic_name, str):

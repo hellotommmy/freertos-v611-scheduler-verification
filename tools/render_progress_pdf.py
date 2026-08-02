@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the audited P2 mathematical progress manuscript as a polished PDF.
+"""Render the sealed P2 mathematical progress manuscript as a polished PDF.
 
 The source manuscript is deliberately treated as read-only.  The renderer uses
 ReportLab for the document, Matplotlib only for high-resolution display-math
@@ -43,11 +43,11 @@ from reportlab.platypus import (
 
 
 TITLE = (
-    "A Conditional Source-to-Abstract Functional-Correctness Theorem "
+    "A Sealed Frozen-Artifact P2 Generated-Source Refinement Milestone "
     "for FreeRTOS V6.1.1 vTaskDelay(2)"
 )
-SHORT_TITLE = "FreeRTOS V6.1.1 P2 Mathematical Progress"
-STATUS_LINE = "Conditional theorem green - frozen-build non-vacuity open"
+SHORT_TITLE = "FreeRTOS V6.1.1 Frozen-Artifact P2 Seal"
+STATUS_LINE = "Scoped seal: artifact-root-bound P2 source refinement green"
 
 NAVY = colors.HexColor("#17324D")
 TEAL = colors.HexColor("#177D7A")
@@ -267,7 +267,7 @@ def make_styles(body_size: float) -> dict[str, ParagraphStyle]:
             fontSize=body_size,
             leading=body_size * 1.27,
             textColor=INK,
-            alignment=TA_JUSTIFY,
+            alignment=TA_LEFT,
             spaceAfter=3.2,
             allowWidows=0,
             allowOrphans=0,
@@ -516,6 +516,10 @@ class Renderer:
             fractions = [0.27, 0.365, 0.365]
         elif ncols == 3:
             fractions = [0.24, 0.51, 0.25]
+        elif ncols == 4 and "run identifier" in heading:
+            # Run identifiers are long and must wrap in a deliberately wide
+            # evidence column; equal quarters create tall, brittle rows.
+            fractions = [0.20, 0.48, 0.12, 0.20]
         elif ncols == 5:
             fractions = [0.22, 0.235, 0.105, 0.13, 0.31]
         else:
@@ -760,7 +764,7 @@ def render(input_path: Path, output_path: Path, tmp_dir: Path, font_dir: Path, b
         pagesize=A4,
         title=TITLE,
         author="Blind Isabelle/HOL reconstruction project",
-        subject="Conditional FreeRTOS V6.1.1 P2 source-to-abstract refinement",
+        subject="Sealed scoped FreeRTOS V6.1.1 frozen-artifact P2 source-to-abstract refinement",
         creator="ReportLab renderer with embedded DejaVu fonts",
         **margins,
     )

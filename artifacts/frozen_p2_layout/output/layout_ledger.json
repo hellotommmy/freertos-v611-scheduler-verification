@@ -1,0 +1,664 @@
+{
+  "schema": 1,
+  "status": "valid",
+  "source_date_epoch": 0,
+  "project_root": "/workspace/freertos_v611_scheduler",
+  "artifact": {
+    "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.elf",
+    "sha256": "dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a",
+    "class": "ELF32",
+    "endianness": "little",
+    "machine": "Intel 80386",
+    "type": "ET_EXEC",
+    "pie": false,
+    "interpreter": false,
+    "dynamic_section": false,
+    "stripped": false,
+    "dwarf": true,
+    "deterministic_relink_sha256_match": true
+  },
+  "compile_flags": [
+    "-m32",
+    "-std=c99",
+    "-O0",
+    "-g3",
+    "-gdwarf-4",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-fno-pic",
+    "-fno-pie",
+    "-fno-lto",
+    "-fno-common",
+    "-fno-stack-protector",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+    "-fno-ident",
+    "-fno-eliminate-unused-debug-types",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-frandom-seed=eal6-frozen-p2-layout",
+    "-fdebug-prefix-map=/workspace/freertos_v611_scheduler=/workspace/freertos_v611_scheduler",
+    "-ffile-prefix-map=/workspace/freertos_v611_scheduler=/workspace/freertos_v611_scheduler",
+    "-fmacro-prefix-map=/workspace/freertos_v611_scheduler=/workspace/freertos_v611_scheduler",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fno-strict-aliasing"
+  ],
+  "include_flags": [
+    "-iquote",
+    "/workspace/freertos_v611_scheduler/proof_port/scheduler",
+    "-I",
+    "/workspace/freertos_v611_scheduler/proof_port/scheduler",
+    "-I",
+    "/workspace/freertos_v611_scheduler/proof_port",
+    "-I",
+    "/workspace/freertos_v611_scheduler/upstream/FreeRTOSV6.1.1/Source/include",
+    "-I",
+    "/workspace/freertos_v611_scheduler/upstream/FreeRTOSV6.1.1/Source"
+  ],
+  "link_flags": [
+    "-m",
+    "elf_i386",
+    "--build-id=sha1",
+    "--fatal-warnings",
+    "--unresolved-symbols=report-all",
+    "-T",
+    "/workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/frozen_p2_layout.ld"
+  ],
+  "tools": {
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+    "gcc_target": "x86_64-linux-gnu",
+    "assembler": "GNU assembler (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or later.\nThis program has absolutely no warranty.\nThis assembler was configured for a target of `x86_64-linux-gnu'.",
+    "linker": "GNU ld (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.",
+    "readelf": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.",
+    "nm": "GNU nm (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.",
+    "objdump": "GNU objdump (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.",
+    "file": "file-5.46\nmagic file from /etc/magic:/usr/share/misc/magic",
+    "os_release": "PRETTY_NAME=\"Ubuntu 26.04 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04 (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo",
+    "gcc_multilib": ".;\n32;@m32\nx32;@mx32",
+    "executable_sha256": "b5f1b773a7c733738352000c92a077dc5852a1a2fc6d836b1e411be1e9ec5f88  /usr/bin/gcc\n4e5fcaa3cdc160173cb5cfe7aa35dc39d7aa1f06ba8d75b8d923bbae5473991b  /usr/bin/as\n97f48d93b8b076a92d2809ec29dcb17f0f37c8827358f832255e2ed22fef6075  /usr/bin/ld\nc857339616bbbfa5eba32733e22365048903fbaf6ed2126b897dd138bcb741fc  /usr/bin/readelf\nf04262bf48192a7cbb78a17ca49ae03f8930b0372bd0115576f957b2e2a57a01  /usr/bin/nm\n44f07f8da860b15bd4dec909f229dec536595fb170a616fe3ab29c7b21c9736f  /usr/bin/objdump\n4b6e9eb1da3575a8b2ba143b9a84db578b83550791aa198dfb9a3c91cf145b88  /usr/bin/file"
+  },
+  "base_symbols": [
+    {
+      "symbol": "pxReadyTasksLists",
+      "address_hex": "0x00102020",
+      "address_decimal": 1056800,
+      "size": 80,
+      "readelf_address_hex": "0x00102020",
+      "readelf_size": 80,
+      "nm_address_hex": "0x00102020",
+      "nm_size": 80,
+      "expected_size": 80,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    },
+    {
+      "symbol": "xDelayedTaskList1",
+      "address_hex": "0x0010208c",
+      "address_decimal": 1056908,
+      "size": 20,
+      "readelf_address_hex": "0x0010208c",
+      "readelf_size": 20,
+      "nm_address_hex": "0x0010208c",
+      "nm_size": 20,
+      "expected_size": 20,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    },
+    {
+      "symbol": "xDelayedTaskList2",
+      "address_hex": "0x001020a0",
+      "address_decimal": 1056928,
+      "size": 20,
+      "readelf_address_hex": "0x001020a0",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020a0",
+      "nm_size": 20,
+      "expected_size": 20,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    },
+    {
+      "symbol": "xPendingReadyList",
+      "address_hex": "0x001020bc",
+      "address_decimal": 1056956,
+      "size": 20,
+      "readelf_address_hex": "0x001020bc",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020bc",
+      "nm_size": 20,
+      "expected_size": 20,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    },
+    {
+      "symbol": "xSuspendedTaskList",
+      "address_hex": "0x001020d4",
+      "address_decimal": 1056980,
+      "size": 20,
+      "readelf_address_hex": "0x001020d4",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020d4",
+      "nm_size": 20,
+      "expected_size": 20,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    },
+    {
+      "symbol": "xTasksWaitingTermination",
+      "address_hex": "0x001020e8",
+      "address_decimal": 1057000,
+      "size": 20,
+      "readelf_address_hex": "0x001020e8",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020e8",
+      "nm_size": 20,
+      "expected_size": 20,
+      "bind": "LOCAL",
+      "nm_type": "b",
+      "readelf_nm_match": true,
+      "map_present": true
+    }
+  ],
+  "physical_roots": [
+    {
+      "logical_name": "ready[0]",
+      "base_symbol": "pxReadyTasksLists",
+      "offset": 0,
+      "address_hex": "0x00102020",
+      "address_decimal": 1056800,
+      "size": 20,
+      "readelf_address_hex": "0x00102020",
+      "readelf_size": 20,
+      "nm_address_hex": "0x00102020",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "ready[1]",
+      "base_symbol": "pxReadyTasksLists",
+      "offset": 20,
+      "address_hex": "0x00102034",
+      "address_decimal": 1056820,
+      "size": 20,
+      "readelf_address_hex": "0x00102034",
+      "readelf_size": 20,
+      "nm_address_hex": "0x00102034",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "ready[2]",
+      "base_symbol": "pxReadyTasksLists",
+      "offset": 40,
+      "address_hex": "0x00102048",
+      "address_decimal": 1056840,
+      "size": 20,
+      "readelf_address_hex": "0x00102048",
+      "readelf_size": 20,
+      "nm_address_hex": "0x00102048",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "ready[3]",
+      "base_symbol": "pxReadyTasksLists",
+      "offset": 60,
+      "address_hex": "0x0010205c",
+      "address_decimal": 1056860,
+      "size": 20,
+      "readelf_address_hex": "0x0010205c",
+      "readelf_size": 20,
+      "nm_address_hex": "0x0010205c",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "delayed-A",
+      "base_symbol": "xDelayedTaskList1",
+      "offset": 0,
+      "address_hex": "0x0010208c",
+      "address_decimal": 1056908,
+      "size": 20,
+      "readelf_address_hex": "0x0010208c",
+      "readelf_size": 20,
+      "nm_address_hex": "0x0010208c",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "delayed-B",
+      "base_symbol": "xDelayedTaskList2",
+      "offset": 0,
+      "address_hex": "0x001020a0",
+      "address_decimal": 1056928,
+      "size": 20,
+      "readelf_address_hex": "0x001020a0",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020a0",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "pending-ready",
+      "base_symbol": "xPendingReadyList",
+      "offset": 0,
+      "address_hex": "0x001020bc",
+      "address_decimal": 1056956,
+      "size": 20,
+      "readelf_address_hex": "0x001020bc",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020bc",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    },
+    {
+      "logical_name": "suspended",
+      "base_symbol": "xSuspendedTaskList",
+      "offset": 0,
+      "address_hex": "0x001020d4",
+      "address_decimal": 1056980,
+      "size": 20,
+      "readelf_address_hex": "0x001020d4",
+      "readelf_size": 20,
+      "nm_address_hex": "0x001020d4",
+      "nm_size": 20,
+      "readelf_nm_match": true
+    }
+  ],
+  "dwarf_structures": [
+    {
+      "structure": "xLIST",
+      "observed_sizes": [
+        20
+      ],
+      "expected_size": 20,
+      "expected_present": true
+    },
+    {
+      "structure": "xLIST_ITEM",
+      "observed_sizes": [
+        20
+      ],
+      "expected_size": 20,
+      "expected_present": true
+    },
+    {
+      "structure": "xMINI_LIST_ITEM",
+      "observed_sizes": [
+        12
+      ],
+      "expected_size": 12,
+      "expected_present": true
+    },
+    {
+      "structure": "tskTaskControlBlock",
+      "observed_sizes": [
+        68
+      ],
+      "expected_size": 68,
+      "expected_present": true
+    }
+  ],
+  "checks": {
+    "base_symbol_count": 6,
+    "physical_root_count": 8,
+    "ready_array_size": 80,
+    "ready_element_size": 20,
+    "ready_stride": 20,
+    "all_base_symbols_readelf_nm_equal": true,
+    "all_base_symbols_in_link_map": true,
+    "all_base_regions_pairwise_disjoint": true,
+    "all_root_regions_pairwise_disjoint": true,
+    "all_addresses_4_byte_aligned": true,
+    "all_regions_inside_32_bit_address_space": true
+  },
+  "tcb_policy": {
+    "elf_symbols": false,
+    "detected_68_byte_object_symbols": [],
+    "statement": "P2_IDLE and P2_RUN TCBs remain runtime logical witness objects; this artifact certifies static scheduler roots only."
+  },
+  "trust_boundary": [
+    "GNU GCC/assembler/linker correctness is not verified.",
+    "GNU readelf and nm are independent extraction paths but share the Binutils implementation.",
+    "This ledger does not connect opaque CParser addressed-data constants to these numeric ELF addresses.",
+    "Allocator behaviour, task construction, boot reachability, and deployed-port equivalence remain outside this artifact."
+  ],
+  "inputs": [
+    {
+      "path": "proof_port/scheduler/scheduler_translation_unit.c",
+      "sha256": "7324c80318ffc5f4bb43c5450fe181f5a92a86abf27d1d7f582e38649c7edfac"
+    },
+    {
+      "path": "proof_port/scheduler/FreeRTOSConfig.h",
+      "sha256": "d9f50714a1137703aceeb884329acaebcfcbf713dab594f6ce5a0e74e4d5952a"
+    },
+    {
+      "path": "proof_port/scheduler/portmacro.h",
+      "sha256": "18249eceb047316b28ce67eecda6c0e2ca28d4bc430110359ddcc8dcf9afbe15"
+    },
+    {
+      "path": "proof_port/scheduler/scheduler_port_contract.h",
+      "sha256": "049206913d9a6ab4d93d2c66b43bd7c378416d9b32ce23e7a3a05dee84a9799f"
+    },
+    {
+      "path": "proof_port/scheduler/scheduler_port_contract.c",
+      "sha256": "a99353238f40f2a987ac15dd1e8e6f95bdac4cf177a16bbbee7fd5d145ffbd38"
+    },
+    {
+      "path": "proof_port/scheduler/stdio.h",
+      "sha256": "60d3e7087fca8757e62c4081292f9efd3f1c6d994f6c4ace861d796d7686c9e6"
+    },
+    {
+      "path": "proof_port/scheduler/string.h",
+      "sha256": "395b6e39bf0d7dc85ce39f7a894ae6eca98da60df05af7b22235295beb621893"
+    },
+    {
+      "path": "proof_port/stddef.h",
+      "sha256": "aec723f43e04d167aa5d90d6a545adf3c1597030e6e055fa25fa948edc2fad8f"
+    },
+    {
+      "path": "proof_port/stdlib.h",
+      "sha256": "6e39015e1b1cc194d7b564afa16adfda9752b04abed5d3d1744e18db1ca2dd2d"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/tasks.c",
+      "sha256": "0a5b6c12aea6fae2a951c0e80bdc301c646ef8c6360d574a2c4699d4c33a45bf"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/list.c",
+      "sha256": "eead2c4f6aeb2da0cf4a5606ec4a213ef492b09c12df1a0097b6442688c82abb"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/FreeRTOS.h",
+      "sha256": "a7c648098f7e872070ed798060bc2049ab921094424508d0d07ec9d43f1afb23"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/list.h",
+      "sha256": "3187f4c359eb301a1fe55b449979cef6053b4aa984f033ce17b8c1ea0bba7306"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/mpu_wrappers.h",
+      "sha256": "33fb90d4da3c4a06c1dfebed02aa0383be3dd7206563cce1040ac35c7be282e0"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/portable.h",
+      "sha256": "403dd8519478c8d43e8d5ef2c83d118b2cb1813403a65edef2b79e5b5c47df61"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/projdefs.h",
+      "sha256": "5541e1df93c679bbebf89fa503d45f639e8d01c6ff9379fe40cb5464b41ac1e8"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/StackMacros.h",
+      "sha256": "aa011c72331cfb782964ef5749492d91ffd7f230ec2b8a028e90958a2f9005de"
+    },
+    {
+      "path": "upstream/FreeRTOSV6.1.1/Source/include/task.h",
+      "sha256": "be6492fb22f656dee420f130f177e38f919d879bf22697e7c645a83714ceb24d"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/link_stubs.c",
+      "sha256": "2ff333fae9422f2f8de4b04f833d8dc73420888598011886cf1c8f586d884977"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/frozen_p2_layout.ld",
+      "sha256": "999622ea9af0e82b93adae5637eb9c0fa97ec3c143347ce2e98a1afd1c37ef05"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/build_and_check.ps1",
+      "sha256": "71840f483773689dc97be534d6aa21116caf5cfc4feb76b4adba1061eb30bfda"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/frozen_p2_layout/output/scheduler_translation_unit.o",
+      "sha256": "6baee12a7c56cbee99b2ea1bae604f311d48b4552582fcd8de525896e3156eb2"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/link_stubs.o",
+      "sha256": "f5e94194a8c0a31723807079df036779a3f8587cd64c2dc682958942f474fab2"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.elf",
+      "sha256": "dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.repro.elf",
+      "sha256": "dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.map",
+      "sha256": "0fec1f371856475937656d74f98648f150a11de9e294c7e0d44825ad38b67fd1"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.repro.map",
+      "sha256": "a0139267302407b0b5a224f35acad2e1e5fd076c4a6da44a6622d7aa62727fd8"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/elf_header.txt",
+      "sha256": "327b5a8d6e4571464d153f943179f34b1b7619ac7f9c03f7ab764146f941ee30"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/program_headers.txt",
+      "sha256": "4c6d10b5c365ea5cc14d74d74951a45c721dd0a467fbe262aefd28a5f6655c89"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/section_headers.txt",
+      "sha256": "2a35632316127b81c4835ce7b2c2cb6f6aa2b4e63680da51736e55ada57b23ef"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/dynamic_section.txt",
+      "sha256": "8f440b11aa34c5145152189d4391ece1272b24d2739a2a33ebcdb30fa0d8d29d"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/symbols.readelf.txt",
+      "sha256": "f2c1dde6fb3a96c9b96d24b306740757fc199c3cfc245666a61bff2cc73ac1c5"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/symbols.nm.txt",
+      "sha256": "33dd0a04bd2d76e541913edf0c126a74bffe7b111e4f7aa2c4d7b35d7e33a2f2"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/symbols.objdump.txt",
+      "sha256": "a6ff5bdd3b7d0def907057a5e97c3c4592d5ea2ca2aab4b80a635f82410f6550"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/dwarf_info.txt",
+      "sha256": "22b6fd8c349226d3dd4f29ebbef41f9c608d5cc245b04628458792f4ad22cf2a"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/file.txt",
+      "sha256": "6f2f12c77dd2c7b45bd7d725384a6d5a00de6bdb1b5dc42e03ab4b908438f663"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/raw/tool_hashes.txt",
+      "sha256": "1a9ea0f47a8ad9a607f1d56c0c17c501c795cd52c4fabd7f06074778168f409d"
+    },
+    {
+      "path": "artifacts/frozen_p2_layout/output/commands.txt",
+      "sha256": "82b1b90f1f40116cbbfb338037771119d9f1950239384de71868ff476f4ad017"
+    }
+  ],
+  "bounded_processes": [
+    {
+      "label": "compile-translation-unit",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/compile_tu.stdout.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/compile_tu.stderr.txt"
+    },
+    {
+      "label": "compile-link-stubs",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/compile_stubs.stdout.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/compile_stubs.stderr.txt"
+    },
+    {
+      "label": "link-primary",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/link.stdout.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/link.stderr.txt"
+    },
+    {
+      "label": "link-reproducibility-copy",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/link_repro.stdout.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/link_repro.stderr.txt"
+    },
+    {
+      "label": "elf-header",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/elf_header.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/elf_header.txt.stderr"
+    },
+    {
+      "label": "program-headers",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/program_headers.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/program_headers.txt.stderr"
+    },
+    {
+      "label": "section-headers",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/section_headers.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/section_headers.txt.stderr"
+    },
+    {
+      "label": "dynamic-section",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/dynamic_section.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/dynamic_section.txt.stderr"
+    },
+    {
+      "label": "readelf-symbols",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/symbols.readelf.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/symbols.readelf.txt.stderr"
+    },
+    {
+      "label": "nm-symbols",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/symbols.nm.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/symbols.nm.txt.stderr"
+    },
+    {
+      "label": "objdump-symbols",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/symbols.objdump.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/symbols.objdump.txt.stderr"
+    },
+    {
+      "label": "dwarf-info",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/dwarf_info.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/dwarf_info.txt.stderr"
+    },
+    {
+      "label": "file-identification",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/file.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/file.txt.stderr"
+    },
+    {
+      "label": "gcc-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/gcc.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/gcc.version.txt.stderr"
+    },
+    {
+      "label": "gcc-target",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/gcc.target.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/gcc.target.txt.stderr"
+    },
+    {
+      "label": "assembler-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/as.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/as.version.txt.stderr"
+    },
+    {
+      "label": "linker-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/ld.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/ld.version.txt.stderr"
+    },
+    {
+      "label": "readelf-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/readelf.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/readelf.version.txt.stderr"
+    },
+    {
+      "label": "nm-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/nm.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/nm.version.txt.stderr"
+    },
+    {
+      "label": "objdump-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/objdump.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/objdump.version.txt.stderr"
+    },
+    {
+      "label": "file-version",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/file.version.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/file.version.txt.stderr"
+    },
+    {
+      "label": "os-release",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/os_release.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/os_release.txt.stderr"
+    },
+    {
+      "label": "gcc-multilib",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/gcc.multilib.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/gcc.multilib.txt.stderr"
+    },
+    {
+      "label": "tool-hashes",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": "artifacts/frozen_p2_layout/output/raw/tool_hashes.txt",
+      "stderr": "artifacts/frozen_p2_layout/output/raw/tool_hashes.txt.stderr"
+    }
+  ]
+}

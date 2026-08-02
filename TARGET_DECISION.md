@@ -1,6 +1,58 @@
 # Target decision
 
-Status: `CONDITIONAL_GO__SPLIT_HEAP_BLOCKED__RAW_HEAP_SCHEDULER_TRANSLATIONS_GREEN__SCHEDULER_LIST_ABI_FOUNDATION_GREEN__EXACT_REFINEMENTS_12__GENERAL_INSERT_REMOVE_GREEN__ORDERED_EMPTY_REFINEMENT_GREEN__REMOVE_INSERT_SEQUENCE_GREEN__SCHEDULER_ROOTS_5_OF_5_RESTRICTED__P2_POSITIVE_DELAY_CONDITIONAL_REFINEMENT_GREEN__FROZEN_BUILD_LAYOUT_NONVACUITY_OPEN`
+Status: `FINAL_GO__SEALED_BLIND_MILESTONE__EXACT_REFINEMENTS_13__DISTINCT_OPERATIONS_8__SEQUENTIAL_COMPOSITIONS_2__FROZEN_P2_PREIMAGE_GREEN__FOUR_CALL_HARD_GATE_GREEN`
+
+## Final decision (2026-08-01)
+
+The scoped FreeRTOS V6.1.1 target is accepted and sealed.  Both conditions
+that were open at the preceding decision checkpoint are now checker-green:
+
+1. an artifact-bound P2 preimage instantiates the artifact-specialized
+   positive-delay generated-source refinement; and
+2. the literal `vListInitialise' -> vListInitialiseItem' ->
+   vListInsertEnd' -> vListRemove'` hard-gate chain executes and refines its
+   abstract remove-after-insert result.
+
+The portable artifact identity is frozen ELF
+`DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A`,
+layout ledger
+`CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02`,
+and generated addressed-global configuration
+`27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712`.
+The external builder and generator extract, relink-check, and hash-lock this
+ELF/ledger/configuration correspondence.  Isabelle consumes the generated
+addresses as definitions; it does not prove that correspondence or a
+source-to-binary relation.
+Six mapped C bases derive nine static list regions; eight are P2 roots.  Fresh
+logical runtime TCB addresses are guarded and separated from all nine.  This
+closes logical non-vacuity without claiming that an allocator or boot path
+constructs the witness.
+
+The artifact-specialized generated `vTaskDelay' (2 :: 32 word)` exact-state/refinement path
+ends at `YieldPending` and agrees with `task_delay_abs 2 p2_pre`.  The literal
+four-call theorem has no assumptions and exactly three `runs_to_bind`
+compositions.  It intentionally makes no `tail8` claim.
+
+The final accounting is **13 source-to-abstract refinements, 8 distinct
+operations, and 2 sequential compositions**.  The portable parser, no-go,
+static geometry, dynamic geometry, P2 preimage, four-call, list-smoke, raw
+skip-heap, and capstone-assumption-audit replays all exited 0 without timeout and with
+`quick_and_dirty=false` (respectively 23.566, 33.162, 27.701, 27.467,
+120.854, 32.338, 67.973, 22.551, and 137.387 seconds).  The last session
+checks the five capstone theorem objects and finds zero premises, hypotheses,
+propositional implications, sort hypotheses, or extra sort hypotheses; no
+function-address or generated `G`/`S` locale premise survives.
+
+The accepted scope excludes allocator and task-construction correctness,
+boot/scheduler-start reachability, context-switch execution after the pending
+yield, compiler and machine-code correctness, binary/source equivalence, and
+full-scheduler functional correctness.
+
+## Historical decision record
+
+The remaining sections preserve the chronological decision audit.  Any
+statement below that the layout/preimage or four-call chain was "open" is a
+checkpoint statement and is superseded by the final decision above.
 
 ## Selected object
 
@@ -473,10 +525,10 @@ weakening C validity, the target switches.  Merely using
 `no_heap_abs`, or an ignored addressability error is not accepted without the
 full nonempty needle and broader correspondence evidence.
 
-## P2 positive-delay decision update (2026-08-01)
+## Historical P2 positive-delay decision update (superseded)
 
 The conditional positive-delay acceptance needle is now checker-green.  The
-real generated `vTaskDelay' 2` body executes through exact suspend, remove,
+artifact-specialized generated `vTaskDelay' 2` body executes through exact suspend, remove,
 wake-key write, delayed-A insertion, quiet resume, and yield states.  The pure
 postrelation checks all eight list roots plus decoder, role, scalar, current,
 and boundary components, and the final corollary relates the source result to
@@ -492,7 +544,7 @@ The three final runs, all with `quick_and_dirty=false`, are:
 
 The decision label is therefore:
 
-> Conditional real-source functional-correctness theorem: green; concrete
+> Conditional generated-source refinement theorem: green; concrete
 > frozen-build-layout P2 non-vacuity witness: open.
 
 The remaining non-vacuity gap is not an SMT or symbolic-execution obligation.

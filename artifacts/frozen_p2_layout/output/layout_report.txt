@@ -1,0 +1,29 @@
+Frozen P2 scheduler layout artifact: VALID
+ELF: artifacts/frozen_p2_layout/output/frozen_p2_layout.elf
+SHA-256: dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a
+Format: ELF32 little-endian i386 ET_EXEC; non-PIE; no interpreter; no dynamic section; unstripped; DWARF present
+Deterministic relink: PASS (dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a)
+
+Six addressed static base symbols (readelf == nm; GNU ld map present):
+  pxReadyTasksLists        0x00102020 size=80
+  xDelayedTaskList1        0x0010208c size=20
+  xDelayedTaskList2        0x001020a0 size=20
+  xPendingReadyList        0x001020bc size=20
+  xSuspendedTaskList       0x001020d4 size=20
+  xTasksWaitingTermination 0x001020e8 size=20
+
+Eight physical scheduler roots:
+  ready[0]         0x00102020 size=20 base=pxReadyTasksLists+0
+  ready[1]         0x00102034 size=20 base=pxReadyTasksLists+20
+  ready[2]         0x00102048 size=20 base=pxReadyTasksLists+40
+  ready[3]         0x0010205c size=20 base=pxReadyTasksLists+60
+  delayed-A        0x0010208c size=20 base=xDelayedTaskList1+0
+  delayed-B        0x001020a0 size=20 base=xDelayedTaskList2+0
+  pending-ready    0x001020bc size=20 base=xPendingReadyList+0
+  suspended        0x001020d4 size=20 base=xSuspendedTaskList+0
+
+Ready array: size=80, element size=20, stride=20; all eight 20-byte regions are pairwise disjoint and 4-byte aligned.
+DWARF sizes: xLIST=20, xLIST_ITEM=20, xMINI_LIST_ITEM=12, tskTaskControlBlock=68.
+TCB policy: P2_IDLE/P2_RUN are runtime logical witnesses, not ELF symbols.
+Limit: this does not yet discharge equality between CParser addressed-data constants and ELF symbol addresses, nor boot/allocator reachability.
+Runtime measurements are intentionally excluded from the content-addressed certificate.

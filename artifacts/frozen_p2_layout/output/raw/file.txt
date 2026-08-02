@@ -1,0 +1,1 @@
+/workspace/freertos_v611_scheduler/artifacts/frozen_p2_layout/output/frozen_p2_layout.elf: ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), statically linked, BuildID[sha1]=9be868b2aacb19de9f9f2be31c9adaa69b33f9e7, with debug_info, not stripped

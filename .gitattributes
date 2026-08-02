@@ -1,0 +1,32 @@
+# Preserve the upstream release's historical checkout representation.
+/upstream/** text eol=crlf
+
+# Project-authored proof, tool, script, patch, and artifact sources are LF.
+/proof_port/** text eol=lf
+/theories/** text eol=lf
+/tools/** text eol=lf
+/scripts/** text eol=lf
+/patches/** text eol=lf
+/artifacts/** text eol=lf
+/scope/** text eol=lf
+/docs/** text eol=lf
+/metrics/** text eol=lf
+/*.md text eol=lf
+/.gitignore text eol=lf
+/.gitattributes text eol=lf
+
+# Generated certificate outputs are hashed byte-for-byte, never EOL-converted.
+/artifacts/**/output/** -text
+/output/pdf/** -text
+
+# Byte-hashed tool output deliberately preserves upstream/tool CRLF and final
+# blank records.  Exempt only these evidence paths from whitespace diagnostics;
+# their exact bytes are authenticated by the seal hashes.
+/artifacts/**/output/** whitespace=-trailing-space
+/runs/20260801Tseal-*/status.txt whitespace=-trailing-space
+/runs/20260801Tseal-*/stdout.log whitespace=-trailing-space
+/patches/*.patch whitespace=-trailing-space
+
+# Final checker evidence is itself hash-pinned in the scope mapping.
+/runs/20260801Tseal-*/status.txt -text
+/runs/20260801Tseal-*/stdout.log -text

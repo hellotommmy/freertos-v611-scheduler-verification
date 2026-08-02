@@ -97,6 +97,106 @@ class SourceItpMappingTests(unittest.TestCase):
             errors,
         )
 
+    def test_frozen_artifact_binding_records_six_nine_eight(self) -> None:
+        binding = load_manifest()["frozen_artifact_binding"]
+        self.assertEqual(
+            binding["counts"],
+            {
+                "mapped_bases": 6,
+                "static_xlist_regions": 9,
+                "p2_relation_roots": 8,
+            },
+        )
+        self.assertEqual(len(binding["mapped_bases"]), 6)
+        self.assertEqual(len(binding["static_xlist_regions"]), 9)
+        self.assertEqual(len(binding["p2_relation_roots"]), 8)
+        self.assertEqual(
+            binding["elf"]["sha256"],
+            "DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A",
+        )
+        self.assertEqual(
+            binding["ledger"]["sha256"],
+            "CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02",
+        )
+        self.assertEqual(
+            binding["patched_parser"]["generated_address_config_sha256"],
+            "27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712",
+        )
+        self.assertEqual(
+            binding["patched_parser"]["patch_sha256"],
+            "44160F97B133D0A66E515E505636D641907DC14811D43DA071EA15C706C8E604",
+        )
+        self.assertEqual(
+            binding["patched_parser"]["evidence"]["run_id"],
+            "20260801Tseal-scheduler-parse-01-portable",
+        )
+        self.assertEqual(
+            binding["stock_layout_no_go"]["theorem"],
+            "p2_source_footprint_delayed_alias_no_go",
+        )
+        self.assertEqual(
+            binding["dynamic_geometry"]["separated_static_region_count"], 9
+        )
+
+    def test_frozen_artifact_count_tampering_is_rejected(self) -> None:
+        manifest = load_manifest()
+        manifest["frozen_artifact_binding"]["counts"]["static_xlist_regions"] = 8
+        errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
+        self.assertIn(
+            "frozen_artifact_binding.counts must be exactly six/nine/eight",
+            errors,
+        )
+
+    def test_patched_parser_hash_tampering_is_rejected(self) -> None:
+        manifest = load_manifest()
+        manifest["frozen_artifact_binding"]["patched_parser"][
+            "staged_calculate_state_sha256"
+        ] = "0" * 64
+        errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
+        self.assertIn(
+            "frozen_artifact_binding.patched_parser staged calculate_state hash is wrong",
+            errors,
+        )
+
+    def test_patched_parser_evidence_hash_tampering_is_rejected(self) -> None:
+        manifest = load_manifest()
+        manifest["frozen_artifact_binding"]["patched_parser"]["evidence"][
+            "status_sha256"
+        ] = "0" * 64
+        errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
+        self.assertIn(
+            "frozen_artifact_binding.patched_parser.evidence: "
+            "status_sha256 disagrees with status file",
+            errors,
+        )
+
+    def test_patched_parser_run_must_share_portable_artifact_identity(self) -> None:
+        manifest = load_manifest()
+        evidence = manifest["frozen_artifact_binding"]["patched_parser"][
+            "evidence"
+        ]
+        target = (PROJECT_ROOT / evidence["status_file"]).resolve()
+        parse_status = validate_source_itp_mapping._parse_status
+
+        def drift_ledger(path: Path) -> dict[str, str]:
+            status = parse_status(path)
+            if path.resolve() == target:
+                status["frozen_layout_ledger_sha256"] = "0" * 64
+            return status
+
+        with mock.patch.object(
+            validate_source_itp_mapping,
+            "_parse_status",
+            side_effect=drift_ledger,
+        ):
+            errors = validate_source_itp_mapping.validate_mapping(
+                manifest, PROJECT_ROOT
+            )
+        self.assertIn(
+            "frozen_artifact_binding.patched_parser.evidence ledger identity drifted",
+            errors,
+        )
+
     def test_raw_rung_ids_must_be_unique(self) -> None:
         manifest = load_manifest()
         duplicate = copy.deepcopy(manifest["raw_operational_rungs"][0])
@@ -213,7 +313,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(manifest["status_summary"]["refined"]["checker_green"], 8)
         self.assertTrue(
@@ -275,7 +375,7 @@ class SourceItpMappingTests(unittest.TestCase):
                 )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_r6_execution_and_relation_layers_do_not_inflate_refinement(self) -> None:
@@ -320,7 +420,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertIs(projection["opens_generated_c_body"], False)
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_general_remove_effect_pipeline_is_green_but_not_refinement(self) -> None:
@@ -370,7 +470,7 @@ class SourceItpMappingTests(unittest.TestCase):
                 )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_general_insert_exact_heap_transformer_is_support_not_refinement(
@@ -396,7 +496,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_ordered_empty_source_effect_is_sealed_support_not_refinement(
@@ -478,6 +578,8 @@ class SourceItpMappingTests(unittest.TestCase):
             ("layer", "Scheduler-List-ABI-Write-Bridge"),
             ("layer", "Scheduler-P2-Raw-Relation"),
             ("rung", "Raw-R6-ordered-insert-empty"),
+            ("rung", "Scheduler-P2-Frozen-Preimage"),
+            ("rung", "Raw-R6-initialise-item-insert-remove-sequence"),
         )
         for record_kind, record_id in cases:
             for field, message in (
@@ -570,7 +672,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(layer["source_to_abstract_refinement_theorem_count_delta"], 0)
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["claim_boundary"]["distinct_source_operations_with_refinement"],
@@ -578,11 +680,11 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertIs(
             manifest["claim_boundary"]["positive_delay_source_refinement_complete"],
-            False,
+            True,
         )
         self.assertIs(
             manifest["claim_boundary"]["concrete_p2_preimage_complete"],
-            False,
+            True,
         )
 
     def test_scheduler_abi_plan_cannot_be_promoted_by_metadata(self) -> None:
@@ -652,7 +754,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(layer["source_to_abstract_refinement_theorem_count_delta"], 0)
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["claim_boundary"]["distinct_source_operations_with_refinement"],
@@ -731,7 +833,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(delay_abstract["supporting_layer_ids"], ["Scheduler-P2"])
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_scheduler_p2_support_link_tampering_is_rejected(self) -> None:
@@ -749,8 +851,8 @@ class SourceItpMappingTests(unittest.TestCase):
         manifest = load_manifest()
         expected = {
             "Scheduler-Parse": (
-                "20260801Tpublish-portable-scheduler-parse-01",
-                "BA286C0091DF4BEE9D4DCB8013A5E3903DEE054357E6012968C459D1ED51BA68",
+                "20260801Tseal-scheduler-parse-01-portable",
+                "ADF5014F4FD55FC46A25C1C84A6F4C0D129AD65215D4B2B9B3904DDD38E94A95",
             ),
             "Scheduler-Tick-Raw": (
                 "20260731Tscheduler-tick-02-raw-heap",
@@ -817,7 +919,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["status_summary"]["refined"],
@@ -872,7 +974,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(switch["theorems"], ["vTaskSwitchContext_suspended_refines"])
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_scheduler_suspended_switch_boundary_tampering_is_rejected(self) -> None:
@@ -928,7 +1030,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_scheduler_suspended_increment_boundary_tampering_is_rejected(self) -> None:
@@ -979,10 +1081,20 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         delay = operation(manifest, "vTaskDelay")["stages"]["refined"]
         self.assertEqual(delay["status"], "checker_green")
-        self.assertEqual(delay["theorems"], ["vTaskDelay_zero_refines"])
+        self.assertEqual(
+            delay["theorems"],
+            [
+                "vTaskDelay_zero_refines",
+                "frozen_p2_artifact_bound_vTaskDelay_2_refinement",
+            ],
+        )
+        self.assertEqual(
+            {case["rung_id"] for case in delay["refinement_cases"]},
+            {"Scheduler-Delay-Zero", "Scheduler-P2-Frozen-Preimage"},
+        )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
 
     def test_scheduler_zero_delay_boundary_tampering_is_rejected(self) -> None:
@@ -996,6 +1108,85 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertIn(
             "source_to_abstract_refinement_rungs[Scheduler-Delay-Zero]: "
             "boundary_conditions must record the exact zero-delay no-wrap boundary",
+            errors,
+        )
+
+    def test_frozen_p2_preimage_is_twelfth_refinement(self) -> None:
+        manifest = load_manifest()
+        rung = refinement_rung(manifest, "Scheduler-P2-Frozen-Preimage")
+        self.assertEqual(rung["scope"], "artifact_bound_frozen_p2_positive_delay")
+        self.assertIs(rung["general_operation_refinement"], False)
+        self.assertEqual(rung["operation_id"], "ROOT-DELAY")
+        self.assertEqual(rung["source_function"], "vTaskDelay'")
+        self.assertEqual(rung["model_operation"], "task_delay_abs")
+        self.assertEqual(rung["relation"], "scheduler_endpoint_rel")
+        self.assertEqual(rung["artifact_binding"], "frozen_artifact_binding")
+        self.assertEqual(rung["preimage_theorem"], "frozen_p2_preimage_nonempty")
+        self.assertEqual(
+            rung["theorem"],
+            "frozen_p2_artifact_bound_vTaskDelay_2_refinement",
+        )
+        self.assertEqual(rung["seal_theorem"], "frozen_p2_artifact_bound_seal")
+        self.assertEqual(
+            rung["theory_sha256"],
+            "DBAA86A8D645C291F67F417645AC170E71EBCE6293CA458E90D153EA5E836A83",
+        )
+        self.assertEqual(
+            rung["boundary_conditions"],
+            {
+                "delay_argument": 2,
+                "pre_phase": "StableRunning",
+                "post_phase": "YieldPending",
+                "prestate": "p2_pre",
+                "poststate": "task_delay_abs 2 p2_pre",
+                "runtime_tcb_addresses": "fresh logical witnesses",
+                "allocator_boot_reachability": False,
+            },
+        )
+        self.assertIs(
+            manifest["claim_boundary"]["positive_delay_source_refinement_complete"],
+            True,
+        )
+        self.assertIs(
+            manifest["claim_boundary"]["concrete_p2_preimage_complete"],
+            True,
+        )
+
+    def test_frozen_p2_artifact_binding_tampering_is_rejected(self) -> None:
+        manifest = load_manifest()
+        refinement_rung(manifest, "Scheduler-P2-Frozen-Preimage")[
+            "artifact_binding"
+        ] = "invented_artifact"
+        errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
+        self.assertIn(
+            "source_to_abstract_refinement_rungs[Scheduler-P2-Frozen-Preimage]: "
+            "artifact_binding is not the sealed frozen ledger",
+            errors,
+        )
+
+    def test_frozen_p2_run_must_share_portable_artifact_identity(self) -> None:
+        manifest = load_manifest()
+        rung = refinement_rung(manifest, "Scheduler-P2-Frozen-Preimage")
+        target = (PROJECT_ROOT / rung["status_file"]).resolve()
+        parse_status = validate_source_itp_mapping._parse_status
+
+        def drift_config(path: Path) -> dict[str, str]:
+            status = parse_status(path)
+            if path.resolve() == target:
+                status["generated_address_config_sha256"] = "0" * 64
+            return status
+
+        with mock.patch.object(
+            validate_source_itp_mapping,
+            "_parse_status",
+            side_effect=drift_config,
+        ):
+            errors = validate_source_itp_mapping.validate_mapping(
+                manifest, PROJECT_ROOT
+            )
+        self.assertIn(
+            "source_to_abstract_refinement_rungs[Scheduler-P2-Frozen-Preimage] "
+            "generated config identity drifted",
             errors,
         )
 
@@ -1055,7 +1246,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["status_summary"]["refined"],
@@ -1161,6 +1352,7 @@ class SourceItpMappingTests(unittest.TestCase):
                 "raw_vListRemove_singleton_refines",
                 "raw_vListRemove_general_refines",
                 "raw_vListRemove_insert_end_general_refines",
+                "raw_vListInitialise_insert_end_remove_refines",
             ],
         )
         self.assertEqual(
@@ -1169,11 +1361,12 @@ class SourceItpMappingTests(unittest.TestCase):
                 "Raw-R5-remove",
                 "Raw-R6-remove-general",
                 "Raw-R6-remove-insert-sequence",
+                "Raw-R6-initialise-item-insert-remove-sequence",
             },
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["status_summary"]["refined"],
@@ -1250,7 +1443,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["status_summary"]["refined"],
@@ -1326,7 +1519,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(refined["corollaries"], rung["corollaries"])
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["claim_boundary"]["distinct_source_operations_with_refinement"],
@@ -1394,7 +1587,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertIs(rung["opens_generated_c_body"], False)
         self.assertEqual(
             manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
-            11,
+            13,
         )
         self.assertEqual(
             manifest["claim_boundary"]["distinct_source_operations_with_refinement"],
@@ -1402,7 +1595,7 @@ class SourceItpMappingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["claim_boundary"]["sequential_composition_refinement_theorems"],
-            1,
+            2,
         )
 
     def test_remove_insert_sequence_bridge_tampering_is_rejected(self) -> None:
@@ -1427,6 +1620,74 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertIn(
             "source_to_abstract_refinement_rungs[Raw-R6-remove-insert-sequence]: "
             "distinct_operation_count_delta must be exactly zero",
+            errors,
+        )
+
+    def test_literal_four_call_chain_is_thirteenth_refinement(self) -> None:
+        manifest = load_manifest()
+        rung = refinement_rung(
+            manifest, "Raw-R6-initialise-item-insert-remove-sequence"
+        )
+        self.assertEqual(rung["kind"], "sequential_composition_refinement")
+        self.assertIs(rung["sequential_composition_refinement"], True)
+        self.assertEqual(rung["distinct_operation_count_delta"], 0)
+        self.assertEqual(
+            rung["composed_operation_ids"],
+            [
+                "LIST-INITIALISE",
+                "LIST-INITIALISE-ITEM",
+                "LIST-INSERT-END",
+                "LIST-REMOVE",
+            ],
+        )
+        self.assertEqual(
+            rung["source_functions"],
+            [
+                "vListInitialise'",
+                "vListInitialiseItem'",
+                "vListInsertEnd'",
+                "vListRemove'",
+            ],
+        )
+        self.assertEqual(
+            rung["theorem"], "raw_vListInitialise_insert_end_remove_refines"
+        )
+        self.assertEqual(
+            rung["corollary"],
+            "raw_vListInitialise_insert_end_remove_empty_refines",
+        )
+        self.assertEqual(
+            rung["fixed_addresses"],
+            {
+                "list": "0x00001000",
+                "item": "0x00002000",
+                "sentinel": "0x00001008",
+            },
+        )
+        self.assertEqual(
+            manifest["claim_boundary"]["source_to_abstract_refinement_theorems"],
+            13,
+        )
+        self.assertEqual(
+            manifest["claim_boundary"]["distinct_source_operations_with_refinement"],
+            8,
+        )
+        self.assertEqual(
+            manifest["claim_boundary"]["sequential_composition_refinement_theorems"],
+            2,
+        )
+
+    def test_literal_four_call_order_tampering_is_rejected(self) -> None:
+        manifest = load_manifest()
+        rung = refinement_rung(
+            manifest, "Raw-R6-initialise-item-insert-remove-sequence"
+        )
+        rung["source_functions"][0:2] = reversed(rung["source_functions"][0:2])
+        errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
+        self.assertIn(
+            "source_to_abstract_refinement_rungs["
+            "Raw-R6-initialise-item-insert-remove-sequence]: "
+            "source_functions must record the literal four-call order",
             errors,
         )
 
@@ -1493,7 +1754,7 @@ class SourceItpMappingTests(unittest.TestCase):
 
     def test_refinement_count_forgery_is_rejected(self) -> None:
         manifest = load_manifest()
-        manifest["claim_boundary"]["source_to_abstract_refinement_theorems"] = 12
+        manifest["claim_boundary"]["source_to_abstract_refinement_theorems"] = 14
         errors = validate_source_itp_mapping.validate_mapping(manifest, PROJECT_ROOT)
         self.assertIn(
             "claim_boundary refinement count disagrees with validated refinement rungs",

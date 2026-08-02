@@ -1,0 +1,132 @@
+diff --git a/ROOT b/ROOT
+--- a/ROOT
++++ b/ROOT
+@@ -11,1 +11,1 @@
+-session AutoCorres2 = Simpl +
++session AutoCorres2_P2_Layout = Simpl +
+@@ -95,1 +95,1 @@
+-session AutoCorres2_Main in main = Simpl +
++session AutoCorres2_P2_Layout_Main in main = Simpl +
+@@ -98,1 +98,1 @@
+-    AutoCorres2 \<comment> \<open>not the parent session to avoid importing the doc / example theories\<close>
++    AutoCorres2_P2_Layout \<comment> \<open>not the parent session to avoid importing the doc / example theories\<close>
+@@ -103,1 +103,1 @@
+-session AutoCorres2_Test in tests = AutoCorres2_Main +  
++session AutoCorres2_P2_Layout_Test in tests = AutoCorres2_P2_Layout_Main +
+diff --git a/main/AutoCorres_Main.thy b/main/AutoCorres_Main.thy
+--- a/main/AutoCorres_Main.thy
++++ b/main/AutoCorres_Main.thy
+@@ -2,1 +2,1 @@
+-  imports AutoCorres2.AutoCorres
++  imports AutoCorres2_P2_Layout.AutoCorres
+diff --git a/main/AutoCorres_Nondet_Syntax.thy b/main/AutoCorres_Nondet_Syntax.thy
+--- a/main/AutoCorres_Nondet_Syntax.thy
++++ b/main/AutoCorres_Nondet_Syntax.thy
+@@ -2,1 +2,1 @@
+-imports AutoCorres2.AutoCorres
++imports AutoCorres2_P2_Layout.AutoCorres
+diff --git a/doc/quickstart/Chapter1_MinMax.thy b/doc/quickstart/Chapter1_MinMax.thy
+--- a/doc/quickstart/Chapter1_MinMax.thy
++++ b/doc/quickstart/Chapter1_MinMax.thy
+@@ -14,1 +14,1 @@
+-imports "AutoCorres2.AutoCorres"
++imports "AutoCorres2_P2_Layout.AutoCorres"
+diff --git a/doc/quickstart/Chapter2_HoareHeap.thy b/doc/quickstart/Chapter2_HoareHeap.thy
+--- a/doc/quickstart/Chapter2_HoareHeap.thy
++++ b/doc/quickstart/Chapter2_HoareHeap.thy
+@@ -10,1 +10,1 @@
+-imports "AutoCorres2.AutoCorres"
++imports "AutoCorres2_P2_Layout.AutoCorres"
+diff --git a/doc/quickstart/Chapter3_HoareHeap.thy b/doc/quickstart/Chapter3_HoareHeap.thy
+--- a/doc/quickstart/Chapter3_HoareHeap.thy
++++ b/doc/quickstart/Chapter3_HoareHeap.thy
+@@ -10,1 +10,1 @@
+-imports "AutoCorres2.AutoCorres"
++imports "AutoCorres2_P2_Layout.AutoCorres"
+diff --git a/c-parser/calculate_state.ML b/c-parser/calculate_state.ML
+--- a/c-parser/calculate_state.ML
++++ b/c-parser/calculate_state.ML
+@@ -23,3 +23,4 @@
+   val globals_all_addressed : bool Config.T
+   val populate_globals : bool Config.T
+   val record_globinits : bool Config.T
++  val addressed_global_definitions : string Config.T
+@@ -122,3 +123,27 @@
+ val globals_all_addressed = Attrib.setup_config_bool \<^binding>\<open>globals_all_addressed\<close> (K false)
+ val populate_globals = Attrib.setup_config_bool \<^binding>\<open>populate_globals\<close> (K false)
+ val record_globinits = Attrib.setup_config_bool \<^binding>\<open>record_globinits\<close> (K true)
++val addressed_global_definitions =
++  Attrib.setup_config_string
++    \<^binding>\<open>c_parser_addressed_global_definitions\<close> (K "")
++
++fun parse_addressed_global_definitions spec =
++  let
++    fun parse_entry entry =
++      (case String.fields (fn c => c = #"=") entry of
++        [name, raw_address] =>
++          if name = "" orelse raw_address = "" then
++            error ("Malformed addressed-global definition: " ^ quote entry)
++          else
++            (case Int.fromString raw_address of
++              SOME address =>
++                if address < 0 orelse address > 4294967295 then
++                  error ("Address outside the 32-bit range: " ^ raw_address)
++                else (name, address)
++            | NONE =>
++                error ("Address is not a decimal integer: " ^ raw_address))
++      | _ => error ("Malformed addressed-global definition: " ^ quote entry))
++    fun insert_entry entry table =
++      let val (name, address) = parse_entry entry
++      in
++        if Symtab.defined table name then
++          error ("Duplicate addressed-global definition: " ^ quote name)
++        else Symtab.update (name, address) table
++      end
++  in
++    if spec = "" then Symtab.empty
++    else fold insert_entry (String.fields (fn c => c = #",") spec) Symtab.empty
++  end
+@@ -1005,8 +1030,26 @@
+-      fun declare_addressed_global g thy =
++      val addressed_global_definition_table =
++        parse_addressed_global_definitions
++          (Config.get_global thy addressed_global_definitions)
++      val addressed_global_source_names =
++        map (MString.dest o #isa_name o #1) adglobs
++          |> sort_distinct string_ord
++      val configured_addressed_global_names =
++        Symtab.keys addressed_global_definition_table |> sort string_ord
++      val _ =
++        if Symtab.is_empty addressed_global_definition_table orelse
++            configured_addressed_global_names = addressed_global_source_names
++        then ()
++        else error
++          ("Addressed-global definition map must exactly cover the CParser " ^
++           "addressed-data globals. Configured: " ^
++           commas_quote configured_addressed_global_names ^ "; actual: " ^
++           commas_quote addressed_global_source_names)
++
++      fun declare_addressed_global g thy =
+         let
+           val T = (mk_ptr_ty o #2) g
+-          val name = (global_var o  MString.dest o #isa_name o #1) g
++          val source_name = (MString.dest o #isa_name o #1) g
++          val name = global_var source_name
+           val b = Binding.make (name, \<^here>) 
+         in
+-          thy |> Theory.specify_const ((b, T), Mixfix.NoSyn)
++          (case Symtab.lookup addressed_global_definition_table source_name of
++            NONE => thy |> Theory.specify_const ((b, T), Mixfix.NoSyn)
++          | SOME address =>
++              let
++                val (pointer, thy') =
++                  Sign.declare_const_global ((b, T), Mixfix.NoSyn) thy
++                val rhs =
++                  Const (\<^const_name>\<open>Ptr\<close>, \<^typ>\<open>addr\<close> --> T) $
++                    HOLogic.mk_number \<^typ>\<open>addr\<close> address
++                val (_, thy'') =
++                  Global_Theory.add_def
++                    (Binding.suffix_name "_def" b,
++                      Logic.mk_equals (pointer, rhs)) thy'
++              in (pointer, thy'') end)
+         end

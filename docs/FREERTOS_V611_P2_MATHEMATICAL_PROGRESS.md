@@ -1,464 +1,434 @@
-# A Conditional Source-to-Abstract Functional-Correctness Theorem for FreeRTOS V6.1.1 `vTaskDelay(2)`
+# A Sealed Frozen-Artifact P2 Generated-Source Refinement Milestone for FreeRTOS V6.1.1 `vTaskDelay(2)`
 
-**Mathematical progress report — blind Isabelle/HOL reconstruction**  
-**Status date:** 1 August 2026  
-**Result label:** *conditional real-source functional-correctness theorem: green; concrete frozen-build-layout P2 non-vacuity witness: open*
+**Mathematical progress report - blind Isabelle/HOL reconstruction**
 
-> **Draft provenance.** The initial narrative draft was prepared with ChatGPT Pro; all claims in this report were audited against the local Isabelle theories and run ledgers. ChatGPT Pro supplied design review and prose only and is outside the trusted proof chain.[^draft]
+**Status date: 1 August 2026 | Result: sealed, scoped artifact-specialised generated-source-to-abstract refinement**
+
+> **Draft provenance.** ChatGPT Pro reviewed the proof design and report wording. Every mathematical claim below was rechecked against the local Isabelle theories, artifact ledger, and final run records. ChatGPT Pro supplied no theorem object and is outside the trusted proof chain.[^draft]
 
 ## Abstract
 
-This report describes a mechanically checked refinement result for one non-trivial execution path of the FreeRTOS V6.1.1 scheduler: a running task at priority 2 calls `vTaskDelay(2)` when the tick count is 5. The path removes the running task's generic list item from the priority-2 ready list, writes wake time 7, inserts the item into the current delayed list, resumes the scheduler through its quiet branch, and issues one proof-port yield. The abstract poststate is deliberately phase-indexed: it is a `YieldPending` endpoint, not a settled post-switch scheduler state. Thus the ready-priority cache and current-task pointer may still identify the pre-yield task even though that task has already migrated to the delayed list.
+This report records a sealed milestone for one non-trivial FreeRTOS V6.1.1 scheduler path. A running priority-2 task calls the generated source function `vTaskDelay'(2)` at tick 5. The checked execution removes its generic list item from ready priority 2, writes wake key 7, inserts the item into the current delayed list, resumes through the quiet branch, returns `Result ()`, and reaches the phase-indexed `YieldPending` endpoint representing `task_delay_abs 2 p2_pre`.
 
-The development separates three proof obligations. First, a source-level theorem symbolically executes the generated semantics of the real `vTaskDelay` body once and identifies an exact final global state. Second, a pure byte-heap postrelation proves the representation of all eight physical scheduler list roots after the remove–key-write–insert transformation. Third, an assembly theorem combines these results with decoder, delayed-list-role, scalar, current-task, and boundary relations to refine the abstract operation. All three layers have exit-zero Isabelle builds with `quick_and_dirty=false`; their theory files are fixed by SHA-256 digests recorded below.
+The earlier result was conditional on an endpoint and a byte-heap footprint. That condition has now been inhabited. The external build-and-check pipeline hash-locks a frozen portable ELF, an extracted and relink-validated layout ledger, and a generated CParser address configuration. Isabelle consumes the configuration as definitions; it does not prove an ELF-to-configuration correspondence theorem. Within the resulting artifact-specialised CParser/AutoCorres2 source semantics, six addressed C bases induce nine pairwise separated static `xLIST` regions; eight of those regions are the scheduler roots used by the P2 relation. Two fresh logical runtime TCB addresses, `0x00200000` and `0x00200100`, are separated from each other and from all nine static regions. An explicit byte heap and generated global state satisfy the complete P2 precondition. Isabelle then discharges the previously conditional refinement theorem at that witness.
 
-The result is conditional. Its hypotheses contain a scheduler endpoint relation and a detailed source footprint. The footprint constrains guards, containment, and separation, but the generated addressed-data constants are not yet instantiated from a particular linked FreeRTOS binary. Consequently the proof establishes functional correctness for every concrete state satisfying those hypotheses, but does not yet prove that one frozen ELF image supplies such a state. Constructing an artifact-bound data-layout certificate is the next required milestone. Reachability of the certified P2 state from boot and scheduler initialisation is a later, separate milestone.
-
-## 1. Scope, statement discipline, and trusted chain
-
-The target is neither whole-kernel correctness nor a claim about every argument of `vTaskDelay`. It is the positive-delay P2 path with the fixed 32-bit argument 2 and the fixed abstract witness described in Section 3. The proof opens the generated source body for this path and composes previously checked exact contracts for suspension, ready-list removal, the generated wake-key write, ordered insertion into an empty delayed list, quiet resume, and the proof-port yield.
-
-The semantic judgment used below is written
-
-$$
-\mathsf{RunsTo}(f,c,Q)
-\;\equiv\;
-\mathsf{succeeds}(f,c)
-\;\land\;
-\forall r\,t.\;\mathsf{reaches}(f,c,r,t)\Longrightarrow Q(r,t).
-$$
-
-It is important that this judgment contains both positive execution and universal postcondition components. A correspondence theorem or a universal claim over an empty set of executions would not be sufficient. Here, `succeeds` rules out that vacuity, while the `reaches` implication constrains every result and final state admitted by the generated monadic semantics.
-
-The checked chain for the current result is:
+The repository also checks the literal source-monad chain
 
 ```text
-frozen FreeRTOS V6.1.1 source slice
-              |
-              v
-     CParser / AutoCorres2 translation
-              |
-              v
- generated monadic semantics of the real vTaskDelay body
-              |
-       Isabelle/HOL proof scripts
-              |
-              v
-     Isabelle kernel-checked theorem objects
+vListInitialise'
+  -> vListInitialiseItem'
+  -> vListInsertEnd'
+  -> vListRemove'
 ```
 
-The C compiler and harness traces are useful for invariant discovery and regression detection, but they are not proof rules. ChatGPT Pro is likewise not a proof rule. The authoritative evidence for the claims in this report is the checked theory graph, the exit status and configuration of each bounded Isabelle build, the no-forbidden-construct scan, and the recorded hashes. A future ELF symbol extractor may be untrusted if it emits candidate data that are independently checked; its output must not enter the logic as an axiom.
+with exactly three monadic binds, no theorem assumptions, and a normal `Result ()` outcome. This theorem makes no claim about preservation of the sentinel's eight-byte over-read tail. The strict inventory now contains 13 source-to-abstract refinement theorems over eight distinct source operations, including two sequential-composition theorems.
 
-## 2. Mathematical objects and notation
+The seal is deliberately narrower than whole-kernel correctness. It does not establish allocator or client boot reachability, execution of the context switch, compiler correctness, machine-code correctness, or full-scheduler verification.
 
-The abstract scheduler state is a record containing live tasks, priorities, optional wake times, ready and delayed rings, delayed-list roles, pending and suspended rings, the 32-bit tick, suspension and missed-tick counters, a missed-yield flag, the top-ready cache, the current task, the overflow count, and the proof-port yield count. A node is either a task's generic list item or event list item. Only generic nodes occur in the P2 ready and delayed rings.
+## 1. Scope and statement discipline
+
+The target is a single fixed positive-delay path, not all calls of `vTaskDelay` and not all scheduler behaviours. The abstract witness has two live tasks:
 
 | Symbol | Meaning |
 |---|---|
-| $I$ | abstract task identifier `P2_IDLE` |
-| $U$ | abstract task identifier `P2_RUN` |
-| $G(t)$ | generic list node belonging to task $t$ |
-| $\epsilon$ | empty abstract node ring, with no cursor |
-| $[n]_{\curvearrowright n}$ | singleton ring containing $n$, with cursor at $n$ |
-| $[n]_{\varnothing}^{k}$ | singleton ordered ring containing $n$, no cursor, item key $k$ |
-| $a_0$, $a_1$ | the abstract P2 prestate and poststate |
-| $D$ | concrete-pointer decoder and encoder package for the two P2 tasks |
-| $R$ | scheduler root package: four ready roots plus four non-ready roots |
-| $c,t$ | generated scheduler global states |
-| $h(c)$ | byte heap `hrs_mem(t_hrs'(c))` extracted from $c$ |
-| $\mathcal E_\phi(D,R,c,a)$ | endpoint relation at phase $\phi$ |
-| $\mathcal F(D,R,H)$ | P2 source-footprint predicate on heap $H$ |
-| $\mathcal L(D,H,\ell,q)$ | physical list at pointer $\ell$ represents abstract ring $q$ under decoder $D$ |
-| $\operatorname{Result}()$ | normal unit-valued return of the generated monad |
-| $+_{32}$ | addition modulo $2^{32}$ |
+| $I$ | task `P2_IDLE`, priority 0 |
+| $U$ | task `P2_RUN`, priority 2 and initially current |
+| $G(t)$ | generic list node embedded in the TCB of task $t$ |
+| $a_0$ | abstract prestate `p2_pre` |
+| $a_1$ | abstract poststate `task_delay_abs 2 p2_pre` |
+| $D_*$ | concrete decoder `frozen_p2_decode` |
+| $R_*$ | `generated_scheduler_roots` |
+| $c_*$ | generated state `frozen_p2_globals` |
+| $h(c)$ | byte heap `hrs_mem (t_hrs' c)` |
+| $\mathcal E_\phi(D,R,c,a)$ | scheduler endpoint relation at phase $\phi$ |
+| $\mathcal F(D,R,H)$ | source footprint on heap $H$ |
 
-The endpoint relation packages seven concrete-to-abstract components: abstract core well-formedness, decoder correctness, all-list representation, delayed-root roles, scalar fields, the current-task pointer, and the scheduler/port boundary. At phase `StableRunning`, it additionally requires the stronger settled invariant. At phase `YieldPending`, it requires core well-formedness, suspension depth and missed ticks equal to zero, an empty pending ring, and a positive yield count. This phase distinction is load-bearing; it prevents the proof from asserting a scheduler invariant at an intermediate boundary where the source has requested but not yet performed a context switch.
-
-## 3. The P2 abstract transition
-
-The P2 witness contains exactly two live tasks. Their priorities are
+The operational judgment is
 
 $$
-\pi(I)=0,
-\qquad
-\pi(U)=2.
+\mathsf{RunsTo}(f,c,Q)
+\equiv
+\mathsf{succeeds}(f,c)
+\land
+\forall r\,t.\;\mathsf{reaches}(f,c,r,t)\Longrightarrow Q(r,t).
 $$
 
-The initial tick is 5 and the delay is 2, so the 32-bit wake time is
+The positive `succeeds` conjunct excludes vacuous universal postconditions. The seal theorem therefore asserts both the existence of a suitable concrete preimage and a positive generated-source execution from that preimage.
+
+The checked chain is:
+
+```text
+frozen FreeRTOS V6.1.1 source slice
+and externally validated address configuration
+              |
+              v
+patched CParser / AutoCorres2 translation
+              |
+              v
+generated monadic source semantics
+              |
+              v
+Isabelle/HOL relation, heap, and refinement proofs
+              |
+              v
+Isabelle kernel-checked theorem objects
+```
+
+The ELF builder, ledger generator, CParser, AutoCorres2, and Isabelle implementation belong to the stated toolchain boundary. The ELF-to-ledger-to-configuration link is externally regenerated and validated, not internalised as an Isabelle theorem. ChatGPT Pro, executable test harnesses, and any SMT search do not supply proof rules. The accepted theorems contain no `sorry`, `oops`, admitted axiom, oracle shortcut, skip-proof mode, or `quick_and_dirty=true` build.
+
+## 2. The abstract P2 transition
+
+The initial tick is 5 and the delay argument is 2, hence the modular wake time is
 
 $$
 w = 5 +_{32} 2 = 7.
 $$
 
-Because $7\not<5$, this is the non-wrapping branch: the node is inserted into delayed list A, which is the current delayed-list role in the prestate. The abstract operation removes $G(U)$ from ready priority 2, records wake time 7, performs ordered insertion into the current delayed ring, and increments the yield count. Its calculation is
+Because $7\not<5$, the execution takes the non-wrapping branch and inserts $G(U)$ into delayed list A. The abstract calculation checked in Isabelle is
 
 $$
 \operatorname{task\_delay\_abs}(2,a_0)=a_1.
 $$
 
-The complete observable state comparison is as follows. “Unchanged” means equality of the corresponding total field, not merely equality on the two named tasks.
+The observable state change is exact:
 
-| Component | $a_0$ (`p2_pre`) | $a_1$ (`p2_post`) |
+| Component | $a_0$ (`p2_pre`) | $a_1$ |
 |---|---|---|
-| Live tasks | $\{I,U\}$ | $\{I,U\}$ |
+| Live tasks | $\{I,U\}$ | unchanged |
 | Priority map | $I\mapsto0,\ U\mapsto2$ | unchanged |
-| Wake map | every task $\mapsto\mathrm{None}$ | $U\mapsto\mathrm{Some}(7)$; all others $\mapsto\mathrm{None}$ |
-| Event-waiting set | $\varnothing$ | $\varnothing$ |
-| Ready root 0 | $[G(I)]_{\curvearrowright G(I)}$ | unchanged |
-| Ready root 1 | $\epsilon$ | $\epsilon$ |
-| Ready root 2 | $[G(U)]_{\curvearrowright G(U)}$ | $\epsilon$ |
-| Ready root 3 | $\epsilon$ | $\epsilon$ |
-| Delayed A | $\epsilon$ | $[G(U)]_{\varnothing}^{7}$ |
-| Delayed B | $\epsilon$ | $\epsilon$ |
-| Current delayed role | A | A |
-| Pending-ready ring | $\epsilon$ | $\epsilon$ |
-| Suspended ring | $\epsilon$ | $\epsilon$ |
-| Tick | 5 | 5 |
-| Missed ticks | 0 | 0 |
+| Wake map | every task maps to `None` | $U\mapsto\mathrm{Some}(7)$; all others unchanged |
+| Ready 0 | singleton $G(I)$, cursor at $G(I)$ | unchanged |
+| Ready 1 | empty | empty |
+| Ready 2 | singleton $G(U)$, cursor at $G(U)$ | empty |
+| Ready 3 | empty | empty |
+| Delayed A | empty | singleton $G(U)$ with key 7 and no cursor |
+| Delayed B | empty | empty |
+| Pending / suspended | both empty | both empty |
+| Tick / missed ticks | 5 / 0 | unchanged |
 | Suspension depth | 0 | 0 |
 | Missed-yield flag | false | false |
 | Top-ready cache | 2 | 2 |
 | Current task | $\mathrm{Some}(U)$ | $\mathrm{Some}(U)$ |
 | Overflow count | 0 | 0 |
-| Yield count | 0 | 1 |
+| Proof-port yield count | 0 | 1 |
 
-The poststate satisfies the scheduler's core invariant but not its settled invariant. That is expected. The priority-2 ready ring is already empty, while the top-ready cache and current-task field have not yet been recomputed by `vTaskSwitchContext`. The mathematical endpoint is therefore `YieldPending`; the report makes no claim that the context switch has already occurred.
+The endpoint is intentionally `YieldPending`. The priority-2 ready ring is already empty, while the cached top priority and current-task pointer have not yet been recomputed by a context switch. Thus $a_1$ satisfies the scheduler core invariant but not the stronger settled scheduler invariant. This is a phase fact, not a failed obligation.
 
-## 4. Representation layers
+## 3. Frozen artifact and addressed static roots
 
-The source semantics operates over generated C structures and a byte-addressed heap, whereas the abstract model uses finite node rings and task identifiers. The proof connects them through explicit layers rather than treating C pointers as abstract nodes.
+The frozen evidence tuple is identified by three primary digests:
 
-The decoder package $D$ contains a task-to-TCB pointer function, a partial inverse from TCB pointers to task identifiers, and a partial decoder from raw list-item pointers to generic or event nodes. On the live set it is injective and round-trips both TCB pointers and the two embedded list-item pointers. Conversely, a successful decode identifies the unique corresponding live task and embedded item.
+| Object | SHA-256 |
+|---|---|
+| `frozen_p2_layout.elf` | `DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A` |
+| `layout_ledger.json` | `CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02` |
+| generated address configuration | `27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712` |
 
-The root package is the ordered vector
+The local addressed-global CParser patch has digest `44160F97B133D0A66E515E505636D641907DC14811D43DA071EA15C706C8E604`. It is applied to an upstream `calculate_state.ML` whose digest is `EA51ECAA01947E53AD38A684B0E97ED360339363A75C6AE16DCFBA7713562898`; the staged patched file has digest `FD244D8228E79EC3626A5CE312446CE49DF550970B758B68D3BBE953CAC8CFA9`. The generated configuration causes the selected addressed globals to be emitted as definitions at the ledger addresses. It does not introduce logical axioms. The builder and generator verify the three-file correspondence outside Isabelle; the theorem layer starts from those generated definitions.
 
-$$
-\mathbf R=
-[R_0,R_1,R_2,R_3,D_A,D_B,P,S_{\mathrm{root}}],
-$$
+Exactly six C bases are mapped:
 
-where $R_i$ is ready priority $i$, $D_A$ and $D_B$ are the two physical delayed roots, $P$ is the pending-ready root, and $S_{\mathrm{root}}$ is the suspended root. The generated role pointers select $D_A$ as current and $D_B$ as overflow in the P2 witness.
+| C base | Address | Extent |
+|---|---:|---:|
+| `pxReadyTasksLists` | `0x00102020` | 80 bytes |
+| `xDelayedTaskList1` | `0x0010208c` | 20 bytes |
+| `xDelayedTaskList2` | `0x001020a0` | 20 bytes |
+| `xPendingReadyList` | `0x001020bc` | 20 bytes |
+| `xSuspendedTaskList` | `0x001020d4` | 20 bytes |
+| `xTasksWaitingTermination` | `0x001020e8` | 20 bytes |
 
-For each root, the relation $\mathcal L$ first establishes a raw cyclic-list representation in the heap and then relabels raw item pointers through $D$ to obtain the abstract ring. This separation is needed because the source-derived list functions and the scheduler translation inhabit distinct generated structure namespaces even though their relevant layouts agree. Audited ABI read and write bridges connect their field addresses and heap observations; the scheduler theorem does not silently identify the two generated types.
+The ready-list base is an array of four 20-byte `xLIST` values. Therefore the six mapped bases induce the following nine static regions:
 
-The scalar relation maps 32-bit source values to the corresponding abstract fields, with `unat` conversions where the abstract model uses natural numbers. It also maps the concrete missed-yield word to a Boolean and the proof-port yield counter to the abstract yield count. The current-task relation decodes `pxCurrentTCB`; the boundary relation fixes a running scheduler, critical depth zero, and interrupts enabled at the theorem boundary.
+| Static region | Address | Used by P2 relation? |
+|---|---:|---|
+| ready[0] | `0x00102020` | yes |
+| ready[1] | `0x00102034` | yes |
+| ready[2] | `0x00102048` | yes |
+| ready[3] | `0x0010205c` | yes |
+| delayed A | `0x0010208c` | yes |
+| delayed B | `0x001020a0` | yes |
+| pending-ready | `0x001020bc` | yes |
+| suspended | `0x001020d4` | yes |
+| termination-wait | `0x001020e8` | no |
 
-## 5. The source footprint and why it is still conditional
-
-The footprint $\mathcal F(D,R,H)$ is a semantic memory contract, not a claim that the generated constants already denote the addresses in a linked binary. It requires:
-
-1. $R$ equals the generated scheduler-root package.
-2. The eight roots in $\mathbf R$ are distinct, individually guarded, and pairwise region-disjoint.
-3. The two TCB pointers for $I$ and $U$ are distinct, guarded, and have disjoint 68-byte TCB regions.
-4. Each TCB region is disjoint from every root region.
-5. In each TCB, the generic and event list items are guarded, contained within that TCB region, and disjoint from each other.
-6. The generated ABI places the 20-byte generic item at TCB offset 4 and the 20-byte event item at offset 24; these intervals lie inside the 68-byte TCB object.
-7. Both delayed-list sentinels have the maximum key required by the ordered insertion branch.
-
-In compact form, with $\operatorname{Reg}_L$ and $\operatorname{Reg}_T$ denoting list-root and TCB byte intervals, the central separation obligations include
-
-<!-- pagebreak -->
-
-$$
-\begin{aligned}
-&\operatorname{distinct}(\mathbf R),
-&&\forall x\in\mathbf R.\;\operatorname{guard}(x),\\
-&\forall x\ne y\in\mathbf R.\;
-  \operatorname{Reg}_L(x)\cap\operatorname{Reg}_L(y)=\varnothing,\\
-&tp_I\ne tp_U,
-&&\operatorname{guard}(tp_I)\land\operatorname{guard}(tp_U),\\
-&\operatorname{Reg}_T(tp_I)\cap\operatorname{Reg}_T(tp_U)=\varnothing,\\
-&\forall tp\in\{tp_I,tp_U\},\;x\in\mathbf R.\;
-  \operatorname{Reg}_T(tp)\cap\operatorname{Reg}_L(x)=\varnothing.
-\end{aligned}
-$$
-
-These assumptions are strong enough for the local alias, guard, and frame proofs. They are not yet an existence theorem. In the present translation, addressed data globals are unconstrained HOL constants, and the existing global-address locale constrains function addresses rather than all scheduler data objects. The missing result must bind the root and TCB addresses to one exact tuple of source, configuration, compiler, assembler, linker flags, linker script, ELF, and supporting symbol/layout data. A synthetic assignment would prove logical satisfiability only; it would not prove the layout of the frozen artifact.
-
-## 6. Exact source execution and heap transformers
-
-Let the initial generated global state be $c$, and define the initial byte heap and the relevant concrete pointers by
+This yields the audited cardinality chain
 
 $$
-\begin{aligned}
-H_0 &\equiv h(c)
-      =\operatorname{hrs\_mem}(\operatorname{t\_hrs}'(c)),\\
-tp &\equiv \operatorname{sd\_tcb\_ptr}(D,U),\\
-p &\equiv \operatorname{abi\_generic\_list\_item\_ptr}(tp),\\
-\ell_A &\equiv \operatorname{abi\_list\_ptr}(\operatorname{sr\_delayed\_a}(R)).
-\end{aligned}
-$$
-
-The exact heap sequence checked by the source proof is
-
-$$
-\boxed{
-\begin{aligned}
-H_r
-  &\equiv \operatorname{raw\_remove\_concrete\_heap}(H_0,p),\\[2mm]
-H_k
-  &\equiv \operatorname{p2\_remove\_then\_wake\_heap}(H_0,D)\\
-  &= \operatorname{scheduler\_generic\_item\_key\_heap}
-       (H_r,tp,5+_{32}2)\\
-  &= \operatorname{scheduler\_generic\_item\_key\_heap}(H_r,tp,7),\\[2mm]
-H_f
-  &\equiv \operatorname{p2\_remove\_wake\_insert\_heap}(H_0,D,R)\\
-  &= \operatorname{raw\_ordered\_insert\_empty\_heap}(H_k,\ell_A,p).
-\end{aligned}}
-$$
-
-Thus $H_r$ is the heap immediately after singleton removal from ready root 2, $H_k$ additionally contains the generated write of wake key 7, and $H_f$ additionally contains the empty-to-singleton ordered insertion into delayed A. These are total heap transformers. Their supporting locality facts show that writes to the active ready root, the running task's generic item, and delayed A preserve the other roots and the idle task's generic item as required by the final relation.
-
-The final generated global state is exactly
-
-$$
-\boxed{
-S(c,D,R)
-=
-\operatorname{Yield}\!\left(
-  \operatorname{ResumeQuiet}\!\left(
-    \operatorname{Mem}\!\left(
-      H_f,
-      \operatorname{Suspend}(c)
-    \right)
-  \right)
-\right).}
-$$
-
-Here `Suspend` increments the suspension word from 0 to 1, `Mem` replaces only the byte-heap component with $H_f$, `ResumeQuiet` decrements the suspension word from 1 to 0 without processing pending work, and `Yield` increments the proof-port yield counter from 0 to 1. Written with the definitions used in the theory, this is
-
-$$
-\operatorname{p2\_yield\_state}
-\bigl(\operatorname{p2\_resume\_quiet\_state}
-  (\operatorname{scheduler\_mem\_state}
-    (H_f,\operatorname{p2\_suspend\_state}(c)))\bigr).
-$$
-
-> **Theorem Box 1 — exact source state (`scheduler_vTaskDelay_2_p2_exact_state`).**  
-> For every $D,R,c$, if
-> $$
-> \mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)
-> \land \mathcal F(D,R,H_0),
-> $$
-> then
-> $$
-> \mathsf{RunsTo}\!\left(
->   \operatorname{vTaskDelay}'(2),c,
->   \lambda(r,t).\;r=\operatorname{Result}()\land t=S(c,D,R)
-> \right).
-> $$
-
-The proof unfolds the real generated `vTaskDelay` body once. It does not replace the caller with a hand-written model. Exact contracts for the called operations are then composed at the actual intermediate states, including the generated nested field write. This arrangement avoids a second large VCG while retaining a precise final state.
-
-## 7. The all-eight-roots postrelation
-
-The heap transformer alone is not an abstract correctness result. The next layer proves that each physical root in $H_f$ represents its intended component of $a_1$. Using $\operatorname{dec}_D$ for the node decoder and suppressing the routine ABI pointer coercions, the postrelation is the conjunction
-
-$$
-\begin{aligned}
-&\mathcal L(D,H_f,R_0,[G(I)]_{\curvearrowright G(I)})\\
-\land{}&\mathcal L(D,H_f,R_1,\epsilon)\\
-\land{}&\mathcal L(D,H_f,R_2,\epsilon)\\
-\land{}&\mathcal L(D,H_f,R_3,\epsilon)\\
-\land{}&\mathcal L(D,H_f,D_A,[G(U)]_{\varnothing}^{7})\\
-\land{}&\mathcal L(D,H_f,D_B,\epsilon)\\
-\land{}&\mathcal L(D,H_f,P,\epsilon)\\
-\land{}&\mathcal L(D,H_f,S_{\mathrm{root}},\epsilon).
-\end{aligned}
-$$
-
-The ready-0 case is not reducible to a root-only frame: its singleton relation observes both the list root and the embedded generic item of $I$. The proof therefore establishes preservation of that entire item as well. Ready 2 uses the exact post-removal empty representation and frames it across the later key write and delayed insertion. Delayed A uses the ordered empty-insertion relation with key 7. The remaining five empty roots are carried across by pairwise region separation.
-
-The checked pure relation result is named `p2_remove_wake_insert_lists_rel`. In mathematical form, if decoder and pre-list relations hold, the footprint holds, and a generated state $c'$ has heap $H_f$, then
-
-$$
-\operatorname{DecodeRel}(D,a_0)
-\land \operatorname{ListsRel}(D,R,c,a_0)
-\land \mathcal F(D,R,H_0)
-\land h(c')=H_f
+6\ \mathrm{mapped\ bases}
 \Longrightarrow
-\operatorname{ListsRel}(D,R,c',a_1).
+9\ \mathrm{static\ xLIST\ regions}
+\Longrightarrow
+8\ \mathrm{P2\ relation\ roots}.
 $$
 
-This layer is deliberately pure Isabelle relation assembly. It does not execute the C body again. Separating operational execution from postrelation assembly makes the proof graph auditable and keeps the expensive generated-body reasoning confined to one source certificate.
+The termination-wait list is outside the P2 abstract relation, but it remains inside the static separation theorem and the TCB-versus-static-region separation theorem. Omitting it from the geometry check would permit an unsound overlap even though the operation does not observe its list contents.
 
-## 8. Final source-to-abstract refinement
+The diagnostic theorem `p2_source_footprint_delayed_alias_no_go` proves that if the two generated delayed-list roots alias, no P2 source-footprint witness can exist. This formally explains why a translation that leaves the two roots indistinguishable cannot close the milestone. Inside the artifact-specialised source semantics, the final construction does not assume their inequality: the addressed definitions and arithmetic geometry prove it. The claim that these definitions correspond to the frozen ELF is the separately validated evidence link described above.
 
-The last layer combines the exact source state with the eight-root postrelation and direct proofs for the non-list components. Decoder correctness is unchanged because the live-task set and pointer interpretation are unchanged. Delayed-root roles remain A-current/B-overflow. The scalar relation observes tick 5, suspension depth 0, no missed ticks or missed yield, top-ready cache 2, two live tasks, overflow count 0, and yield count 1. The current pointer remains the TCB of $U$. The boundary again has a running scheduler, critical depth zero, and interrupts enabled.
+> **Theorem Box 1 - static artifact geometry (`frozen_addressed_xlist_geometry`).**
+> Let $\mathbf A$ be the list of the nine addresses above and let $\operatorname{Reg}_L(p)$ be the 20-byte list region at $p$. Isabelle proves
+> $$
+> \operatorname{distinct}(\mathbf A)
+> \land \forall p\in\mathbf A.\;\operatorname{guard}(p)
+> \land \forall p,q\in\mathbf A.\;p\ne q\Longrightarrow
+> \operatorname{Reg}_L(p)\cap\operatorname{Reg}_L(q)=\varnothing.
+> $$
+> The theorem `frozen_p2_static_root_geometry` projects this result to the eight P2 roots.
 
-The proof dependency is summarized below. Solid arrows denote already checked implications. The dashed future edge is exactly the open non-vacuity task and is not used to label the conditional theorem green.
+## 4. Dynamic TCB geometry and source footprint
 
-<!-- pagebreak -->
+The frozen preimage uses two explicit runtime TCB pointers:
+
+$$
+tp_I = 0x00200000,
+\qquad
+tp_U = 0x00200100.
+$$
+
+They are fresh logical witness addresses. They are not claimed to be allocator results, ELF static objects, or states reached by the official boot path. Each TCB occupies 68 bytes. Its generic list item begins at offset 4 and its event list item begins at offset 24; each embedded item occupies 20 bytes. The checked interval facts include
+
+$$
+\begin{aligned}
+&tp_I\ne tp_U,\\
+&\operatorname{Reg}_T(tp_I)\cap\operatorname{Reg}_T(tp_U)=\varnothing,\\
+&\forall tp\in\{tp_I,tp_U\},\ p\in\mathbf A.\;
+  \operatorname{Reg}_T(tp)\cap\operatorname{Reg}_L(p)=\varnothing,\\
+&\operatorname{Reg}_G(tp)\subseteq\operatorname{Reg}_T(tp),\\
+&\operatorname{Reg}_E(tp)\subseteq\operatorname{Reg}_T(tp),\\
+&\operatorname{Reg}_G(tp)\cap\operatorname{Reg}_E(tp)=\varnothing.
+\end{aligned}
+$$
+
+The theorem `frozen_p2_nonheap_geometry` packages decoder round trips, pointer guards, TCB separation, separation from all nine static regions, and the embedded Generic/Event geometry. Combining its facts with the eight-root static projection and maximum-key delayed sentinels proves
+
+$$
+\mathcal F(D_*,R_*,H_*),
+$$
+
+where $H_*$ is the explicitly constructed heap `frozen_p2_heap`.
+
+The decoder maps $I$ and $U$ injectively to $tp_I$ and $tp_U$, maps their embedded generic and event items to the corresponding abstract nodes, and supplies exact forward and reverse laws on the live set. No successful decode can silently identify the two tasks or confuse a generic item with an event item.
+
+## 5. Explicit P2 heap and generated globals
+
+The heap $H_*$ starts from a zero heap, writes eight `xLIST` root values, and writes the two live generic list items. Its abstract views are:
+
+$$
+\begin{aligned}
+R_0 &\mapsto [G(I)]_{\curvearrowright G(I)},\\
+R_1 &\mapsto \epsilon,\\
+R_2 &\mapsto [G(U)]_{\curvearrowright G(U)},\\
+R_3 &\mapsto \epsilon,\\
+D_A &\mapsto \epsilon,\\
+D_B &\mapsto \epsilon,\\
+P &\mapsto \epsilon,\\
+S &\mapsto \epsilon.
+\end{aligned}
+$$
+
+Both delayed-list sentinels contain the maximum key required by ordered insertion. The singleton ready-list roots contain consistent count, cursor, next, previous, owner, and container fields. The proofs read these values back through the generated heap selectors; the abstract relation is not postulated.
+
+The state $c_*$ sets the generated scheduler fields to the P2 values: delayed A is current, delayed B is overflow, tick is 5, scheduler suspension and missed ticks are zero, missed yield is false, top-ready cache is 2, live-task count is 2, overflow count is zero, yield count is zero, `pxCurrentTCB` decodes to $U$, the scheduler-running word is 1, critical depth is zero, and interrupts are enabled.
+
+> **Theorem Box 2 - concrete endpoint (`frozen_p2_endpoint`).**
+> The explicit decoder, generated roots, heap, and globals satisfy
+> $$
+> \mathcal E_{\mathrm{StableRunning}}(D_*,R_*,c_*,a_0).
+> $$
+
+Together with the footprint theorem, this proves the non-vacuity statement
+
+$$
+\exists D\,R\,c.\; \mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)
+\land \mathcal F(D,R,h(c)).
+$$
+
+The checked theorem is `frozen_p2_preimage_nonempty`. It closes the earlier open preimage obligation without asserting that $c_*$ is reachable from reset or official scheduler initialisation.
+
+## 6. Exact generated-source execution and refinement
+
+For a generic state satisfying the endpoint and footprint, the artifact-specialised generated body has an exact-state theorem. Let
+
+$$
+\begin{aligned}
+H_0 &\equiv h(c),\\
+H_r &\equiv \operatorname{raw\_remove\_concrete\_heap}(H_0,p_U),\\
+H_k &\equiv \operatorname{scheduler\_generic\_item\_key\_heap}(H_r,tp_U,7),\\
+H_f &\equiv \operatorname{raw\_ordered\_insert\_empty\_heap}(H_k,D_A,p_U).
+\end{aligned}
+$$
+
+The final generated state is
+
+$$
+S(c,D,R)=\operatorname{Yield}\bigl(
+\operatorname{ResumeQuiet}(\operatorname{Mem}(H_f,\operatorname{Suspend}(c)))\bigr).
+$$
+
+The theorem `scheduler_vTaskDelay_2_p2_exact_state` proves positive execution and equality of every admitted final state with $S(c,D,R)$. The pure theorem `p2_remove_wake_insert_lists_rel` separately proves the representation of all eight P2 list roots after removal, key write, and insertion. The assembly theorem `scheduler_vTaskDelay_2_p2_refines_task_delay_abs` states
+
+$$
+\begin{aligned}
+&\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0) \land \mathcal F(D,R,h(c))\\
+&\quad\Longrightarrow \mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,
+\lambda(r,t).\;r=\operatorname{Result}() \land
+\mathcal E_{\mathrm{YieldPending}}(D,R,t,\operatorname{task\_delay\_abs}(2,a_0))).
+\end{aligned}
+$$
+
+The new preimage theorem supplies this implication's antecedent. Isabelle checks the specialised theorem
+
+$$
+\mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c_*,
+\lambda(r,t).\;r=\operatorname{Result}() \land
+\mathcal E_{\mathrm{YieldPending}}(D_*,R_*,t,\operatorname{task\_delay\_abs}(2,a_0))).
+$$
+
+> **Theorem Box 3 - frozen-artifact seal (`frozen_p2_artifact_bound_seal`).**
+> Isabelle proves
+> $$
+> \exists D\,R\,c.\; \mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)
+> \land \mathcal F(D,R,h(c))
+> \land \mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,
+> \lambda(r,t).\;r=\operatorname{Result}() \land
+> \mathcal E_{\mathrm{YieldPending}}(D,R,t,\operatorname{task\_delay\_abs}(2,a_0))).
+> $$
+
+The witness is artifact-bound for the static scheduler-root layout and logical for the two runtime TCB allocations. That qualification is part of the seal, not a caveat added after the theorem.
+
+## 7. Literal four-call source-monad hard gate
+
+The independent list hard gate is the literal generated-function composition
+
+$$
+\begin{aligned}
+C_{4} \equiv{}&
+\operatorname{bind}(\operatorname{vListInitialise}'(L),\lambda\_.\\
+&\operatorname{bind}(\operatorname{vListInitialiseItem}'(P),\lambda\_.\\
+&\operatorname{bind}(\operatorname{vListInsertEnd}'(L,P),\lambda\_.\\
+&\operatorname{vListRemove}'(P)))).
+\end{aligned}
+$$
+
+The definition `raw_initialise_insert_remove_needle'` contains exactly three `bind` nodes. It uses the fixed list address `0x00001000`, item address `0x00002000`, and sentinel address `0x00001008`. The theorem `raw_vListInitialise_insert_end_remove_refines` has no assumptions and proves
+
+$$
+\mathsf{RunsTo}(C_4,s,
+\lambda(r,t).\;r=\operatorname{Result}() \land \exists k.\;
+\operatorname{raw\_xlist\_rel}(h(t),L,\operatorname{list\_remove\_abs}
+(P,\operatorname{list\_insert\_end\_abs}(P,k,\operatorname{empty}(keys))))).
+$$
+
+The round-trip simplifies to an empty list whose total key map is updated at $P$. A key-congruence lemma then yields the clean corollary `raw_vListInitialise_insert_end_remove_empty_refines`, which returns to `raw_empty_abs keys` because non-live keys are observationally irrelevant to the empty relation.
+
+This is a source-monad composition theorem assembled from already checked exact and general contracts at their actual intermediate states. It does not equate the insert result with an independently constructed removal prestate. It also does not claim that the full eight-byte sentinel over-read tail is preserved by the four-call sequence. Tail framing is proved elsewhere for narrower source contracts and is deliberately absent from this hard-gate statement.
+
+## 8. Sealed checker evidence and inventory
+
+The final portable runs relevant to this seal are:
+
+| Proof layer | Run identifier | Time | Result |
+|---|---|---:|---|
+| Address-bound scheduler parse | `20260801Tseal-scheduler-parse-01-portable` | 23.566 s | exit 0; QAD false |
+| Delayed-root alias no-go | `20260801Tseal-p2-layout-no-go-01-portable` | 33.162 s | exit 0; QAD false |
+| Nine-region static geometry | `20260801Tseal-p2-static-nine-01-portable` | 27.701 s | exit 0; QAD false |
+| TCB separation from all nine regions | `20260801Tseal-p2-dynamic-all-nine-01-portable` | 27.467 s | exit 0; QAD false |
+| Explicit P2 preimage and refinement seal | `20260801Tseal-p2-preimage-06-parenthesised-seal` | 120.854 s | exit 0; QAD false |
+| Literal four-call list composition | `20260801Tseal-list-four-call-01-portable` | 32.338 s | exit 0; QAD false |
+| Capstone theorem-object assumption audit | `20260801Tseal-assumption-audit-01-portable` | 137.387 s | exit 0; QAD false |
+
+Every status file records the same frozen ELF, ledger, and generated-address-configuration digests shown in Section 3. The final stdout digests, in table order, are:
+
+1. `36AA4AE5EDA156D123DAAC5A53A5DB76CC5C817B8B7B8F9378163E9C94A3363D`;
+2. `286AF01D88A5007CECBD1860739AE206F1A5083220501E9088054B1A412A1DF9`;
+3. `BB442ECA20CE4753278CC884B79E403BC1EC0B82DAE7843A5AC5B68F0B2130C5`;
+4. `BB442ECA20CE4753278CC884B79E403BC1EC0B82DAE7843A5AC5B68F0B2130C5`;
+5. `1E51B030BD7D73DD4491CDA05712ED099BEAD1D340F64C96242CD7E168B902CC`;
+6. `B71D9682664FF9E68DBB2F93EE195DF4AB50BFD9CA6A2B62CE444FC10D6F427C`;
+7. `9186E921B5881C9412AE3FEB98CBAECF92A1E2E734F3A1344D9AEBF4CB88B1C3`.
+
+The repeated static/dynamic stdout digest is expected because the dynamic session reuses the same successful dependency closure and produces the same bounded log text. Hash equality is a provenance observation, not a substitute for the exit status or theorem object.
+
+The final leaf audit inspects five capstone theorem objects: the two four-call results and the frozen-P2 preimage, refinement, and seal. Every object has empty `Thm.prems_of` and `Thm.hyps_of`; its complete proposition contains no `Pure.imp` or `HOL.implies`; and both `Thm.shyps_of` and `Thm.extra_shyps` have cardinality zero. Consequently none retains a function-address, addressed-data-global, or generated `G`/`S` locale premise. This statement is about theorem assumptions only and does not turn the external ELF-to-configuration evidence check into an Isabelle theorem.
+
+The strict source-to-abstract inventory now records:
+
+| Measure | Sealed count | Interpretation |
+|---|---:|---|
+| Refinement theorems | 13 | individual strict source-to-abstract entries, including the artifact P2 result and four-call chain |
+| Distinct source operations | 8 | compositions do not inflate the operation count |
+| Sequential compositions | 2 | remove-then-insert-end and initialise/initialise-item/insert-end/remove |
+
+The artifact-bound P2 theorem strengthens the already counted `vTaskDelay` operation, so it adds a refinement theorem without adding a ninth operation. The four-call theorem is a new composition over already counted list operations and likewise adds no distinct operation.
+
+## 9. Historical progression and corrected ledger
+
+The development passed through five materially different stages:
+
+1. The abstract P2 calculation and phase-indexed endpoint were proved first.
+2. The generated `vTaskDelay'(2)` body and all-eight-roots postrelation yielded a conditional source-to-abstract theorem. At that time the accurate status was: source refinement green, frozen preimage open.
+3. The delayed-root alias no-go isolated the addressed-global obstruction. The external builder/generator checks then linked one frozen ELF/ledger tuple to a configuration that definitionally fixed the six relevant C bases in CParser.
+4. Static and dynamic geometry proved the exact `6 -> 9 -> 8` accounting, introduced two fresh logical TCB witnesses, and separated their 68-byte regions from all nine static list regions.
+5. The explicit heap and globals discharged the conditional antecedent, and the independent literal four-call theorem closed the source-monad composition hard gate.
+
+Earlier reports used the phrase "eight roots" for the P2 relation and could be read as saying that only eight static list regions mattered. The final ledger corrects that ambiguity: there are six mapped bases, nine static `xLIST` regions, and eight relation roots. The ninth region, termination-wait, is excluded only from the abstract P2 list relation; it remains included in static and dynamic non-alias proofs.
+
+Historical red runs document proof search and do not belong to the sealed evidence set. The seven final run identifiers in Section 8 supersede intermediate green runs for the artifact binding, geometry, preimage, four-call, and assumption-audit claims. The earlier conditional theorems remain useful reusable general results; they are not retracted, but their premises are now instantiated for this witness.
+
+## 10. Tooling assessment and trust boundary
+
+No additional symbolic executor, verification-condition generator, or SMT backend is required to finish this sealed P2 milestone. The operational work already uses CParser/AutoCorres2 generated monadic semantics and Isabelle proof/VCG infrastructure. The hard parts were representation alignment, byte-heap readback, alias geometry, frame reasoning, and phase-correct relation assembly. A second generic executor would not replace those invariants.
+
+Future scheduler-wide work could benefit from a heap-aware path and VC generator that proposes frame obligations, plus an SMT solver that proposes finite address arithmetic or disjointness facts. Such output should remain untrusted candidate evidence and be replayed by Isabelle. The useful architecture is therefore
 
 ```text
-                       abstract P2 calculation
-                     a0 --delay(2)--> a1
-                              |
-                              v
-source endpoint + footprint   phase facts: core, YieldPending, not settled
-          |                                  |
-          +--------------+-------------------+
-                         |
-          +--------------+-------------------+
-          |                                  |
-          v                                  v
- real generated body                 raw heap transformer
- exact state S(c,D,R)              H0 -> Hr -> Hk -> Hf
-          |                                  |
-          |                                  v
-          |                           all eight list roots
-          |                                  |
-          +----------------+-----------------+
-                           v
-              final endpoint representation
-                           |
-                           v
-               conditional refinement theorem
-
- frozen ELF + checked layout certificate - - -> witness for endpoint + footprint
-                                                    (OPEN)
+path / heap-VC generator -> candidate obligations
+SMT backend             -> candidate arithmetic facts
+Isabelle replay         -> accepted theorem objects
 ```
 
-> **Theorem Box 2 — conditional functional correctness (`scheduler_vTaskDelay_2_p2_refines_task_delay_abs`).**  
-> For every $D,R,c$, if
-> $$
-> \mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)
-> \land \mathcal F(D,R,h(c)),
-> $$
-> then
-> $$
-> \mathsf{RunsTo}\!\left(
->   \operatorname{vTaskDelay}'(2),c,
->   \lambda(r,t).\;
->     r=\operatorname{Result}()
->     \land
->     \mathcal E_{\mathrm{YieldPending}}
->       (D,R,t,\operatorname{task\_delay\_abs}(2,a_0))
-> \right).
-> $$
-> Since $\operatorname{task\_delay\_abs}(2,a_0)=a_1$, every admitted source execution returns normally in a concrete state representing $a_1$ at the `YieldPending` boundary.
+The following claims remain explicitly outside this report:
 
-A checked intermediate result also establishes
+- allocator correctness or allocation of the two logical TCB witnesses;
+- reachability of $c_*$ from reset, task creation, or scheduler initialisation;
+- execution and correctness of `vTaskSwitchContext` after `YieldPending`;
+- compiler, assembler, linker, loader, or machine-code correctness;
+- correspondence between every C execution and a target-processor execution;
+- arbitrary task sets, priorities, delay values, wrap branches, or callers;
+- whole-list-library or whole-scheduler functional correctness.
 
-$$
-\mathcal E_{\mathrm{YieldPending}}(D,R,S(c,D,R),a_1)
-\land \neg\operatorname{settled\_wf}(a_1).
-$$
-
-The negated settled predicate is a positive description of the phase boundary, not a proof failure. The later context-switch caller is responsible for selecting the next ready task and restoring the settled scheduler condition.
-
-## 9. Reproducibility and checker evidence
-
-The four principal P2 runs are listed below. Each was a bounded Isabelle build with exit code 0 and `quick_and_dirty=false`. The digest shown is the SHA-256 of the corresponding theory source at the recorded green run.
-
-| Proof layer | Run identifier | Final wall time | Result | Theory SHA-256 |
-|---|---|---:|---|---|
-| Pure abstract P2 transition and phase witness | `20260731Tscheduler-p2-06-post-witness` | 12.597 s | exit 0; QAD false | `FB03C1FDE6BEC66357F4E7185838423B8867D8999E2CD1422CF2064DC0C48236` |
-| Exact real-source P2 state | `20260801Tscheduler-p2-delay-source-09-canonical-states` | 35.056 s | exit 0; QAD false | `7BFB623FE099104EA4276D0119CCD6C7B23A0F94ABF04B87FAAFAF3AEB1DD6C0` |
-| All-eight-roots postrelation | `20260801Tscheduler-p2-post-relation-09-nat-index` | 38.618 s | exit 0; QAD false | `CF5CCB728150BC4B185CEAE448E9E2FAB0C9C88E1CCBCDA1F79E2A67AD7375B8` |
-| Final conditional refinement assembly | `20260801Tscheduler-p2-delay-refinement-04-final-heap` | 39.603 s | exit 0; QAD false | `43BC41254C609DF8302F38113F662912E2FD99C72D0A612E5A72925E5AA1C9E7` |
-| Current portable dependency-closure replay | `20260801Tpublish-portable-refinement-02` | 385.146 s | exit 0; QAD false | final theory unchanged: `43BC41254C609DF8302F38113F662912E2FD99C72D0A612E5A72925E5AA1C9E7` |
-
-The exact-source development took nine checker calls and 413.312 seconds in total, of which the last call was green. The final list-relation development took nine calls and 367.365 seconds, and the final assembly took four calls and 169.437 seconds. Those totals measure proof discovery as well as final replay; the final-wall column is the more useful reproducibility expectation for the fixed successful theory.
-
-The current-tree replay was run after replacing four machine-specific CParser wrapper paths by theory-master-directory resolution. Its status SHA-256 is `6D45F563CB84212812C59F5A723DD17177E03FF36328D6FFAF96AAA3FAB78B5E`, and its stdout SHA-256 is `594A6C89502091A013CB9A6D71EDC6DB1AB76A5C174D869F15DB2687F4B95C89`. This closes the evidence-timing gap between the portable parser snapshot and the final refinement theorem.
-
-The source-to-ITP mapping validator passes, 65 repository unit tests pass, and the theory/proof-port/build-script forbidden-pattern scan is clean. The mapping manifest validates the evidence inventory currently registered in its schema; it still records the preceding count of eleven source-to-abstract refinements and has not yet promoted this new P2 positive-delay theorem as a twelfth rung. The theorem and run evidence above are therefore reported directly, not presented as a manifest-registered rung. In particular, the accepted proof does not depend on `sorry`, `oops`, `admit`, an axiom declaration, skip-proof mode, an oracle shortcut, or `quick_and_dirty=true`. Hashes are provenance aids rather than logical premises: they make it possible to detect whether a later report is still describing the checked files.
-
-## 10. Claim taxonomy, open obligations, and tooling
-
-The following taxonomy prevents useful evidence from being promoted beyond what it establishes.
-
-| Class | Current content | Status |
-|---|---|---|
-| Kernel-checked pure mathematics | abstract two-tick P2 transition; core and phase facts | green |
-| Kernel-checked source execution | positive execution of generated `vTaskDelay'(2)` with one exact final state | green under endpoint and footprint premises |
-| Kernel-checked representation | all eight roots plus decoder, roles, scalars, current task, and boundary | green under the same premises |
-| Kernel-checked refinement | real source result represents the abstract delay result at `YieldPending` | **conditional theorem green** |
-| Executable evidence | frozen-source harness traces and regression checks used for invariant discovery | useful, but not a theorem |
-| Artifact-bound satisfiability | concrete addresses and byte heap from one frozen linked FreeRTOS build satisfy the premises | **open** |
-| Initialisation reachability | the artifact-bound P2 state is reachable from boot and scheduler setup | **later milestone** |
-| Scheduler-wide correctness | arbitrary tasks, priorities, delays, wrap branches, context switches, and all callers | out of scope for this report |
-
-### 10.1 The next proof obligation
-
-The next required result is an artifact-bound existential witness of the form
-
-$$
-\exists D,c.\;
-\mathcal E_{\mathrm{StableRunning}}
-  (D,R_{\mathrm{generated}},c,a_0)
-\land
-\mathcal F(D,R_{\mathrm{generated}},h(c)),
-$$
-
-where every generated root constant is connected, by checked certificate facts, to symbols in one frozen ELF. The certificate must record exact source and configuration hashes, compiler/assembler/linker versions and flags, linker script, ELF, and supporting map/DWARF/symbol-table data. It must check symbol identity, object extents, alignment, containment, pairwise interval separation, and the embedded list-item offsets.
-
-A practical architecture is: an untrusted extractor reads the ELF and emits candidate addresses and sizes; a small independently reviewable checker validates the symbol and interval ledger; Isabelle checks the resulting concrete arithmetic and interprets a data-layout locale; finally, a concrete two-task decoder, heap, and globals state instantiate the existential statement. If no verified ELF parser is used, the residual extractor and binary-analysis trust boundary must be stated explicitly.
-
-<!-- pagebreak -->
-
-### 10.2 Do additional symbolic execution, VCG, or SMT tools help?
-
-The present source theorem already uses the CParser/AutoCorres2-generated monadic semantics together with a verification-condition generator. No missing operational path remains for the P2 result, so adding a second symbolic executor or a generic SMT backend would duplicate work rather than close the outstanding premise. The difficult completed obligations were typed ABI bridging, byte-heap locality, alias separation, and assembly of the physical-to-abstract relation; they required project-specific invariants and frame lemmas rather than generic first-order search.
-
-An additional tool can nevertheless accelerate the next milestone if it is aimed at the actual gap: a deterministic ELF/link-map/DWARF extractor plus a small certificate checker. SMT may be used as an untrusted convenience for proposing interval arithmetic, but the accepted address, extent, and separation facts should be replayed by Isabelle or another independently reviewable checker. The artifact identity and the connection between generated constants and ELF symbols are more important than solver power.
-
-Boot reachability should not be folded into the layout certificate. Layout answers *where the objects are* and supplies one state satisfying the memory premises. Reachability answers *whether the official initialisation path can construct that state*. Keeping the two milestones separate preserves an auditable statement of what has and has not been proved.
+These exclusions do not weaken the stated theorem. They delimit which antecedents and semantic layers the theorem actually contains.
 
 ## Conclusion
 
-The P2 development has crossed the main functional-correctness boundary. The real generated `vTaskDelay'(2)` semantics has a positive exact execution theorem; the corresponding concrete heap is shown to represent the intended poststate at all eight scheduler list roots; and the assembled final result refines the abstract two-tick delay transition. The phase is correctly recorded as `YieldPending`, with one yield request and no claim that context switching has already settled the scheduler.
+The scoped blind-reconstruction milestone is sealed. The literal alias-sensitive source-monad chain `vListInitialise' -> vListInitialiseItem' -> vListInsertEnd' -> vListRemove'` is kernel-green without assumptions and contains exactly three binds. In the artifact-specialised CParser/AutoCorres2 source semantics, the generated configuration definitionally fixes six addressed-data bases, and Isabelle proves the resulting nine static list regions distinct, guarded, and pairwise disjoint. The external builder/generator validates that configuration against the hash-locked frozen ELF and ledger; this correspondence is not itself an Isabelle theorem. An artifact-root-bound P2 state exists using fresh logical TCB witnesses at `0x00200000` and `0x00200100`. From that state, the generated FreeRTOS V6.1.1 `vTaskDelay'(2)` source semantics returns `Result ()` and refines `task_delay_abs 2 p2_pre` at `YieldPending`.
 
-The remaining blocker is narrower and qualitatively different from symbolic execution. It is the absence of a checked, frozen-build data-layout instantiation for the addressed scheduler globals and TCBs. Until that existential witness is constructed, the strongest accurate summary remains: **conditional real-source functional-correctness theorem green; frozen-build-layout P2 non-vacuity open; boot reachability later**.
+The strongest accurate one-line status is:
 
-<!-- pagebreak -->
+> **Sealed frozen-artifact P2 milestone: non-vacuous generated-source refinement is green; boot/allocator reachability, context-switch execution, compiler and machine-code correctness, and full-scheduler verification are outside scope.**
 
-## Appendix A. Compact proof obligations
+## Appendix A. Compact proof ledger
 
-For reference, the completed logical chain can be compressed to the following five formulas:
+The seal can be compressed to five checked layers:
 
-$$
-\operatorname{task\_delay\_abs}(2,a_0)=a_1.
-$$
+| Layer | Sealed mathematical fact |
+|---|---|
+| Static roots | $\operatorname{Geometry}_9(\mathbf A)\land\operatorname{Projection}_8(\mathbf A,R_*)$ |
+| Logical TCBs | $\operatorname{TCBGeometry}(D_*,tp_I,tp_U)\land\operatorname{SeparateFrom}_9(tp_I,tp_U,\mathbf A)$ |
+| Concrete witness | $\mathcal E_{\mathrm{StableRunning}}(D_*,R_*,c_*,a_0)\land\mathcal F(D_*,R_*,h(c_*))$ |
+| Generic refinement | $\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)\land\mathcal F(D,R,h(c))\Longrightarrow\mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,Q_{D,R})$ |
+| Final seal | $\exists D\,R\,c.\;\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)\land\mathcal F(D,R,h(c))\land\mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,Q_{D,R})$ |
 
-$$
-\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)\land\mathcal F(D,R,H_0)
-\Longrightarrow
-\mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,
-  \lambda(r,t).\;r=\operatorname{Result}()\land t=S(c,D,R)).
-$$
-
-$$
-\operatorname{DecodeRel}(D,a_0)\land\operatorname{ListsRel}(D,R,c,a_0)
-\land\mathcal F(D,R,H_0)\land h(c')=H_f
-\Longrightarrow\operatorname{ListsRel}(D,R,c',a_1).
-$$
-
-$$
-\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)\land\mathcal F(D,R,H_0)
-\Longrightarrow
-\mathcal E_{\mathrm{YieldPending}}(D,R,S(c,D,R),a_1)
-\land\neg\operatorname{settled\_wf}(a_1).
-$$
-
-$$
-\mathcal E_{\mathrm{StableRunning}}(D,R,c,a_0)\land\mathcal F(D,R,H_0)
-\Longrightarrow
-\mathsf{RunsTo}(\operatorname{vTaskDelay}'(2),c,
-  \lambda(r,t).\;r=\operatorname{Result}()\land
-  \mathcal E_{\mathrm{YieldPending}}(D,R,t,
-    \operatorname{task\_delay\_abs}(2,a_0))).
-$$
+Here $Q_{D,R}(r,t)$ abbreviates $r=\operatorname{Result}()\land\mathcal E_{\mathrm{YieldPending}}(D,R,t,\operatorname{task\_delay\_abs}(2,a_0))$.
 
 ## Appendix B. Interpretation checklist
 
-- “Real source” means that the proof opens the generated semantics of the frozen C function body; it does not mean that the linked deployment image has already been instantiated.
-- “Exact state” means every admitted final generated state equals the displayed transformer result, together with positive success.
-- “All eight roots” means ready priorities 0–3, delayed A, delayed B, pending-ready, and suspended.
-- “Refinement” means preservation of the stated endpoint relation to the abstract operation, at the explicitly named phase.
-- “Conditional” refers precisely to the endpoint and source-footprint premises whose frozen-build preimage remains to be constructed.
-- “Non-vacuity open” refers to the artifact-bound existence of those premises, not to the source run under them; the latter is already positive.
-- “Boot reachability later” means no present claim connects the P2 prestate to the complete official initialisation and scheduling history.
+- "Frozen artifact / 6 / 9 / 8" means the three hashes fix the external evidence tuple; six addressed C bases expand to nine static `xLIST` regions, of which eight are P2 roots.
+- "Artifact-bound P2" means external checks link the ELF and ledger to the static-root configuration consumed by Isabelle; the two runtime TCB addresses remain logical witnesses.
+- "Preimage / generated source / YieldPending" means explicit $D_*,R_*,c_*$ inhabit the predicates, execution succeeds in the specialised source semantics, and no context-switch execution is claimed.
+- "Exactly three binds / no tail8" characterises the literal four-call syntax and its deliberately limited frame claim.
+- "No capstone assumptions" means the five audited theorem objects have no rule premises, context hypotheses, proposition implications, or sort hypotheses.
+- "13 / 8 / 2" means 13 refinement theorems, eight distinct source operations, and two sequential compositions.
+- "Sealed" refers only to this stated milestone and its final evidence set.
 
-[^draft]: No external generated proof, attachment, source artifact, or theorem from ChatGPT Pro was admitted. Its contribution was an initial prose/design pass; the report's formulas, theorem names, run data, and limitations were checked against the local repository.
+[^draft]: No external proof, source artifact, theorem, or generated obligation from ChatGPT Pro was admitted. Its contribution was critical review of scope and prose. Isabelle theorem objects and the recorded artifact/run evidence remain authoritative.

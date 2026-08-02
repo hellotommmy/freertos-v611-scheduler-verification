@@ -71,6 +71,24 @@ runs/**
 !runs/20260801Tscheduler-p2-delay-refinement-04-final-heap/stdout.log
 !runs/20260801Tpublish-portable-scheduler-parse-01/stdout.log
 !runs/20260801Tpublish-portable-refinement-02/stdout.log
+!runs/20260801Tseal-scheduler-parse-01-portable/status.txt
+!runs/20260801Tseal-scheduler-parse-01-portable/stdout.log
+!runs/20260801Tseal-p2-layout-no-go-01-portable/status.txt
+!runs/20260801Tseal-p2-layout-no-go-01-portable/stdout.log
+!runs/20260801Tseal-p2-static-nine-01-portable/status.txt
+!runs/20260801Tseal-p2-static-nine-01-portable/stdout.log
+!runs/20260801Tseal-p2-dynamic-all-nine-01-portable/status.txt
+!runs/20260801Tseal-p2-dynamic-all-nine-01-portable/stdout.log
+!runs/20260801Tseal-p2-preimage-06-parenthesised-seal/status.txt
+!runs/20260801Tseal-p2-preimage-06-parenthesised-seal/stdout.log
+!runs/20260801Tseal-list-four-call-01-portable/status.txt
+!runs/20260801Tseal-list-four-call-01-portable/stdout.log
+!runs/20260801Tseal-list-smoke-01-portable/status.txt
+!runs/20260801Tseal-list-smoke-01-portable/stdout.log
+!runs/20260801Tseal-list-raw-skip-01-portable/status.txt
+!runs/20260801Tseal-list-raw-skip-01-portable/stdout.log
+!runs/20260801Tseal-assumption-audit-01-portable/status.txt
+!runs/20260801Tseal-assumption-audit-01-portable/stdout.log
 
 build/
 tmp/

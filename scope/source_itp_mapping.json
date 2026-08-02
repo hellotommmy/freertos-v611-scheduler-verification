@@ -14,18 +14,124 @@
     ],
     "original_formalization_consulted": false
   },
+  "frozen_artifact_binding": {
+    "status": "checker_green",
+    "elf": {
+      "path": "artifacts/frozen_p2_layout/output/frozen_p2_layout.elf",
+      "sha256": "DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A"
+    },
+    "ledger": {
+      "path": "artifacts/frozen_p2_layout/output/layout_ledger.json",
+      "sha256": "CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02"
+    },
+    "patched_parser": {
+      "theory": "theories/scheduler_parse/Scheduler_V611_Parse.thy",
+      "theory_sha256": "ADF5014F4FD55FC46A25C1C84A6F4C0D129AD65215D4B2B9B3904DDD38E94A95",
+      "patch_path": "patches/autocorres2-addressed-global-definitions.patch",
+      "patch_sha256": "44160F97B133D0A66E515E505636D641907DC14811D43DA071EA15C706C8E604",
+      "upstream_calculate_state_sha256": "EA51ECAA01947E53AD38A684B0E97ED360339363A75C6AE16DCFBA7713562898",
+      "staged_calculate_state_sha256": "FD244D8228E79EC3626A5CE312446CE49DF550970B758B68D3BBE953CAC8CFA9",
+      "config_option": "c_parser_addressed_global_definitions",
+      "generated_address_config_sha256": "27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712",
+      "evidence": {
+        "session": "EAL6_FreeRTOS_V611_Scheduler_Parse",
+        "run_id": "20260801Tseal-scheduler-parse-01-portable",
+        "status_file": "runs/20260801Tseal-scheduler-parse-01-portable/status.txt",
+        "status_sha256": "F298A91A14C19386307589D140ECB3D0298F78BBF989C9768D632AA3F6A304F2",
+        "stdout_file": "runs/20260801Tseal-scheduler-parse-01-portable/stdout.log",
+        "stdout_sha256": "36AA4AE5EDA156D123DAAC5A53A5DB76CC5C817B8B7B8F9378163E9C94A3363D"
+      }
+    },
+    "mapped_bases": [
+      {"symbol": "pxReadyTasksLists", "address_hex": "0x00102020", "size": 80},
+      {"symbol": "xDelayedTaskList1", "address_hex": "0x0010208c", "size": 20},
+      {"symbol": "xDelayedTaskList2", "address_hex": "0x001020a0", "size": 20},
+      {"symbol": "xPendingReadyList", "address_hex": "0x001020bc", "size": 20},
+      {"symbol": "xSuspendedTaskList", "address_hex": "0x001020d4", "size": 20},
+      {"symbol": "xTasksWaitingTermination", "address_hex": "0x001020e8", "size": 20}
+    ],
+    "static_xlist_regions": [
+      {"logical_name": "ready[0]", "address_hex": "0x00102020"},
+      {"logical_name": "ready[1]", "address_hex": "0x00102034"},
+      {"logical_name": "ready[2]", "address_hex": "0x00102048"},
+      {"logical_name": "ready[3]", "address_hex": "0x0010205c"},
+      {"logical_name": "delayed-A", "address_hex": "0x0010208c"},
+      {"logical_name": "delayed-B", "address_hex": "0x001020a0"},
+      {"logical_name": "pending-ready", "address_hex": "0x001020bc"},
+      {"logical_name": "suspended", "address_hex": "0x001020d4"},
+      {"logical_name": "termination-wait", "address_hex": "0x001020e8"}
+    ],
+    "p2_relation_roots": [
+      {"logical_name": "ready[0]", "address_hex": "0x00102020"},
+      {"logical_name": "ready[1]", "address_hex": "0x00102034"},
+      {"logical_name": "ready[2]", "address_hex": "0x00102048"},
+      {"logical_name": "ready[3]", "address_hex": "0x0010205c"},
+      {"logical_name": "delayed-A", "address_hex": "0x0010208c"},
+      {"logical_name": "delayed-B", "address_hex": "0x001020a0"},
+      {"logical_name": "pending-ready", "address_hex": "0x001020bc"},
+      {"logical_name": "suspended", "address_hex": "0x001020d4"}
+    ],
+    "counts": {
+      "mapped_bases": 6,
+      "static_xlist_regions": 9,
+      "p2_relation_roots": 8
+    },
+    "runtime_tcb_policy": "fresh_logical_witness_addresses",
+    "stock_layout_no_go": {
+      "theory": "theories/scheduler_p2_layout_no_go/Scheduler_P2_Layout_No_Go.thy",
+      "theory_sha256": "82F39339020F8CB4766322C663922B64785F79CA62AFB649D87C0B837A067C57",
+      "theorem": "p2_source_footprint_delayed_alias_no_go",
+      "evidence": {
+        "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Layout_No_Go",
+        "run_id": "20260801Tseal-p2-layout-no-go-01-portable",
+        "status_file": "runs/20260801Tseal-p2-layout-no-go-01-portable/status.txt",
+        "status_sha256": "7B72F0727D91C1F6E1D67045D14BB666A9C02C8257A599672C329F4930073AC2",
+        "stdout_file": "runs/20260801Tseal-p2-layout-no-go-01-portable/stdout.log",
+        "stdout_sha256": "286AF01D88A5007CECBD1860739AE206F1A5083220501E9088054B1A412A1DF9"
+      }
+    },
+    "static_geometry": {
+      "theory": "theories/scheduler_p2_frozen_static_layout/Scheduler_P2_Frozen_Static_Layout.thy",
+      "theory_sha256": "1E7D9A465ED4760913DC40BF1E9D826EF22A3BA01DCDB68C56BB74BA69E2563D",
+      "theorem": "frozen_addressed_xlist_geometry",
+      "p2_projection_theorem": "frozen_p2_static_root_geometry"
+    },
+    "binding_evidence": {
+      "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout",
+      "run_id": "20260801Tseal-p2-static-nine-01-portable",
+      "status_file": "runs/20260801Tseal-p2-static-nine-01-portable/status.txt",
+      "status_sha256": "6916C72A9D7C92AF4337FA7AB805D949B8DAEAED39FF19C4C961E438D31E2238",
+      "stdout_file": "runs/20260801Tseal-p2-static-nine-01-portable/stdout.log",
+      "stdout_sha256": "BB442ECA20CE4753278CC884B79E403BC1EC0B82DAE7843A5AC5B68F0B2130C5"
+    },
+    "dynamic_geometry": {
+      "theory": "theories/scheduler_p2_frozen_dynamic_geometry/Scheduler_P2_Frozen_Dynamic_Geometry.thy",
+      "theory_sha256": "00D2FE13142BEC28B9243580760EF763D676EDDF873EDCFE971DF27D9FCC2039",
+      "theorem": "frozen_p2_nonheap_geometry",
+      "tcb_separation_theorem": "frozen_p2_tcb_addressed_xlist_separation",
+      "separated_static_region_count": 9,
+      "evidence": {
+        "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Dynamic_Geometry",
+        "run_id": "20260801Tseal-p2-dynamic-all-nine-01-portable",
+        "status_file": "runs/20260801Tseal-p2-dynamic-all-nine-01-portable/status.txt",
+        "status_sha256": "E246B0B3A71817D5F76FB17F426A7F9B41B600ED19DFACEA9EE77D5B6FE87757",
+        "stdout_file": "runs/20260801Tseal-p2-dynamic-all-nine-01-portable/stdout.log",
+        "stdout_sha256": "BB442ECA20CE4753278CC884B79E403BC1EC0B82DAE7843A5AC5B68F0B2130C5"
+      }
+    }
+  },
   "claim_boundary": {
     "translation_builds_are_not_refinement": true,
     "abstract_model_proofs_are_not_source_refinement": true,
     "non_refinement_green_layers_are_not_refinement": true,
-    "source_to_abstract_refinement_theorems": 11,
+    "source_to_abstract_refinement_theorems": 13,
     "distinct_source_operations_with_refinement": 8,
-    "sequential_composition_refinement_theorems": 1,
-    "refinement_scope": "three fixed list simulations (empty insert-end, singleton remove, and empty ordered insertion), general-N member removal and fresh insert-end, one general remove-then-insert-end sequential composition, plus quiescent tick-read, suspended switch-context, suspended/no-wrap increment-tick, zero-delay/no-wrap, and suspended/no-delay delay-until scheduler refinements",
+    "sequential_composition_refinement_theorems": 2,
+    "refinement_scope": "three fixed list simulations (empty insert-end, singleton remove, and empty ordered insertion), general-N member removal and fresh insert-end, two source-monad compositions (general remove-then-insert-end and the literal initialise/initialise-item/insert-end/remove chain), plus quiescent tick-read, suspended switch-context, suspended/no-wrap increment-tick, zero-delay/no-wrap, suspended/no-delay delay-until, and frozen-artifact P2 positive-delay scheduler refinements",
     "general_list_refinement_complete": false,
     "scheduler_refinement_complete": false,
-    "positive_delay_source_refinement_complete": false,
-    "concrete_p2_preimage_complete": false
+    "positive_delay_source_refinement_complete": true,
+    "concrete_p2_preimage_complete": true
   },
   "raw_operational_rungs": [
     {
@@ -911,10 +1017,13 @@
       "generated_definitions": [],
       "artifacts": ["scheduler_translation_unit.c"],
       "theory": "theories/scheduler_parse/Scheduler_V611_Parse.thy",
-      "theory_sha256": "BA286C0091DF4BEE9D4DCB8013A5E3903DEE054357E6012968C459D1ED51BA68",
+      "theory_sha256": "ADF5014F4FD55FC46A25C1C84A6F4C0D129AD65215D4B2B9B3904DDD38E94A95",
       "session": "EAL6_FreeRTOS_V611_Scheduler_Parse",
-      "run_id": "20260801Tpublish-portable-scheduler-parse-01",
-      "status_file": "runs/20260801Tpublish-portable-scheduler-parse-01/status.txt",
+      "run_id": "20260801Tseal-scheduler-parse-01-portable",
+      "status_file": "runs/20260801Tseal-scheduler-parse-01-portable/status.txt",
+      "status_sha256": "F298A91A14C19386307589D140ECB3D0298F78BBF989C9768D632AA3F6A304F2",
+      "stdout_file": "runs/20260801Tseal-scheduler-parse-01-portable/stdout.log",
+      "stdout_sha256": "36AA4AE5EDA156D123DAAC5A53A5DB76CC5C817B8B7B8F9378163E9C94A3363D",
       "is_source_to_abstract_refinement": false,
       "source_to_abstract_refinement_theorem_count_delta": 0
     },
@@ -1330,6 +1439,92 @@
       "stdout_file": "runs/20260731Tlist-raw-r6oier-03-key-let/stdout.log",
       "stdout_sha256": "91801D97F2C08C506E3BC75753C3AADE4846B5902DEB05D2DD77BCC497F8F0CB",
       "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Scheduler-P2-Frozen-Preimage",
+      "status": "checker_green",
+      "scope": "artifact_bound_frozen_p2_positive_delay",
+      "general_operation_refinement": false,
+      "claim": "the source-derived vTaskDelay at delay 2 has a concrete, nonempty preimage for the frozen portable ELF-root artifact and refines task_delay_abs from StableRunning to YieldPending; runtime TCB addresses are fresh logical witnesses and allocator or boot reachability is not claimed",
+      "operation_id": "ROOT-DELAY",
+      "source_function": "vTaskDelay'",
+      "model_operation": "task_delay_abs",
+      "relation": "scheduler_endpoint_rel",
+      "relation_theory": "theories/scheduler_p2_raw_relation/Scheduler_P2_Raw_Relation.thy",
+      "relation_theory_sha256": "9A153B79D0871D4D96A5DF82299EF0D40AC8F918692FE60934A8245E048510ED",
+      "boundary_conditions": {
+        "delay_argument": 2,
+        "pre_phase": "StableRunning",
+        "post_phase": "YieldPending",
+        "prestate": "p2_pre",
+        "poststate": "task_delay_abs 2 p2_pre",
+        "runtime_tcb_addresses": "fresh logical witnesses",
+        "allocator_boot_reachability": false
+      },
+      "artifact_binding": "frozen_artifact_binding",
+      "preimage_theorem": "frozen_p2_preimage_nonempty",
+      "supporting_refinement_theorem": "scheduler_vTaskDelay_2_p2_refines_task_delay_abs",
+      "theorem": "frozen_p2_artifact_bound_vTaskDelay_2_refinement",
+      "seal_theorem": "frozen_p2_artifact_bound_seal",
+      "theory": "theories/scheduler_p2_frozen_preimage/Scheduler_P2_Frozen_Preimage.thy",
+      "theory_sha256": "DBAA86A8D645C291F67F417645AC170E71EBCE6293CA458E90D153EA5E836A83",
+      "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Preimage",
+      "run_id": "20260801Tseal-p2-preimage-06-parenthesised-seal",
+      "status_file": "runs/20260801Tseal-p2-preimage-06-parenthesised-seal/status.txt",
+      "status_sha256": "54D8D243FAA3F97786C2F8D27477CF03846D71EEBC53388F4B593099C9B69806",
+      "stdout_file": "runs/20260801Tseal-p2-preimage-06-parenthesised-seal/stdout.log",
+      "stdout_sha256": "1E51B030BD7D73DD4491CDA05712ED099BEAD1D340F64C96242CD7E168B902CC",
+      "is_source_to_abstract_refinement": true
+    },
+    {
+      "id": "Raw-R6-initialise-item-insert-remove-sequence",
+      "kind": "sequential_composition_refinement",
+      "status": "checker_green",
+      "scope": "fixed_initialise_item_insert_end_remove_roundtrip",
+      "general_operation_refinement": false,
+      "sequential_composition_refinement": true,
+      "distinct_operation_count_delta": 0,
+      "claim": "the literal source-monad chain vListInitialise followed by vListInitialiseItem, vListInsertEnd, and vListRemove reaches Result without assumptions and returns the fixed list witness to an abstract empty raw_xlist_rel state",
+      "operation_id": "LIST-REMOVE",
+      "composed_operation_ids": [
+        "LIST-INITIALISE",
+        "LIST-INITIALISE-ITEM",
+        "LIST-INSERT-END",
+        "LIST-REMOVE"
+      ],
+      "source_function": "vListRemove'",
+      "source_functions": [
+        "vListInitialise'",
+        "vListInitialiseItem'",
+        "vListInsertEnd'",
+        "vListRemove'"
+      ],
+      "source_sequence_definition": "raw_initialise_insert_remove_needle'",
+      "model_operation": "list_remove_abs",
+      "relation": "raw_xlist_rel",
+      "relation_theory": "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
+      "relation_theory_sha256": "5CD5EF0B3850FEBD712664EA375ED04E3BDDD2C8B80B9AEA75EBDF006613A199",
+      "supporting_rung_ids": [
+        "Raw-R6-insert-general",
+        "Raw-R6-remove-general"
+      ],
+      "fixed_addresses": {
+        "list": "0x00001000",
+        "item": "0x00002000",
+        "sentinel": "0x00001008"
+      },
+      "theorem": "raw_vListInitialise_insert_end_remove_refines",
+      "corollary": "raw_vListInitialise_insert_end_remove_empty_refines",
+      "theory": "theories/list_raw_r6_initialise_insert_remove_sequence/List_V611_Raw_R6_Initialise_Insert_Remove_Sequence.thy",
+      "theory_sha256": "279B203FED23C9E23F6285D993A599EB925670E71267A1B1ECE51336CD1025CD",
+      "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Initialise_Insert_Remove_Sequence",
+      "run_id": "20260801Tseal-list-four-call-01-portable",
+      "status_file": "runs/20260801Tseal-list-four-call-01-portable/status.txt",
+      "status_sha256": "AC47CE2744C1F1212623CCD96A449CB916651E85E4F70225245072DE3630A7CA",
+      "stdout_file": "runs/20260801Tseal-list-four-call-01-portable/stdout.log",
+      "stdout_sha256": "B71D9682664FF9E68DBB2F93EE195DF4AB50BFD9CA6A2B62CE444FC10D6F427C",
+      "opens_generated_c_body": false,
+      "is_source_to_abstract_refinement": true
     }
   ],
   "official_source_hashes": {
@@ -1723,10 +1918,14 @@
           "encoding_route": "raw_heap_skip_heap_abs",
           "scope": "zero_delay_no_wrap_scheduler_control_boundary",
           "general_operation_refinement": false,
-          "relation_ids": ["scheduler_control_rel"],
-          "theorems": ["vTaskDelay_zero_refines"],
+          "relation_ids": ["scheduler_control_rel", "scheduler_endpoint_rel"],
+          "theorems": [
+            "vTaskDelay_zero_refines",
+            "frozen_p2_artifact_bound_vTaskDelay_2_refinement"
+          ],
           "theories": [
-            "theories/scheduler_delay_zero_refinement/Scheduler_V611_Delay_Zero_Refinement.thy"
+            "theories/scheduler_delay_zero_refinement/Scheduler_V611_Delay_Zero_Refinement.thy",
+            "theories/scheduler_p2_frozen_preimage/Scheduler_P2_Frozen_Preimage.thy"
           ],
           "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement",
           "boundary_conditions": {
@@ -1738,6 +1937,48 @@
             "current_tcb_access": false,
             "list_access": false
           },
+          "refinement_cases": [
+            {
+              "rung_id": "Scheduler-Delay-Zero",
+              "scope": "zero_delay_no_wrap_scheduler_control_boundary",
+              "general_operation_refinement": false,
+              "session": "EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement",
+              "boundary_conditions": {
+                "delay_argument": 0,
+                "scheduler_yield_count_no_wrap": true,
+                "source_effect": "eal6_port_yield_count_' := eal6_port_yield_count_' + 1",
+                "abstract_effect": "sa_yield_count := Suc sa_yield_count",
+                "scheduler_suspend_protocol": false,
+                "current_tcb_access": false,
+                "list_access": false
+              },
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260731Tscheduler-delay-zero-02-vcg-solved",
+                "status_file": "runs/20260731Tscheduler-delay-zero-02-vcg-solved/status.txt"
+              }
+            },
+            {
+              "rung_id": "Scheduler-P2-Frozen-Preimage",
+              "scope": "artifact_bound_frozen_p2_positive_delay",
+              "general_operation_refinement": false,
+              "session": "EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Preimage",
+              "boundary_conditions": {
+                "delay_argument": 2,
+                "pre_phase": "StableRunning",
+                "post_phase": "YieldPending",
+                "prestate": "p2_pre",
+                "poststate": "task_delay_abs 2 p2_pre",
+                "runtime_tcb_addresses": "fresh logical witnesses",
+                "allocator_boot_reachability": false
+              },
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260801Tseal-p2-preimage-06-parenthesised-seal",
+                "status_file": "runs/20260801Tseal-p2-preimage-06-parenthesised-seal/status.txt"
+              }
+            }
+          ],
           "evidence": {
             "kind": "refinement_proof",
             "run_id": "20260731Tscheduler-delay-zero-02-vcg-solved",
@@ -2339,14 +2580,16 @@
           "theorems": [
             "raw_vListRemove_singleton_refines",
             "raw_vListRemove_general_refines",
-            "raw_vListRemove_insert_end_general_refines"
+            "raw_vListRemove_insert_end_general_refines",
+            "raw_vListInitialise_insert_end_remove_refines"
           ],
           "theories": [
             "theories/list_raw_r5_relation/List_V611_Raw_R5_Relation.thy",
             "theories/list_raw_r5_remove_prestate/List_V611_Raw_R5_Remove_Prestate.thy",
             "theories/list_raw_r5_remove_refinement/List_V611_Raw_R5_Remove_Refinement.thy",
             "theories/list_raw_r6_remove_general_refinement/List_V611_Raw_R6_Remove_General_Refinement.thy",
-            "theories/list_raw_r6_remove_insert_sequence/List_V611_Raw_R6_Remove_Insert_Sequence.thy"
+            "theories/list_raw_r6_remove_insert_sequence/List_V611_Raw_R6_Remove_Insert_Sequence.thy",
+            "theories/list_raw_r6_initialise_insert_remove_sequence/List_V611_Raw_R6_Initialise_Insert_Remove_Sequence.thy"
           ],
           "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Remove_General_Refinement",
           "refinement_cases": [
@@ -2381,6 +2624,17 @@
                 "kind": "refinement_proof",
                 "run_id": "20260731Tlist-raw-r6ris-07-bind-weaken",
                 "status_file": "runs/20260731Tlist-raw-r6ris-07-bind-weaken/status.txt"
+              }
+            },
+            {
+              "rung_id": "Raw-R6-initialise-item-insert-remove-sequence",
+              "scope": "fixed_initialise_item_insert_end_remove_roundtrip",
+              "general_operation_refinement": false,
+              "session": "EAL6_FreeRTOS_V611_List_Raw_R6_Initialise_Insert_Remove_Sequence",
+              "evidence": {
+                "kind": "refinement_proof",
+                "run_id": "20260801Tseal-list-four-call-01-portable",
+                "status_file": "runs/20260801Tseal-list-four-call-01-portable/status.txt"
               }
             }
           ],

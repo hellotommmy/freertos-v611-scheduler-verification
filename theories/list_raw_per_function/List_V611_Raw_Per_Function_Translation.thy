@@ -1,5 +1,5 @@
 theory List_V611_Raw_Per_Function_Translation
-  imports "AutoCorres2_Main.AutoCorres_Main"
+  imports "AutoCorres2_P2_Layout_Main.AutoCorres_Main"
 begin
 
 text \<open>
