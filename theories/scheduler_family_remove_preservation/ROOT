@@ -1,0 +1,15 @@
+session EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core in "core" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Relabel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 180]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+  theories
+    Scheduler_Family_Remove_Core
+
+session EAL6_FreeRTOS_V611_Scheduler_Node_Kind_Family_Remove_Preservation in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 180]
+  theories
+    Scheduler_Node_Kind_Family_Remove_Preservation

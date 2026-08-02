@@ -674,6 +674,26 @@ session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Preservation in "s
   theories
     Scheduler_Event_Root_Family_Remove_Preservation
 
+session EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core in "scheduler_family_remove_preservation/core" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Relabel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 180]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+  theories
+    Scheduler_Family_Remove_Core
+
+session EAL6_FreeRTOS_V611_Scheduler_Node_Kind_Family_Remove_Preservation in "scheduler_family_remove_preservation" =
+  EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 180]
+  sessions
+    EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry
+  theories
+    Scheduler_Node_Kind_Family_Remove_Preservation
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   sessions
