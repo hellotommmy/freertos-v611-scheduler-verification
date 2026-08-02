@@ -588,6 +588,92 @@ session EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core in "scheduler_delay_su
   theories
     Scheduler_Delay_Suspended_Core
 
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1 in "scheduler_event_root_family_remove_preservation/relabel/remove1" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Decoder_Remove1
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Predecessor in "scheduler_event_root_family_remove_preservation/relabel/predecessor" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1 +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Predecessor
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Cursor in "scheduler_event_root_family_remove_preservation/relabel/cursor" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Predecessor +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Cursor
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Keys in "scheduler_event_root_family_remove_preservation/relabel/keys" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Cursor +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Keys
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Relabel in "scheduler_event_root_family_remove_preservation/relabel" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Keys +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Relabel
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Pre_Rel in "scheduler_event_root_family_remove_preservation/physical/pre_rel" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Relabel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+  theories
+    Scheduler_Event_Root_Family_Remove_Pre_Rel
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Payload_Frame in "scheduler_event_root_family_remove_preservation/physical/payload_frame" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Pre_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Payload_Frame
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Physical in "scheduler_event_root_family_remove_preservation/physical" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Payload_Frame +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Physical
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Container_Rep in "scheduler_event_root_family_remove_preservation/preservation/container" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Physical +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Container_Rep
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Key_Rep in "scheduler_event_root_family_remove_preservation/preservation/key_rep" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Container_Rep +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Key_Rep
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Root_Rep in "scheduler_event_root_family_remove_preservation/preservation/root_rep" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Key_Rep +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Root_Rep
+
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Preservation in "scheduler_event_root_family_remove_preservation" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Root_Rep +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Event_Root_Family_Remove_Preservation
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   sessions
