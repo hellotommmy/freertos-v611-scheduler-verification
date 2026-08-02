@@ -22,14 +22,186 @@ where
        sa_suspended := list_remove_abs (Generic t) (sa_suspended s)
      \<rparr>"
 
+text \<open>
+  A pending-ready task still owns its Generic item through exactly one of the
+  two physical delayed rings or the suspended ring.  Its C xItemValue is a
+  persistent item payload: vListRemove and vListInsertEnd do not rewrite it.
+  In particular, a genuinely suspended task may retain a nonzero value from
+  an earlier delay.  The total selector below therefore reads the value from
+  the physical source ring before any removal; it deliberately does not infer
+  a default value from @{const sa_wake}.
+
+  The delayed-ring tests are physical A then physical B, independent of the
+  current/overflow role pointers.  Under @{const core_wf}, pending ownership
+  makes exactly one of those tests or the suspended fallback applicable.
+\<close>
+
+definition pending_generic_key_abs ::
+  "'tid \<Rightarrow> 'tid scheduler_abs \<Rightarrow> 32 word"
+where
+  "pending_generic_key_abs t s =
+     (if Generic t \<in> set (ring (sa_delayed_a s))
+      then item_key (sa_delayed_a s) (Generic t)
+      else if Generic t \<in> set (ring (sa_delayed_b s))
+      then item_key (sa_delayed_b s) (Generic t)
+      else item_key (sa_suspended s) (Generic t))"
+
+definition resume_add_ready_with_key_abs ::
+  "'tid \<Rightarrow> 32 word \<Rightarrow> 'tid scheduler_abs \<Rightarrow>
+   'tid scheduler_abs"
+where
+  "resume_add_ready_with_key_abs t k s =
+     (let p = sa_priority s t;
+          q = sa_ready s p
+      in s\<lparr>
+           sa_ready := (sa_ready s)
+             (p := list_insert_end_abs (Generic t) k q),
+           sa_wake := (sa_wake s)(t := None),
+           sa_event_waiting := sa_event_waiting s - {t},
+           sa_top_ready := max (sa_top_ready s) p
+         \<rparr>)"
+
 definition resume_one_pending_abs ::
   "'tid \<Rightarrow> 'tid scheduler_abs \<Rightarrow> 'tid scheduler_abs"
 where
   "resume_one_pending_abs t s =
-     (let s0 = s\<lparr>
-          sa_pending := list_remove_abs (Event t) (sa_pending s)\<rparr>;
-          s1 = resume_remove_generic_abs t s0
-      in add_ready_node (Generic t) s1)"
+     (let k = pending_generic_key_abs t s;
+          s0 = s\<lparr>
+           sa_pending := list_remove_abs (Event t) (sa_pending s)\<rparr>;
+           s1 = resume_remove_generic_abs t s0
+      in resume_add_ready_with_key_abs t k s1)"
+
+lemma pending_generic_key_abs_delayed_a:
+  assumes owned:
+    "Generic t \<in> set (ring (sa_delayed_a s))"
+  shows
+    "pending_generic_key_abs t s =
+       item_key (sa_delayed_a s) (Generic t)"
+  using owned by (simp add: pending_generic_key_abs_def)
+
+lemma pending_generic_key_abs_delayed_b:
+  assumes not_a:
+      "Generic t \<notin> set (ring (sa_delayed_a s))"
+    and owned:
+      "Generic t \<in> set (ring (sa_delayed_b s))"
+  shows
+    "pending_generic_key_abs t s =
+       item_key (sa_delayed_b s) (Generic t)"
+  using not_a owned by (simp add: pending_generic_key_abs_def)
+
+lemma pending_generic_key_abs_suspended:
+  assumes not_a:
+      "Generic t \<notin> set (ring (sa_delayed_a s))"
+    and not_b:
+      "Generic t \<notin> set (ring (sa_delayed_b s))"
+  shows
+    "pending_generic_key_abs t s =
+       item_key (sa_suspended s) (Generic t)"
+  using not_a not_b by (simp add: pending_generic_key_abs_def)
+
+lemma core_wf_pending_generic_key_has_physical_source:
+  assumes wf: "core_wf s"
+    and pending: "Event t \<in> set (ring (sa_pending s))"
+  shows
+    "(Generic t \<in> set (ring (sa_delayed_a s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_delayed_a s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_delayed_b s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_delayed_b s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_suspended s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_suspended s) (Generic t))"
+proof -
+  have located:
+    "Generic t \<in> set (ring (sa_delayed_a s)) \<or>
+     Generic t \<in> set (ring (sa_delayed_b s)) \<or>
+     Generic t \<in> set (ring (sa_suspended s))"
+    using wf pending
+    by (auto simp: core_wf_def membership_wf_def event_task_set_def
+        generic_task_set_def Let_def)
+  show ?thesis
+    using located by (auto simp: pending_generic_key_abs_def)
+qed
+
+lemma resume_add_ready_with_key_abs_ready_key:
+  "item_key
+     (sa_ready (resume_add_ready_with_key_abs t k s) (sa_priority s t))
+     (Generic t) = k"
+  by (simp add: resume_add_ready_with_key_abs_def
+      list_insert_end_abs_def Let_def)
+
+lemma resume_one_pending_abs_preserves_captured_generic_key:
+  "item_key
+     (sa_ready (resume_one_pending_abs t s) (sa_priority s t))
+     (Generic t) = pending_generic_key_abs t s"
+  by (simp add: resume_one_pending_abs_def resume_remove_generic_abs_def
+      resume_add_ready_with_key_abs_def list_insert_end_abs_def Let_def)
+
+corollary core_wf_resume_one_pending_abs_preserves_physical_source_key:
+  assumes wf: "core_wf s"
+    and pending: "Event t \<in> set (ring (sa_pending s))"
+  shows
+    "(Generic t \<in> set (ring (sa_delayed_a s)) \<and>
+       item_key
+         (sa_ready (resume_one_pending_abs t s) (sa_priority s t))
+         (Generic t) = item_key (sa_delayed_a s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_delayed_b s)) \<and>
+       item_key
+         (sa_ready (resume_one_pending_abs t s) (sa_priority s t))
+         (Generic t) = item_key (sa_delayed_b s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_suspended s)) \<and>
+       item_key
+         (sa_ready (resume_one_pending_abs t s) (sa_priority s t))
+         (Generic t) = item_key (sa_suspended s) (Generic t))"
+proof -
+  have source:
+    "(Generic t \<in> set (ring (sa_delayed_a s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_delayed_a s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_delayed_b s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_delayed_b s) (Generic t)) \<or>
+     (Generic t \<in> set (ring (sa_suspended s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_suspended s) (Generic t))"
+    by (rule core_wf_pending_generic_key_has_physical_source[OF wf pending])
+  have ready:
+    "item_key
+       (sa_ready (resume_one_pending_abs t s) (sa_priority s t))
+       (Generic t) = pending_generic_key_abs t s"
+    by (rule resume_one_pending_abs_preserves_captured_generic_key)
+  from source show ?thesis
+  proof
+    assume delayed_a:
+      "Generic t \<in> set (ring (sa_delayed_a s)) \<and>
+       pending_generic_key_abs t s =
+         item_key (sa_delayed_a s) (Generic t)"
+    then show ?thesis using ready by auto
+  next
+    assume delayed_b_or_suspended:
+      "(Generic t \<in> set (ring (sa_delayed_b s)) \<and>
+        pending_generic_key_abs t s =
+          item_key (sa_delayed_b s) (Generic t)) \<or>
+       (Generic t \<in> set (ring (sa_suspended s)) \<and>
+        pending_generic_key_abs t s =
+          item_key (sa_suspended s) (Generic t))"
+    then show ?thesis
+    proof
+      assume delayed_b:
+        "Generic t \<in> set (ring (sa_delayed_b s)) \<and>
+         pending_generic_key_abs t s =
+           item_key (sa_delayed_b s) (Generic t)"
+      then show ?thesis using ready by auto
+    next
+      assume suspended:
+        "Generic t \<in> set (ring (sa_suspended s)) \<and>
+         pending_generic_key_abs t s =
+           item_key (sa_suspended s) (Generic t)"
+      then show ?thesis using ready by auto
+    qed
+  qed
+qed
 
 fun drain_pending_nodes_abs ::
   "'tid node_kind list \<Rightarrow> 'tid scheduler_abs \<Rightarrow>
@@ -201,7 +373,8 @@ lemma resume_discovery_drain_and_replay_do_not_commute:
       (drain_pending_abs
         (replay_missed_abs 1 resume_interference_example)) 0)"
   by (simp add: resume_interference_example_def drain_pending_abs_def
-      resume_one_pending_abs_def resume_remove_generic_abs_def
+      resume_one_pending_abs_def pending_generic_key_abs_def
+      resume_remove_generic_abs_def resume_add_ready_with_key_abs_def
       tick_unlocked_abs_def due_nodes_def remove_nodes_def
       add_ready_node.simps list_insert_end_abs_def
       list_insert_ordered_abs_def list_remove_abs_def empty_node_ring_def

@@ -4,6 +4,8 @@ param(
 
     [string]$RunId = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'),
 
+    [switch]$CentralOnly,
+
     [ValidateSet(
         'EAL6_FreeRTOS_V611_List_Smoke',
         'EAL6_FreeRTOS_V611_Model',
@@ -98,6 +100,16 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement',
         'EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership',
         'EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General',
+        'EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge',
+        'EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core',
+        'EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone',
+        'EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone',
+        'EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General',
+        'EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold',
+        'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
+        'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement',
@@ -139,6 +151,76 @@ $expectedArtifactElfSha256 =
     'dc830e50513384d712e0d1c68cb198ea656365f673d021c452d7d7ebd45c045a'
 $isabelleHomeUser = Join-Path $env:USERPROFILE '.isabelle\Isabelle2025-2'
 $session = $Session
+$localSessionRoots = if ($CentralOnly) {
+    @()
+} else {
+switch ($session) {
+    'EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge' {
+        @(Join-Path $theoryRoot 'scheduler_delay_endpoint_bridge')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_universal_capacity')
+            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
+            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
+        )
+    }
+    'EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_universal_capacity')
+            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_universal_capacity')
+            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
+            (Join-Path $theoryRoot 'scheduler_insert_end_translation_general')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_universal_capacity')
+            (Join-Path $theoryRoot 'scheduler_universal_geometry')
+            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
+            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
+            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
+            (Join-Path $theoryRoot 'scheduler_list_family_frame_capstone')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source' {
+        @(Join-Path $theoryRoot 'scheduler_resume_inner_source')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold' {
+        @(Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
+            (Join-Path $theoryRoot 'scheduler_task_observation_rel')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_universal_capacity')
+            (Join-Path $theoryRoot 'scheduler_universal_geometry')
+            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
+            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
+            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
+            (Join-Path $theoryRoot 'scheduler_list_family_frame_capstone')
+            (Join-Path $theoryRoot 'scheduler_delay_endpoint_bridge')
+            (Join-Path $theoryRoot 'scheduler_delay_suspended_core')
+        )
+    }
+    default { @() }
+}
+}
 
 foreach ($required in @(
     $isabelleTool, $cygwinBash, $autoCorresRoot, $simplRoot, $wordLibRoot,
@@ -193,9 +275,17 @@ $patchedAutoCorresRootCygwin = ConvertTo-CygwinPath $patchedAutoCorresRoot
 $simplRootCygwin = ConvertTo-CygwinPath $simplRoot
 $wordLibRootCygwin = ConvertTo-CygwinPath $wordLibRoot
 $theoryRootCygwin = ConvertTo-CygwinPath $theoryRoot
+$localSessionOption = (($localSessionRoots | ForEach-Object {
+    $localSessionRootCygwin = ConvertTo-CygwinPath $_
+    "-d '$localSessionRootCygwin'"
+}) -join ' ')
+if ($localSessionOption.Length -gt 0) {
+    $localSessionOption += ' '
+}
 $bashCommand = "exec '$isabelleToolCygwin' build " +
     "-d '$simplRootCygwin' -d '$wordLibRootCygwin' " +
     "-d '$patchedAutoCorresRootCygwin' -d '$theoryRootCygwin' " +
+    $localSessionOption +
     "-o quick_and_dirty=false -j 1 '$session'"
 Set-Content -LiteralPath $commandPath -Encoding utf8 -Value (
     "`"$cygwinBash`" --login -c `"$bashCommand`""

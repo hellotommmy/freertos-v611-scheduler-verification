@@ -1,6 +1,6 @@
 # Universal Scheduler Refinement Acceptance Criteria
 
-**Correction date:** 2 August 2026  
+**Correction date:** 2 August 2026
 **Frozen build:** FreeRTOS V6.1.1 proof configuration with `configMAX_PRIORITIES = 4`
 
 ## 1. Purpose and immediate correction
@@ -181,10 +181,17 @@ More specifically:
 - `vTaskIncrementTick` covers only the scheduler-suspended branch;
 - `vTaskSwitchContext` covers only the scheduler-suspended branch.
 
-At the reusable list layer, general-$N$ member removal and fresh insert-end are
-proved, while ordered insertion is refined only for an empty list.  This is
-valuable preparation, but general ordered insertion into a non-empty delayed
-queue is still a blocking obligation.
+At the reusable list layer, Gate L is now closed.  Generated general ordered
+insertion and general removal are checker-green for arbitrary legal
+represented rings; generated raw and scheduler insert-end are checker-green;
+and the accepted family capstone supplies non-target-root, sibling-owner, and
+priority-field frames under its explicit representation and separation
+premises.  The central QAD-false closure runs are
+`20260802Tgate-l-central-family-02` and
+`20260802Tgate-l-central-insert-end-01`.  These list-layer results remove the
+former non-empty ordered-insert blocker, but they do not change the **0/5**
+whole-operation score above: no list primitive or abstract composition is by
+itself a universal generated-source refinement of a scheduler root.
 
 ## 6. Anti-cheat acceptance rules
 
@@ -224,11 +231,27 @@ mutation tests, but never substitutes for the universal theorem.
 ### Gate L -- universal list layer
 
 Close the general-$N$ ordered-insertion refinement for arbitrary well-formed
-non-empty rings and retain the existing general remove and insert-end
-theorems.  The gate also requires generic-item/event-item alias and frame
+rings, including the legal empty-ring sentinel alias, together with general
+remove and insert-end theorems.  The gate also requires generic-item/event-item
+alias and frame
 lemmas strong enough to use these operations at arbitrary scheduler-owned
-roots.  Gate L is closed only by source-derived, checker-green theorems; it is
-currently partial.
+roots.  Gate L is closed only by source-derived, checker-green theorems.
+
+**Current status: Gate L is closed.**  Generated general ordered insertion,
+generated general removal, generated raw and scheduler insert-end, derived
+count capacity, exact write footprints, the legal empty-ring alias, same-TCB
+Generic/Event separation, and arbitrary non-target scheduler-root frames are
+present in the accepted central dependency closure.  The two top-level
+QAD-false runs are `20260802Tgate-l-central-family-02` for
+`EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone` and
+`20260802Tgate-l-central-insert-end-01` for
+`EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General`; both have
+`exit_code=0`.  The exact quantified scope, explicit premises, hashes, and
+session ledger are recorded in `GATE_L_CLOSURE_AUDIT.md`.
+
+The trace-led invariant design and its empty-ring/alias falsification tests are
+recorded in `UNIVERSAL_ORDERED_INSERT_INVARIANT_AUDIT.md`.  Those traces guide
+the invariant but are not evidence for closing this gate.
 
 ### Gate H -- universal heap/state `vTaskDelay` hard gate
 
@@ -239,6 +262,25 @@ every tick, delay, priority assignment, and valid topology at the declared API
 boundary.  Add generic preimage/inhabitation evidence and audit the exported
 theorem object's assumptions.  The existing P2 theorem is a regression witness
 for Gate H, not its completion.
+
+The positive-delay composition must expose a remove-to-insert intermediate
+state in which the current generic item is globally unlinked (normally witnessed
+by a null container under the faithful-membership invariant).  Spatial
+freshness relative to the target delayed list alone is not enough to frame all
+other scheduler-owned roots.
+
+Delay-phase endpoints must identify their physical root.  A single anonymous
+sentinel value cannot represent two distinct empty scheduler lists, especially
+across tick-wrap role exchange.  The root-tagged abstract endpoint model, its
+raw removal/ordered-scan bridge, and a general abstract `ResumeRel` are now
+checker-green.  The abstract captured-source-key result is also checker-green:
+`core_wf_resume_one_pending_abs_preserves_physical_source_key` preserves the
+key selected from physical delayed A, delayed B, or suspended storage, with
+central QAD-false evidence in `20260802Tresume-general-relation-central-01`.
+This is an abstract relation lemma, not a generated-source theorem.  The
+resume outer scaffold likewise supplies proof architecture only.  Composition
+with the generated outer `xTaskResumeAll'` pending-ready and missed-tick loops
+remains an open source-level Gate-H obligation; therefore Gate H remains open.
 
 ### Gate D -- five-root dispatcher and trace gate
 

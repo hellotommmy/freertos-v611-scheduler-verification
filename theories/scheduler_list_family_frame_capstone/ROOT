@@ -1,0 +1,9 @@
+session EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry
+  theories
+    Scheduler_List_Family_Frame_Capstone

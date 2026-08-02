@@ -1,0 +1,8 @@
+session EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Loop +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone
+  theories
+    Scheduler_Insert_End_Translation_General

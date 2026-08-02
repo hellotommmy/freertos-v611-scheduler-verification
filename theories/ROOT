@@ -506,6 +506,61 @@ session EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General in "scheduler_re
   theories
     Scheduler_Remove_Translation_General
 
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity in "scheduler_universal_capacity" =
+  EAL6_FreeRTOS_V611_List_Raw_R5_Interface +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Capacity
+
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry in "scheduler_universal_geometry" =
+  EAL6_FreeRTOS_V611_Scheduler_P2_Raw_Relation +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Geometry
+
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Ordered_Insert_Composition in "scheduler_universal_ordered_insert_composition" =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity
+  theories
+    Scheduler_Universal_Ordered_Insert_Composition
+
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone in "scheduler_ordered_insert_generated_capstone" =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Loop +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Ordered_Insert_Composition
+  theories
+    Scheduler_Ordered_Insert_Generated_Capstone
+
+session EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone in "list_insert_end_generated_capstone" =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity
+  theories
+    List_Insert_End_Generated_Capstone
+
+session EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General in "scheduler_insert_end_translation_general" =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Loop +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone
+  theories
+    Scheduler_Insert_End_Translation_General
+
+session EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone in "scheduler_list_family_frame_capstone" =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry
+  theories
+    Scheduler_List_Family_Frame_Capstone
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   sessions
