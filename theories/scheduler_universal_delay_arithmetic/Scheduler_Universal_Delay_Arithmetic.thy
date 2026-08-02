@@ -145,4 +145,24 @@ proof -
          put_overflow_delayed_def wake_def Let_def split: if_splits)
 qed
 
+theorem task_delay_abs_all_inputs_capstone:
+  "task_delay_abs ticks s =
+     (if ticks = 0
+      then request_yield s
+      else case sa_current s of
+        None \<Rightarrow> request_yield s
+      | Some t \<Rightarrow> positive_delay_state ticks t s) \<and>
+   (ticks = 0 \<longrightarrow> task_delay_abs ticks s = request_yield s) \<and>
+   (ticks \<noteq> 0 \<and> sa_current s = None \<longrightarrow>
+      task_delay_abs ticks s = request_yield s) \<and>
+   (\<forall>t. ticks \<noteq> 0 \<and> sa_current s = Some t \<longrightarrow>
+      task_delay_abs ticks s = positive_delay_state ticks t s) \<and>
+   sa_current (task_delay_abs ticks s) = sa_current s \<and>
+   sa_tick (task_delay_abs ticks s) = sa_tick s \<and>
+   sa_yield_count (task_delay_abs ticks s) = Suc (sa_yield_count s)"
+  by (cases "ticks = 0"; cases "sa_current s")
+     (simp_all add: task_delay_abs_def positive_delay_state_def
+       request_yield_def block_task_at_def put_current_delayed_def
+       put_overflow_delayed_def Let_def split: if_splits)
+
 end
