@@ -1,0 +1,5 @@
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry in "." =
+  EAL6_FreeRTOS_V611_Scheduler_P2_Raw_Relation +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Geometry

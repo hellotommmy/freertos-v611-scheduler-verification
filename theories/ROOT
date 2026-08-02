@@ -15,6 +15,21 @@ session EAL6_FreeRTOS_V611_Scheduler_Abstract_Model in "scheduler_abs_model" = E
   theories
     Scheduler_Abstract_Model
 
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Validity in "scheduler_universal_validity" = EAL6_FreeRTOS_V611_Scheduler_Abstract_Model +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Validity
+
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Delay_Arithmetic in "scheduler_universal_delay_arithmetic" = EAL6_FreeRTOS_V611_Scheduler_Abstract_Model +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Delay_Arithmetic
+
+session EAL6_FreeRTOS_V611_Scheduler_Universal_Delay_Phases in "scheduler_universal_delay_phases" = EAL6_FreeRTOS_V611_Scheduler_Abstract_Model +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Universal_Delay_Phases
+
 session EAL6_FreeRTOS_V611_M0_Bridge in "m0_bridge" = EAL6_FreeRTOS_V611_List_Smoke +
   options [quick_and_dirty = false, timeout = 300]
   theories
@@ -451,6 +466,45 @@ session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source in "scheduler_p2_insert_so
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   theories
     Scheduler_P2_Insert_Source
+
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Bridges in "scheduler_ordered_insert_general_bridges" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  theories
+    Scheduler_Ordered_Insert_General_Bridges
+
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Source in "scheduler_ordered_insert_general_source" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Raw_R6_Ordered_Insert_Empty_Refinement
+    EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Bridges
+  theories
+    Scheduler_Ordered_Insert_General_Source
+
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Loop in "scheduler_ordered_insert_general_loop" = EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Source +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  theories
+    Scheduler_Ordered_Insert_General_Loop
+
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement in "scheduler_ordered_insert_general_refinement" = EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Source +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Post_Relation
+  theories
+    Scheduler_Ordered_Insert_General_Refinement
+
+session EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership in "scheduler_remove_unlinked_ownership" = EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Raw_R6_Remove_General_Refinement
+  theories
+    Scheduler_Remove_Unlinked_Ownership
+
+session EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General in "scheduler_remove_translation_general" = EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Remove_Source
+  theories
+    Scheduler_Remove_Translation_General
 
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
