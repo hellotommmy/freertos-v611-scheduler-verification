@@ -1,0 +1,22 @@
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base in "base" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout
+  theories
+    Scheduler_Generic_Root_Universe_Base
+
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core in "coverage" =
+  EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Generic_Root_Universe_Coverage_Core
+
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Generic_Root_Universe_Coverage

@@ -694,6 +694,29 @@ session EAL6_FreeRTOS_V611_Scheduler_Node_Kind_Family_Remove_Preservation in "sc
   theories
     Scheduler_Node_Kind_Family_Remove_Preservation
 
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base in "scheduler_generic_root_universe_coverage/base" =
+  EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout
+  theories
+    Scheduler_Generic_Root_Universe_Base
+
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core in "scheduler_generic_root_universe_coverage/coverage" =
+  EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Generic_Root_Universe_Coverage_Core
+
+session EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage in "scheduler_generic_root_universe_coverage" =
+  EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Generic_Root_Universe_Coverage
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   sessions
