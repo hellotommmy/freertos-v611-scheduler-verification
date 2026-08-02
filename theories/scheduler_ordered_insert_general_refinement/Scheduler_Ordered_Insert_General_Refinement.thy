@@ -991,4 +991,152 @@ proof -
     by (simp add: raw_ordered_insert_general_heap_def Let_def)
 qed
 
+text \<open>
+  Exact six-write footprint.  The two source-shaped whole-record updates are
+  first converted back to their generated field writes, so neither the whole
+  item nor the whole list allocation appears in this footprint.
+\<close>
+
+definition raw_container_field_ptr :: "raw_node_id \<Rightarrow> unit ptr ptr"
+where
+  "raw_container_field_ptr p =
+     PTR(unit ptr) &(p\<rightarrow>[''pvContainer_C''])"
+
+definition raw_container_field_region :: "raw_node_id \<Rightarrow> addr set"
+where
+  "raw_container_field_region p =
+     {ptr_val (raw_container_field_ptr p)..+size_of TYPE(unit ptr)}"
+
+lemma raw_insert_container_heap_to_field:
+  assumes guard: "c_guard p"
+  shows
+    "raw_insert_container_heap h lp p =
+     heap_update (raw_container_field_ptr p)
+       (PTR_COERCE(xLIST_C \<rightarrow> unit) lp) h"
+  unfolding raw_insert_container_heap_def raw_container_field_ptr_def
+  apply (rule sym)
+  by (rule xLIST_ITEM_C_heap_update_fields(5)[OF guard])
+
+lemma raw_count_update_to_constant:
+  "uxNumberOfItems_C_update f x =
+   uxNumberOfItems_C_update (\<lambda>_. f (uxNumberOfItems_C x)) x"
+  by (cases x) simp
+
+lemma raw_insert_count_heap_to_field:
+  assumes guard: "c_guard lp"
+  shows
+    "raw_insert_count_heap h lp =
+     heap_update (raw_count_field_ptr lp)
+       (uxNumberOfItems_C (h_val h lp) + 1) h"
+  unfolding raw_insert_count_heap_def raw_count_field_ptr_def
+  apply (subst raw_count_update_to_constant)
+  apply (rule sym)
+  by (rule xLIST_C_heap_update_fields(1)[OF guard])
+
+lemma heap_update_raw_container_field_external_frame:
+  assumes outside: "a \<notin> raw_container_field_region p"
+  shows "heap_update (raw_container_field_ptr p) v h a = h a"
+  unfolding heap_update_def raw_container_field_region_def
+  apply (rule heap_update_nmem_same)
+  using outside by (simp add: raw_container_field_region_def)
+
+lemma heap_update_raw_count_field_external_frame:
+  assumes outside: "a \<notin> raw_count_field_region lp"
+  shows "heap_update (raw_count_field_ptr lp) v h a = h a"
+  unfolding heap_update_def raw_count_field_region_def
+  apply (rule heap_update_nmem_same)
+  using outside by (simp add: raw_count_field_region_def)
+
+definition raw_ordered_insert_general_exact_write_footprint ::
+  "heap_mem \<Rightarrow> xLIST_C ptr \<Rightarrow>
+   (raw_node_id, raw_key) xlist_abs \<Rightarrow> raw_node_id \<Rightarrow> addr set"
+where
+  "raw_ordered_insert_general_exact_write_footprint h lp xs p =
+     (let k = raw_key_at h p;
+          before = ordered_scan_prefix (item_key xs) k (ring xs);
+          c = last (raw_end_item lp # before);
+          q = raw_next_at h lp c
+      in raw_pointer_field_region (raw_next_field_ptr p) \<union>
+         raw_pointer_field_region (raw_previous_field_ptr q) \<union>
+         raw_pointer_field_region (raw_previous_field_ptr p) \<union>
+         raw_pointer_field_region (raw_next_field_ptr c) \<union>
+         raw_container_field_region p \<union>
+         raw_count_field_region lp)"
+
+theorem raw_ordered_insert_general_heap_exact_external_frame:
+  assumes rel: "raw_xlist_rel h lp xs"
+    and fresh: "raw_fresh_for_insert lp (ring xs) p"
+    and outside:
+      "a \<notin> raw_ordered_insert_general_exact_write_footprint h lp xs p"
+  shows "raw_ordered_insert_general_heap h lp xs p a = h a"
+proof -
+  let ?k = "raw_key_at h p"
+  let ?before = "ordered_scan_prefix (item_key xs) ?k (ring xs)"
+  let ?c = "last (raw_end_item lp # ?before)"
+  let ?q = "raw_next_at h lp ?c"
+  let ?h1 = "raw_insert_next_heap h p ?q"
+  let ?h2 = "raw_insert_previous_heap ?h1 ?q p"
+  let ?h3 = "raw_insert_previous_heap ?h2 p ?c"
+  let ?h4 = "raw_insert_next_heap ?h3 ?c p"
+  let ?h5 = "raw_insert_container_heap ?h4 lp p"
+  have layout: "raw_xlist_layout lp (ring xs)"
+    using rel by (simp add: raw_xlist_rel_def)
+  have p_guard: "c_guard p"
+    using fresh by (simp add: raw_fresh_for_insert_def)
+  have lp_guard: "c_guard lp"
+    using layout by (simp add: raw_xlist_layout_def)
+  have out_p_next:
+    "a \<notin> raw_pointer_field_region (raw_next_field_ptr p)"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have out_q_previous:
+    "a \<notin> raw_pointer_field_region (raw_previous_field_ptr ?q)"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have out_p_previous:
+    "a \<notin> raw_pointer_field_region (raw_previous_field_ptr p)"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have out_c_next:
+    "a \<notin> raw_pointer_field_region (raw_next_field_ptr ?c)"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have out_container: "a \<notin> raw_container_field_region p"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have out_count: "a \<notin> raw_count_field_region lp"
+    using outside
+    by (simp add: raw_ordered_insert_general_exact_write_footprint_def Let_def)
+  have h1: "?h1 a = h a"
+    unfolding raw_insert_next_heap_def
+    by (rule heap_update_raw_pointer_field_external_frame[OF out_p_next])
+  have h2: "?h2 a = ?h1 a"
+    unfolding raw_insert_previous_heap_def
+    by (rule heap_update_raw_pointer_field_external_frame[OF out_q_previous])
+  have h3: "?h3 a = ?h2 a"
+    unfolding raw_insert_previous_heap_def
+    by (rule heap_update_raw_pointer_field_external_frame[OF out_p_previous])
+  have h4: "?h4 a = ?h3 a"
+    unfolding raw_insert_next_heap_def
+    by (rule heap_update_raw_pointer_field_external_frame[OF out_c_next])
+  have h5_field:
+    "?h5 = heap_update (raw_container_field_ptr p)
+       (PTR_COERCE(xLIST_C \<rightarrow> unit) lp) ?h4"
+    by (rule raw_insert_container_heap_to_field[OF p_guard])
+  have h5: "?h5 a = ?h4 a"
+    unfolding h5_field
+    by (rule heap_update_raw_container_field_external_frame[OF out_container])
+  have h6_field:
+    "raw_insert_count_heap ?h5 lp =
+     heap_update (raw_count_field_ptr lp)
+       (uxNumberOfItems_C (h_val ?h5 lp) + 1) ?h5"
+    by (rule raw_insert_count_heap_to_field[OF lp_guard])
+  have h6: "raw_insert_count_heap ?h5 lp a = ?h5 a"
+    unfolding h6_field
+    by (rule heap_update_raw_count_field_external_frame[OF out_count])
+  show ?thesis
+    using h1 h2 h3 h4 h5 h6
+    by (simp add: raw_ordered_insert_general_heap_def Let_def)
+qed
+
 end
