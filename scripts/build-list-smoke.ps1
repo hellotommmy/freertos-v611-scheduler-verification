@@ -102,6 +102,7 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_General_Relation',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Source',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Post_Relation',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Refinement',

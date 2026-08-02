@@ -518,6 +518,13 @@ session EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves in "scheduler_p2_control_
   theories
     Scheduler_P2_Control_Leaves
 
+session EAL6_FreeRTOS_V611_Scheduler_Resume_General_Relation in "scheduler_resume_general_relation" = EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement
+  theories
+    Scheduler_Resume_General_Relation
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Source in "scheduler_p2_delay_source" = EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   theories

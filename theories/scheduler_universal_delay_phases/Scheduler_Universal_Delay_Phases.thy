@@ -25,6 +25,10 @@ datatype 'root delay_txn_phase =
   | DelayResumed delay_resume_path
   | DelayYieldPending
 
+datatype ('node, 'root) delay_link_endpoint =
+    DelayNode 'node
+  | DelayEnd 'root
+
 record ('tid, 'root) delay_txn_context =
   dt_live :: "'tid set"
   dt_priority_levels :: nat
@@ -44,8 +48,10 @@ record ('tid, 'root) delay_txn_snapshot =
   ds_overflow_delayed :: "'tid node_ring"
   ds_members :: "'root \<Rightarrow> 'tid node_kind set"
   ds_container :: "'tid node_kind \<Rightarrow> 'root option"
-  ds_next :: "'tid node_kind option \<Rightarrow> 'tid node_kind option"
-  ds_previous :: "'tid node_kind option \<Rightarrow> 'tid node_kind option"
+  ds_next :: "('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
+    ('tid node_kind, 'root) delay_link_endpoint"
+  ds_previous :: "('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
+    ('tid node_kind, 'root) delay_link_endpoint"
   ds_wake :: "'tid \<Rightarrow> 32 word option"
   ds_tick :: "32 word"
   ds_top_hint :: nat
@@ -343,27 +349,49 @@ where
      ds_yield_count S = ds_yield_count T"
 
 definition delay_existing_ring_slot ::
-  "'id \<Rightarrow> ('id, 'key) xlist_abs \<Rightarrow>
-   'id option \<Rightarrow> 'id option \<Rightarrow> bool"
+  "'root \<Rightarrow> 'id \<Rightarrow> ('id, 'key) xlist_abs \<Rightarrow>
+   ('id, 'root) delay_link_endpoint \<Rightarrow>
+   ('id, 'root) delay_link_endpoint \<Rightarrow> bool"
 where
-  "delay_existing_ring_slot n xs c q \<longleftrightarrow>
+  "delay_existing_ring_slot root n xs c q \<longleftrightarrow>
      (\<exists>before after.
         ring xs = before @ n # after \<and>
-        c = (case rev before of [] \<Rightarrow> None | x # _ \<Rightarrow> Some x) \<and>
-        q = (case after of [] \<Rightarrow> None | x # _ \<Rightarrow> Some x))"
+        c = (case rev before of
+               [] \<Rightarrow> DelayEnd root | x # _ \<Rightarrow> DelayNode x) \<and>
+        q = (case after of
+               [] \<Rightarrow> DelayEnd root | x # _ \<Rightarrow> DelayNode x))"
 
 definition delay_ordered_scan_slot ::
-  "'id \<Rightarrow> 'key::linorder \<Rightarrow> ('id, 'key) xlist_abs \<Rightarrow>
-   'id option \<Rightarrow> 'id option \<Rightarrow> bool"
+  "'root \<Rightarrow> 'id \<Rightarrow> 'key::linorder \<Rightarrow>
+   ('id, 'key) xlist_abs \<Rightarrow>
+   ('id, 'root) delay_link_endpoint \<Rightarrow>
+   ('id, 'root) delay_link_endpoint \<Rightarrow> bool"
 where
-  "delay_ordered_scan_slot n k xs c q \<longleftrightarrow>
+  "delay_ordered_scan_slot root n k xs c q \<longleftrightarrow>
      n \<notin> set (ring xs) \<and>
      (\<exists>before after.
         ring xs = before @ after \<and>
         (\<forall>x\<in>set before. item_key xs x \<le> k) \<and>
         (case after of [] \<Rightarrow> True | x # _ \<Rightarrow> k < item_key xs x) \<and>
-        c = (case rev before of [] \<Rightarrow> None | x # _ \<Rightarrow> Some x) \<and>
-        q = (case after of [] \<Rightarrow> None | x # _ \<Rightarrow> Some x))"
+        c = (case rev before of
+               [] \<Rightarrow> DelayEnd root | x # _ \<Rightarrow> DelayNode x) \<and>
+        q = (case after of
+               [] \<Rightarrow> DelayEnd root | x # _ \<Rightarrow> DelayNode x))"
+
+theorem delay_distinct_root_ends_support_independent_links:
+  fixes r s :: 'root
+    and left right :: "('node, 'root) delay_link_endpoint"
+  assumes distinct: "r \<noteq> s"
+  shows
+    "\<exists>f :: ('node, 'root) delay_link_endpoint \<Rightarrow>
+          ('node, 'root) delay_link_endpoint.
+       f (DelayEnd r) = left \<and> f (DelayEnd s) = right"
+proof
+  show
+    "((\<lambda>_. left)(DelayEnd s := right)) (DelayEnd r) = left \<and>
+     ((\<lambda>_. left)(DelayEnd s := right)) (DelayEnd s) = right"
+    using distinct by simp
+qed
 
 definition delay_selected_snapshot_ring ::
   "('tid, 'root) delay_txn_context \<Rightarrow> 'root \<Rightarrow>
@@ -376,17 +404,18 @@ where
 
 definition delay_ready_unlinked_delta ::
   "('tid, 'root) delay_txn_context \<Rightarrow>
-   'tid node_kind option \<Rightarrow> 'tid node_kind option \<Rightarrow>
+   ('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
+   ('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
    ('tid, 'root) delay_txn_snapshot \<Rightarrow>
    ('tid, 'root) delay_txn_snapshot \<Rightarrow> bool"
 where
   "delay_ready_unlinked_delta C c q S T \<longleftrightarrow>
      (let t = dt_task C;
           p = dt_priority C t;
-          n = Some (Generic t);
+          n = DelayNode (Generic t);
           source = dt_ready_root C p
       in c \<noteq> n \<and> q \<noteq> n \<and>
-         delay_existing_ring_slot (Generic t) (ds_ready S p) c q \<and>
+         delay_existing_ring_slot source (Generic t) (ds_ready S p) c q \<and>
          ds_previous S n = c \<and> ds_next S n = q \<and>
          ds_next S c = n \<and> ds_previous S q = n \<and>
          ds_ready T =
@@ -439,17 +468,18 @@ where
 
 definition delay_selected_inserted_delta ::
   "('tid, 'root) delay_txn_context \<Rightarrow> 'root \<Rightarrow>
-   'tid node_kind option \<Rightarrow> 'tid node_kind option \<Rightarrow>
+   ('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
+   ('tid node_kind, 'root) delay_link_endpoint \<Rightarrow>
    ('tid, 'root) delay_txn_snapshot \<Rightarrow>
    ('tid, 'root) delay_txn_snapshot \<Rightarrow> bool"
 where
   "delay_selected_inserted_delta C selected c q S T \<longleftrightarrow>
      (let t = dt_task C;
-          n = Some (Generic t);
+          n = DelayNode (Generic t);
           wake = delay_wake C
       in selected = delay_selected_root C \<and>
          c \<noteq> n \<and> q \<noteq> n \<and>
-         delay_ordered_scan_slot (Generic t) wake
+         delay_ordered_scan_slot selected (Generic t) wake
            (delay_selected_snapshot_ring C selected S) c q \<and>
          ds_next S c = q \<and> ds_previous S q = c \<and>
          ds_ready T = ds_ready S \<and>
@@ -576,10 +606,13 @@ text \<open>
   quiescent boundary fixes that bit false and consequently selects the outer
   branch.
 
-  The slot predicates connect c/q to list-level source geometry: removal uses
-  the actual predecessor/successor decomposition of the source ready ring,
-  and insertion uses the exact stable ordered-scan split (all passed keys are
-  at most the new wake key, while the first unpassed key is greater).  A
+  The slot predicates connect c/q to list-level source geometry.  Every list
+  sentinel is represented by @{const DelayEnd} applied to its own root, so
+  different ready and delayed roots never alias through a shared logical end
+  node.  Removal uses the actual predecessor/successor decomposition of the
+  source ready ring, and insertion uses the exact stable ordered-scan split
+  (all passed keys are at most the new wake key, while the first unpassed key
+  is greater).  A
   raw-pointer-to-slot refinement theorem remains a separate implementation
   bridge; this proof-only phase model does not claim it.
 \<close>
@@ -899,10 +932,10 @@ lemma delay_ready_unlinked_precomputed_wake_and_frames:
 lemma delay_ready_unlinked_removed_links_stale:
   assumes delta: "delay_ready_unlinked_delta C c q S T"
   shows
-    "ds_next T (Some (Generic (dt_task C))) =
-       ds_next S (Some (Generic (dt_task C))) \<and>
-     ds_previous T (Some (Generic (dt_task C))) =
-       ds_previous S (Some (Generic (dt_task C)))"
+    "ds_next T (DelayNode (Generic (dt_task C))) =
+       ds_next S (DelayNode (Generic (dt_task C))) \<and>
+     ds_previous T (DelayNode (Generic (dt_task C))) =
+       ds_previous S (DelayNode (Generic (dt_task C)))"
   using delta
   by (auto simp: delay_ready_unlinked_delta_def Let_def)
 
@@ -912,11 +945,11 @@ lemma delay_ready_unlinked_exact_deltaD:
       and "p \<equiv> dt_priority C (dt_task C)"
       and "source \<equiv> dt_ready_root C (dt_priority C (dt_task C))"
   shows
-    "delay_existing_ring_slot (Generic t) (ds_ready S p) c q \<and>
-     ds_previous S (Some (Generic t)) = c \<and>
-     ds_next S (Some (Generic t)) = q \<and>
-     ds_next S c = Some (Generic t) \<and>
-     ds_previous S q = Some (Generic t) \<and>
+    "delay_existing_ring_slot source (Generic t) (ds_ready S p) c q \<and>
+     ds_previous S (DelayNode (Generic t)) = c \<and>
+     ds_next S (DelayNode (Generic t)) = q \<and>
+     ds_next S c = DelayNode (Generic t) \<and>
+     ds_previous S q = DelayNode (Generic t) \<and>
      ds_ready T =
        (ds_ready S)(p := list_remove_abs (Generic t) (ds_ready S p)) \<and>
      ds_members T =
@@ -959,11 +992,11 @@ lemma delay_keyed_selected_public_stutterD:
 lemma delay_selected_inserted_exact_deltaD:
   assumes delta: "delay_selected_inserted_delta C selected c q S T"
   defines "t \<equiv> dt_task C"
-      and "n \<equiv> Some (Generic (dt_task C))"
+      and "n \<equiv> DelayNode (Generic (dt_task C))"
       and "wake \<equiv> delay_wake C"
   shows
     "selected = delay_selected_root C \<and>
-     delay_ordered_scan_slot (Generic t) wake
+     delay_ordered_scan_slot selected (Generic t) wake
        (delay_selected_snapshot_ring C selected S) c q \<and>
      ds_next S c = q \<and> ds_previous S q = c \<and>
      ds_ready T = ds_ready S \<and>
