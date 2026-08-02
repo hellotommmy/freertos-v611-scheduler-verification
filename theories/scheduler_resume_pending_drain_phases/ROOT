@@ -1,0 +1,80 @@
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Phases in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core
+    EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General
+  theories
+    Scheduler_Resume_Pending_Drain_Phases
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Base in "gate_relation_base" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Phases +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Base
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Decoder in "gate_relation_decoder" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Base +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Decoder
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Observation in "gate_relation_coverage_observation" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Decoder +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Observation
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Count in "gate_relation_coverage_count" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Observation +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Count
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Ownership in "gate_relation_coverage_ownership" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Count +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Ownership
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Freshness in "gate_relation_coverage_freshness" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Ownership +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Freshness
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Event in "gate_relation_coverage_event" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Freshness +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Event
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage in "gate_relation_coverage" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Event +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation in "gate_relation_bridge" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate_Relation
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate in "gate_interface" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Pending_Drain_Gate
