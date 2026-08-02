@@ -109,6 +109,7 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry',
@@ -155,68 +156,8 @@ $localSessionRoots = if ($CentralOnly) {
     @()
 } else {
 switch ($session) {
-    'EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge' {
-        @(Join-Path $theoryRoot 'scheduler_delay_endpoint_bridge')
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_universal_capacity')
-            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
-            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
-        )
-    }
-    'EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_universal_capacity')
-            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
-        )
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Insert_End_Translation_General' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_universal_capacity')
-            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
-            (Join-Path $theoryRoot 'scheduler_insert_end_translation_general')
-        )
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_universal_capacity')
-            (Join-Path $theoryRoot 'scheduler_universal_geometry')
-            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
-            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
-            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
-            (Join-Path $theoryRoot 'scheduler_list_family_frame_capstone')
-        )
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source' {
-        @(Join-Path $theoryRoot 'scheduler_resume_inner_source')
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold' {
-        @(Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
-            (Join-Path $theoryRoot 'scheduler_task_observation_rel')
-        )
-    }
     'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_resume_outer_scaffold')
-            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold')
-        )
-    }
-    'EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core' {
-        @(
-            (Join-Path $theoryRoot 'scheduler_universal_capacity')
-            (Join-Path $theoryRoot 'scheduler_universal_geometry')
-            (Join-Path $theoryRoot 'scheduler_universal_ordered_insert_composition')
-            (Join-Path $theoryRoot 'scheduler_ordered_insert_generated_capstone')
-            (Join-Path $theoryRoot 'list_insert_end_generated_capstone')
-            (Join-Path $theoryRoot 'scheduler_list_family_frame_capstone')
-            (Join-Path $theoryRoot 'scheduler_delay_endpoint_bridge')
-            (Join-Path $theoryRoot 'scheduler_delay_suspended_core')
-        )
+        @(Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold')
     }
     default { @() }
 }

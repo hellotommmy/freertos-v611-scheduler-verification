@@ -781,6 +781,51 @@ proof -
           OF rel fresh outside])
 qed
 
+theorem raw_remove_family_sibling_item_priority_byte_frame:
+  assumes pre: "scheduler_family_pre_rel h roots fam live D"
+    and target: "target \<in> roots"
+    and member: "p \<in> set (ring (fam target))"
+    and sibling_managed:
+      "sibling \<in> universal_managed_nodes live D"
+    and sibling_nonmember:
+      "sibling \<notin> set (ring (fam target))"
+    and t_live: "t \<in> live"
+  shows
+    "(\<forall>a\<in>raw_item_region sibling.
+       raw_remove_concrete_heap h p a = h a) \<and>
+     (\<forall>a\<in>universal_priority_field_region (sd_tcb_ptr D t).
+       raw_remove_concrete_heap h p a = h a)"
+proof -
+  have rel: "raw_xlist_rel h target (fam target)"
+    using pre target
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have footprint:
+    "raw_remove_exact_write_footprint h target p \<subseteq>
+       raw_xlist_storage target (fam target)"
+    by (rule raw_remove_exact_footprint_subset_storage[OF rel member])
+  have sibling_storage:
+    "raw_xlist_storage target (fam target) \<inter>
+       raw_item_region sibling = {}"
+    by (rule scheduler_family_target_storage_disjoint_nonmember_item[
+          OF pre target sibling_managed sibling_nonmember])
+  have item_outside:
+    "\<And>a. a \<in> raw_item_region sibling \<Longrightarrow>
+       a \<notin> raw_remove_exact_write_footprint h target p"
+    using footprint sibling_storage by blast
+  have priority_storage:
+    "raw_xlist_storage target (fam target) \<inter>
+       universal_priority_field_region (sd_tcb_ptr D t) = {}"
+    by (rule scheduler_family_target_storage_priority_disjoint[
+          OF pre target t_live])
+  have priority_outside:
+    "\<And>a. a \<in> universal_priority_field_region (sd_tcb_ptr D t)
+       \<Longrightarrow> a \<notin> raw_remove_exact_write_footprint h target p"
+    using footprint priority_storage by blast
+  show ?thesis
+    using raw_remove_concrete_heap_exact_external_frame[
+      OF rel member] item_outside priority_outside by blast
+qed
+
 theorem raw_remove_family_sibling_owner_priority_byte_frame:
   assumes pre: "scheduler_family_pre_rel h roots fam live D"
     and target: "target \<in> roots"
@@ -825,6 +870,68 @@ proof -
   show ?thesis
     using raw_remove_concrete_heap_exact_external_frame[
       OF rel member] owner_outside priority_outside by blast
+qed
+
+theorem raw_ordered_insert_family_sibling_item_priority_byte_frame:
+  assumes pre: "scheduler_family_pre_rel h roots fam live D"
+    and target: "target \<in> roots"
+    and fresh: "raw_fresh_for_insert target (ring (fam target)) p"
+    and p_managed: "p \<in> universal_managed_nodes live D"
+    and sibling_managed:
+      "sibling \<in> universal_managed_nodes live D"
+    and p_sibling: "p \<noteq> sibling"
+    and sibling_nonmember:
+      "sibling \<notin> set (ring (fam target))"
+    and t_live: "t \<in> live"
+  shows
+    "(\<forall>a\<in>raw_item_region sibling.
+       raw_ordered_insert_general_heap h target (fam target) p a = h a) \<and>
+     (\<forall>a\<in>universal_priority_field_region (sd_tcb_ptr D t).
+       raw_ordered_insert_general_heap h target (fam target) p a = h a)"
+proof -
+  have geometry: "universal_tcb_geometry live D"
+    using pre by (simp add: scheduler_family_pre_rel_def)
+  have rel: "raw_xlist_rel h target (fam target)"
+    using pre target
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have footprint:
+    "raw_ordered_insert_general_exact_write_footprint
+       h target (fam target) p \<subseteq>
+       raw_xlist_storage target (fam target) \<union> raw_item_region p"
+    by (rule raw_ordered_insert_exact_footprint_subset_storage[OF rel])
+  have sibling_storage:
+    "raw_xlist_storage target (fam target) \<inter>
+       raw_item_region sibling = {}"
+    by (rule scheduler_family_target_storage_disjoint_nonmember_item[
+          OF pre target sibling_managed sibling_nonmember])
+  have p_sibling_regions:
+    "raw_item_region p \<inter> raw_item_region sibling = {}"
+    by (rule universal_distinct_managed_item_regions_disjoint[
+          OF geometry p_managed sibling_managed p_sibling])
+  have item_outside:
+    "\<And>a. a \<in> raw_item_region sibling \<Longrightarrow>
+       a \<notin> raw_ordered_insert_general_exact_write_footprint
+         h target (fam target) p"
+    using footprint sibling_storage p_sibling_regions by blast
+  have storage_priority:
+    "raw_xlist_storage target (fam target) \<inter>
+       universal_priority_field_region (sd_tcb_ptr D t) = {}"
+    by (rule scheduler_family_target_storage_priority_disjoint[
+          OF pre target t_live])
+  have p_priority:
+    "raw_item_region p \<inter>
+       universal_priority_field_region (sd_tcb_ptr D t) = {}"
+    by (rule universal_managed_item_priority_region_disjoint[
+          OF geometry t_live p_managed])
+  have priority_outside:
+    "\<And>a. a \<in> universal_priority_field_region (sd_tcb_ptr D t)
+       \<Longrightarrow>
+       a \<notin> raw_ordered_insert_general_exact_write_footprint
+         h target (fam target) p"
+    using footprint storage_priority p_priority by blast
+  show ?thesis
+    using raw_ordered_insert_general_heap_exact_external_frame[
+      OF rel fresh] item_outside priority_outside by blast
 qed
 
 theorem raw_ordered_insert_family_sibling_owner_priority_byte_frame:
@@ -888,6 +995,67 @@ proof -
   show ?thesis
     using raw_ordered_insert_general_heap_exact_external_frame[
       OF rel fresh] owner_outside priority_outside by blast
+qed
+
+theorem raw_insert_end_family_sibling_item_priority_byte_frame:
+  assumes pre: "scheduler_family_pre_rel h roots fam live D"
+    and target: "target \<in> roots"
+    and fresh: "raw_fresh_for_insert target (ring (fam target)) p"
+    and p_managed: "p \<in> universal_managed_nodes live D"
+    and sibling_managed:
+      "sibling \<in> universal_managed_nodes live D"
+    and p_sibling: "p \<noteq> sibling"
+    and sibling_nonmember:
+      "sibling \<notin> set (ring (fam target))"
+    and t_live: "t \<in> live"
+  shows
+    "(\<forall>a\<in>raw_item_region sibling.
+       raw_insert_concrete_heap h target (fam target) p a = h a) \<and>
+     (\<forall>a\<in>universal_priority_field_region (sd_tcb_ptr D t).
+       raw_insert_concrete_heap h target (fam target) p a = h a)"
+proof -
+  have geometry: "universal_tcb_geometry live D"
+    using pre by (simp add: scheduler_family_pre_rel_def)
+  have rel: "raw_xlist_rel h target (fam target)"
+    using pre target
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have footprint:
+    "raw_insert_end_exact_write_footprint h target (fam target) p \<subseteq>
+       raw_xlist_storage target (fam target) \<union> raw_item_region p"
+    by (rule raw_insert_end_exact_footprint_subset_storage[OF rel])
+  have sibling_storage:
+    "raw_xlist_storage target (fam target) \<inter>
+       raw_item_region sibling = {}"
+    by (rule scheduler_family_target_storage_disjoint_nonmember_item[
+          OF pre target sibling_managed sibling_nonmember])
+  have p_sibling_regions:
+    "raw_item_region p \<inter> raw_item_region sibling = {}"
+    by (rule universal_distinct_managed_item_regions_disjoint[
+          OF geometry p_managed sibling_managed p_sibling])
+  have item_outside:
+    "\<And>a. a \<in> raw_item_region sibling \<Longrightarrow>
+       a \<notin> raw_insert_end_exact_write_footprint
+         h target (fam target) p"
+    using footprint sibling_storage p_sibling_regions by blast
+  have storage_priority:
+    "raw_xlist_storage target (fam target) \<inter>
+       universal_priority_field_region (sd_tcb_ptr D t) = {}"
+    by (rule scheduler_family_target_storage_priority_disjoint[
+          OF pre target t_live])
+  have p_priority:
+    "raw_item_region p \<inter>
+       universal_priority_field_region (sd_tcb_ptr D t) = {}"
+    by (rule universal_managed_item_priority_region_disjoint[
+          OF geometry t_live p_managed])
+  have priority_outside:
+    "\<And>a. a \<in> universal_priority_field_region (sd_tcb_ptr D t)
+       \<Longrightarrow>
+       a \<notin> raw_insert_end_exact_write_footprint
+         h target (fam target) p"
+    using footprint storage_priority p_priority by blast
+  show ?thesis
+    using raw_insert_concrete_heap_exact_external_frame[
+      OF rel fresh] item_outside priority_outside by blast
 qed
 
 theorem raw_insert_end_family_sibling_owner_priority_byte_frame:

@@ -282,6 +282,37 @@ resume outer scaffold likewise supplies proof architecture only.  Composition
 with the generated outer `xTaskResumeAll'` pending-ready and missed-tick loops
 remains an open source-level Gate-H obligation; therefore Gate H remains open.
 
+The following additional Gate-H bricks are now checker-green.  Their stated
+boundaries are part of the result; none is counted as the missing full
+`vTaskDelay` source theorem.
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel`; central run `20260802Ttask-observation-central-01` | For an arbitrary finite live-task set, records each live TCB's guarded Generic/Event item pointers, owner payloads, and concrete/abstract priority equality with the frozen bound `< 4`; derives represented list-head owner/priority observations and exact observation frames. | This is a representation and frame layer, not execution of a scheduler root. |
+| `EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel`; central run `20260802Tevent-root-family-central-01` | Represents an arbitrary finite Event-root family with a distinguished pending root, arbitrary finite live set, every root ring/count/cursor/key, total Event-key map `K_E`, unique membership, exact container/null fidelity, and non-target/removal payload frames. | These are relation and raw-transformer facts; they do not execute the generated pending-ready loop or close `xTaskResumeAll'`. |
+| `EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core`; central run `20260802Tdelay-suspended-core-central-01` | Checks the arbitrary remove--32-bit-wake-key-write--ordered-insert core under explicit family ownership, geometry, ordered-target, current/overflow-root, and owner/target-distinct premises; modular wake comparison derives the selected delayed root, and the composed helper reaches the exact heap. | The checked helper composes generated list leaves with an explicit proof-level key-write step; it is not execution of the complete generated `vTaskDelay'` body and contains no suspend/resume/final-yield composition. |
+| `EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source`; central run `20260802Tresume-inner-central-01` | Executes generated `xTaskResumeAll'` when the positive suspension word remains nonzero after decrement.  Under the declared proof-port boundary it returns integer `0`, changes only the suspension word, and refines the inner `ResumeRel` constructor through `scheduler_control_mod_rel`; tasks, priorities, heap, and list populations remain arbitrary. | This is only the nested/inner resume branch; it excludes the outermost pending, missed-tick, and yield paths. |
+| `scheduler_xTaskResumeAll_outer_quiet_general_exact`; QAD-false run `20260802Tresume-outer-quiet-general-02` | Executes generated outermost `xTaskResumeAll'` for suspension word `1`, nonzero task count, an empty guarded pending list, zero missed ticks, zero missed yield, and the declared proof-port boundary.  It returns integer `0` and changes only the suspension word from `1` to `0`; no task identity, priority, tick, heap, or other list population is fixed. | This is the quiet branch only and has no representation-preservation or `ResumeRel` postcondition.  Its recorded command used the then-local outer-scaffold session root, so it is checker-green evidence but not a `-CentralOnly` closure run. |
+
+All five runs have `exit_code=0`, `quick_and_dirty=false`, empty stderr, and
+`timed_out=false`.  Local recomputation matches every recorded stdout/stderr
+SHA-256.  They also share the frozen evidence hashes:
+
+- ELF: `DC830E50513384D712E0D1C68CB198EA656365F673D021C452D7D7EBD45C045A`;
+- layout ledger: `CA288A4CD2344BE979ADFA9DBF0298C6715F196D64AE472D173304289C4F2C02`;
+- generated address configuration:
+  `27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712`.
+
+Gate H therefore remains open.  In particular, no accepted generated-source
+theorem yet covers arbitrary pending-ready prefixes, arbitrary missed-tick
+debt, the complete zero/one/$N$ due prefix (including equal-key tasks and the
+exact first-not-due stop), Event linked/null branches, tick-wrap role exchange
+with its reachable old-current-empty invariant, both internal and caller yield
+results, or the complete positive-delay `vTaskDelay'` composition.  Concurrent
+interrupt correctness additionally requires the separately declared
+interference or rely/guarantee model; it is not implied by these sequential
+source theorems.
+
 ### Gate D -- five-root dispatcher and trace gate
 
 Prove Level B for the other four roots, the required helper closure, the formal

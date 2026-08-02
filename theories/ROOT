@@ -561,6 +561,33 @@ session EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone in "scheduler_li
   theories
     Scheduler_List_Family_Frame_Capstone
 
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel in "scheduler_event_root_family_rel" =
+  EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Insert_Sequence
+  theories
+    Scheduler_Event_Root_Family_Rel
+
+session EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge in "scheduler_delay_endpoint_bridge" =
+  EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Delay_Phases
+  theories
+    Scheduler_Delay_Endpoint_Bridge
+
+session EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core in "scheduler_delay_suspended_core" =
+  EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge
+  theories
+    Scheduler_Delay_Suspended_Core
+
 session EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement in "scheduler_p2_insert_refinement" = EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Source +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
   sessions
@@ -579,6 +606,30 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_General_Relation in "scheduler_resum
     EAL6_FreeRTOS_V611_Scheduler_Delay_Zero_Refinement
   theories
     Scheduler_Resume_General_Relation
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source in "scheduler_resume_inner_source" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_General_Relation +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Inner_Source
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold in "scheduler_resume_outer_scaffold" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_General_Relation +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Outer_Scaffold
+
+session EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel in "scheduler_task_observation_rel" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership
+  theories
+    Scheduler_Task_Observation_Rel
 
 session EAL6_FreeRTOS_V611_Scheduler_P2_Delay_Source in "scheduler_p2_delay_source" = EAL6_FreeRTOS_V611_Scheduler_P2_Control_Leaves +
   options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]

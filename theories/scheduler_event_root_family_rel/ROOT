@@ -1,0 +1,7 @@
+session EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel in "." =
+  EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_List_Raw_R6_Remove_Insert_Sequence
+  theories
+    Scheduler_Event_Root_Family_Rel

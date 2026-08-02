@@ -1,0 +1,7 @@
+session EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel in "." = EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership
+  theories
+    Scheduler_Task_Observation_Rel

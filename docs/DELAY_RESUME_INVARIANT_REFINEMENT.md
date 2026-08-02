@@ -9,6 +9,11 @@ not claim that the generated outer-resume source composition or the final
 whole-scheduler theorem has already been discharged.  The abstract general
 resume relation itself is checker-green.
 
+The strengthened Event-root, Event-key, due-task phase, and wrap-epoch clauses
+introduced below are **invariant design obligations** obtained by manual
+source-order analysis.  They are not being reported here as checker-green
+lemmas, generated-source refinements, or completed Gate-H results.
+
 Concrete values below are **discovery probes only**.  They expose false
 invariants with a small state.  Every acceptance theorem must quantify over an
 arbitrary legal state, an arbitrary finite live-task set, every priority
@@ -24,16 +29,26 @@ result.
 Let a scheduler observation be
 
 \[
-  \sigma=(R,D_c,D_o,M,C,N,P,K,x,\tau,h,s,Q,m,y,Y).
+  \sigma=(R,D_c,D_o,\mathcal E,q_E,M,C,N,P,K_E,x,\tau,h,s,Q,m,y,Y).
 \]
 
 Here $R$ is the family of ready rings; $D_c,D_o$ are the current and
-overflow delayed rings; $M$ and $C$ are root membership and container
-ownership; $N,P$ are next and previous links; $K$ is the item-key map;
-$x$ is the current task; $\tau$ is the tick; $h$ is the ready-priority hint;
-$s$ is the scheduler-suspension depth; $Q$ is the pending-ready ring;
-$m$ is the missed-tick count; $y$ is the missed-yield flag; and $Y$ is an
-abstract yield observation count.
+overflow delayed semantic views; $\mathcal E$ is an arbitrary finite family of
+protected Event roots and $q_E\in\mathcal E$ is its distinguished
+pending-ready root; $M$ and $C$ are root membership and container ownership;
+$N,P$ are next and previous links; and $K_E:T\to 32\ \mathsf{word}$ is a
+total logical map for Event-item payload keys.  Finally, $x$ is the current
+task; $\tau$ is the tick; $h$ is the ready-priority hint; $s$ is the
+scheduler-suspension depth; $Q$ is the ring represented at $q_E$; $m$ is the
+missed-tick count; $y$ is the missed-yield flag; and $Y$ is an abstract yield
+observation count.
+
+There is deliberately no total global Generic-key map.  While a Generic item
+is root-owned, its key is derived from that root's represented ring.  When the
+source takes the item into transit, the proof captures its concrete key at the
+last owning root and carries that phase-local value across the exact frames
+until the next source write or insertion.  This covers both the wake-key write
+in `vTaskDelay` and the preserved source key used while draining pending work.
 
 For an arbitrary finite live set $T$, arbitrary positive priority-level
 count $L$, and priority map
@@ -75,7 +90,7 @@ are stable.  `Ready` and `Unlinked` impose no value on the old item key: a ready
 item may retain an earlier `xItemValue`.  `Keyed` is the first phase requiring
 
 \[
-  K(t)=\tau+_{32}d.
+  \mathsf{key}(G_x)=\tau+_{32}d.
 \]
 
 ## 3. Ownership, top, and slot invariants
@@ -99,6 +114,36 @@ The Event item must have a null container and be absent from every protected
 Event root.  This is a scheduler API-state invariant.  It does not follow from
 the fact that the Generic item is ready, nor from byte disjointness between the
 same TCB's Generic and Event subregions.
+
+### 3.1 Event-root family, container fidelity, and Event keys
+
+An opaque per-task Event-container ghost that records only `Null` versus
+`NonNull` is sufficient to predict the source test
+`event.pvContainer != NULL`.  It is not sufficient for exact all-root source
+refinement: in the linked branch it neither identifies the root whose ring,
+count, and cursor change nor proves that every other Event root is framed.
+
+The exact representation must instead quantify an arbitrary finite protected
+Event-root family $\mathcal E$, with the pending-ready list $q_E$ distinguished
+inside it.  For every $e\in\mathcal E$ it represents the physical root, ring,
+count, cursor, and member keys.  It also requires:
+
+1. unique Event-item membership across $\mathcal E$;
+2. container fidelity: $E_t$ is in root $e$ iff its concrete container is the
+   pointer to $e$, and absence from the whole family iff that container is
+   null;
+3. agreement of the represented ring key for every linked $E_t$ with
+   $K_E(t)$; and
+4. an exact non-target frame for every root in $\mathcal E$ other than the
+   unique source root modified by the branch.
+
+The map $K_E$ is total and independent of Event membership.  An Event item may
+be unlinked with an arbitrary retained `xItemValue`, so neither null container
+nor absence from $\mathcal E$ determines its key.  Link and unlink operations
+must preserve $K_E(t)$ unless the generated source explicitly writes that
+payload.  This is different from Generic keys: root-owned Generic keys are
+derived from their owning ring, and an in-transit Generic key is captured
+locally rather than stored in a global logical map.
 
 The ready top is phase-sensitive.  At `Ready`, exactness may be required:
 
@@ -154,6 +199,14 @@ the map from semantic roles to physical roots, but never renames the physical
 roots or their endpoint tags.  The remaining Gate-H obligation is to connect
 this repaired datatype to the raw scheduler-list relations in generated-source
 composition.
+
+The role exchange also requires a legal epoch invariant: immediately before a
+wrap swaps the semantic roles, the old current delayed root must be empty.
+This condition may not be inserted as an unexplained branch premise.  It must
+be derived from the reachable scheduler invariant and the fact that all items
+due in the ending epoch have already been removed.  The physical roots, their
+rings, and `End r` identities remain where they are; only the semantic
+current/overflow role map changes.
 
 This is a **Gate-H composition-model gap**, not a failure of the local Gate-L
 remove or insertion theorems.  Those raw theorems use `raw_end_item lp`, so the
@@ -360,6 +413,12 @@ either removal.  Event removal and Generic removal must frame $k_t$, and the
 ready `vListInsertEnd` must insert with exactly $k_t$.  The implication
 `wake=None -> key=0` is false and must not appear as an invariant or premise.
 
+The Event item's payload is governed separately by the total map $K_E$.
+Removing $E_t$ from the distinguished pending root must preserve $K_E(t)$,
+and a null Event container elsewhere still permits any value of $K_E(t)$.
+Neither the captured Generic key $k_t$ nor the semantic wake option may be
+used to reconstruct the Event key.
+
 For an arbitrary initial pending order $Q_0$, the loop-head invariant freezes
 the initial current task $c_0$ and quantifies a processed prefix and remaining
 suffix:
@@ -386,7 +445,7 @@ tracks the top hint.  Because the source raises the hint before calling
 new ready item has not yet been linked; exact top/list agreement is therefore
 required only at the completed body boundary.
 
-The body-local ownership phases for the current task are
+The body-local ownership phases for the current pending task are
 
 \[
   \mathsf{BothOwned}\to\mathsf{EventUnlinked}
@@ -416,28 +475,60 @@ task just inserted into physical root $B$ with wake key zero may immediately
 become due and move to its ready root before the surrounding `vTaskDelay`
 returns.  No final relation may preserve that task's delayed membership.
 
+At the wrap boundary the old semantic-current physical root must be empty
+before the role pointers exchange.  This is a required legal-epoch invariant,
+not a free source precondition: the Gate-H reachability/invariant proof must
+derive it.  After the exchange the same physical root and endpoint objects
+remain in memory, with only their semantic roles changed.
+
 For a non-wrap or post-wrap current delayed ring, write
 
 \[
-  \mathit{ring}=D@F,
+  D=\mathsf{takeWhile}(\lambda t.\ \mathsf{key}(G_t)\leq\tau,\mathit{ring}),
+  \qquad
+  F=\mathsf{dropWhile}(\lambda t.\ \mathsf{key}(G_t)\leq\tau,\mathit{ring}).
 \]
 
-where every node in the arbitrary finite prefix $D$ is due and $F$ is empty or
-its head key is strictly in the future.  The generated delayed loop processes
-exactly $D$, including the cases $|D|=0$, $|D|=1$, and unbounded finite
-$|D|>1$.  At a loop head,
+Thus $\mathit{ring}=D@F$, every node in the arbitrary finite prefix $D$ has key
+at most the current tick, and $F$ is empty or its first key is strictly greater
+than the tick.  This is a complete `takeWhile key <= tick` characterization:
+the generated delayed loop processes exactly $D$, including $|D|=0$,
+$|D|=1$, and every finite $|D|=N$; an entire run of keys equal to the tick is
+processed, and execution stops at exactly the first not-due item.  At a loop
+head,
 
 \[
   D=\mathit{done}@\mathit{todo},\qquad
   \sigma=\mathsf{foldl}(\mathsf{WakeStep},\sigma_e,\mathit{done}),
 \]
 
-and the current physical delayed ring is `todo @ F`.  `WakeStep` removes the
-Generic item, conditionally removes its Event item from its independently
-owned Event root, raises the top hint, and inserts the Generic item into its
-priority-selected ready root.  Hence a tick may modify several ready roots and
-several Event roots, and the delayed cursor is the fold of the exact removal
-cursor rule rather than a frame.
+and the current physical delayed ring is `todo @ F`.  One due task is refined
+through the source-order phases
+
+\[
+  \mathsf{DueOwned}
+  \to\mathsf{GenericUnlinked}
+  \to\mathsf{EventChecked}
+  \to\mathsf{EventUnlinked}
+  \to\mathsf{TopRaised}
+  \to\mathsf{GenericReady}.
+\]
+
+`EventChecked` records the concrete null/non-null branch without changing the
+heap.  In the null branch, `EventUnlinked` is a no-op and $E_t$ remains absent
+from all protected Event roots.  In the linked branch, container fidelity
+identifies the unique $e\in\mathcal E$ that owns $E_t$; the step removes it
+from exactly that root and frames every other Event root.  Both branches
+preserve the independently modelled Event key $K_E(t)$.  The later phases
+raise the top hint and insert $G_t$ into ready root $R_{\pi(t)}$.
+
+Consequently a tick may modify several ready roots and several Event roots.
+The loop invariant must carry a cursor fold, not a cursor frame: after
+processing `done`, every affected delayed, Event, and ready root cursor is the
+result of folding the exact source removal or insert-end cursor rule over the
+operations on that root.  This fold, together with the exact `takeWhile`
+decomposition, proves both complete processing of the due prefix and stopping
+before the first future item.
 
 For an arbitrary initial missed count $M$, replay then uses
 
@@ -475,6 +566,21 @@ following quantified obligations are available:
    addresses, ring lengths, or branch choices occur only in named discovery
    probes or counterexamples, never as hidden restrictions on positive
    acceptance theorems.
+7. **Protected Event-root family.**  The representation quantifies every
+   finite protected Event-root family, distinguishes the pending root, proves
+   count/ring/cursor/key and container fidelity, and frames all non-target
+   Event roots in both linked and null branches.  A Boolean or opaque
+   container ghost is not counted as this result.
+8. **Total Event-key fidelity.**  One total $K_E$ represents arbitrary retained
+   Event payloads even while unlinked; Generic keys remain root-derived or
+   phase-locally captured rather than being conflated with $K_E$.
+9. **Complete due-prefix refinement.**  The generated loop implements the
+   exact finite `takeWhile key <= tick` prefix for zero, one, and arbitrary
+   $N$ tasks, consumes all equal-tick items, stops at the first future item,
+   and refines the six due-task phases and per-root cursor fold.
+10. **Wrap-epoch reachability.**  A proved invariant establishes that the old
+    current delayed root is empty at wrap; the role exchange preserves the
+    physical roots and root-qualified endpoints.
 
 Until the general resume and raw slot bridges are connected to generated
 source execution, the phase model is an invariant specification and proof

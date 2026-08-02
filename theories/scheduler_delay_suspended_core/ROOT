@@ -1,0 +1,6 @@
+session EAL6_FreeRTOS_V611_Scheduler_Delay_Suspended_Core = EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge
+  theories
+    Scheduler_Delay_Suspended_Core
