@@ -1,10 +1,12 @@
-# A Sealed Frozen-Artifact P2 Generated-Source Refinement Milestone for FreeRTOS V6.1.1 `vTaskDelay(2)`
+# Artifact-Bound Non-Vacuous Single-Path Refinement of FreeRTOS V6.1.1 `vTaskDelay(2)`
 
 **Mathematical progress report - blind Isabelle/HOL reconstruction**
 
-**Status date: 1 August 2026 | Result: sealed, scoped artifact-specialised generated-source-to-abstract refinement**
+**Status date: 2 August 2026 | Result: fixed P2 witness checked; universal functional correctness remains open**
 
 > **Draft provenance.** ChatGPT Pro reviewed the proof design and report wording. Every mathematical claim below was rechecked against the local Isabelle theories, artifact ledger, and final run records. ChatGPT Pro supplied no theorem object and is outside the trusted proof chain.[^draft]
+
+> **Scope warning -- not universal scheduler correctness.** The principal result is one fixed two-task witness: priorities 0 and 2, tick 5, and `vTaskDelay(2)` taking the non-wrapping quiet-resume path to wake 7. It is **not** a proof for every priority assignment, task population, scheduler state, delay argument, source branch, API call, or call sequence. In particular, it does not establish universal correctness of `vTaskDelay`, the five scheduler roots, or the whole FreeRTOS scheduler. The acceptance criteria for those stronger claims are recorded separately in `UNIVERSAL_SCHEDULER_ACCEPTANCE.md`.
 
 ## Abstract
 

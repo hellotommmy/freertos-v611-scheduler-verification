@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the sealed P2 mathematical progress manuscript as a polished PDF.
+"""Render the fixed-instance P2 mathematical progress manuscript as a polished PDF.
 
 The source manuscript is deliberately treated as read-only.  The renderer uses
 ReportLab for the document, Matplotlib only for high-resolution display-math
@@ -43,11 +43,11 @@ from reportlab.platypus import (
 
 
 TITLE = (
-    "A Sealed Frozen-Artifact P2 Generated-Source Refinement Milestone "
-    "for FreeRTOS V6.1.1 vTaskDelay(2)"
+    "Artifact-Bound Non-Vacuous Single-Path Refinement "
+    "of FreeRTOS V6.1.1 vTaskDelay(2)"
 )
-SHORT_TITLE = "FreeRTOS V6.1.1 Frozen-Artifact P2 Seal"
-STATUS_LINE = "Scoped seal: artifact-root-bound P2 source refinement green"
+SHORT_TITLE = "FreeRTOS V6.1.1 Fixed P2 Witness"
+STATUS_LINE = "Fixed P2 witness checked; universal functional correctness open"
 
 NAVY = colors.HexColor("#17324D")
 TEAL = colors.HexColor("#177D7A")
@@ -737,7 +737,7 @@ def header_footer(canvas, document) -> None:
         canvas.setFont("DejaVuSans", 6.8)
         canvas.setFillColor(MUTED)
         canvas.drawString(left, height - 9.6 * mm, SHORT_TITLE)
-        canvas.drawRightString(right, height - 9.6 * mm, "Status date: 1 August 2026")
+        canvas.drawRightString(right, height - 9.6 * mm, "Status date: 2 August 2026")
     canvas.setStrokeColor(RULE)
     canvas.setLineWidth(0.45)
     canvas.line(left, 11.5 * mm, right, 11.5 * mm)
@@ -764,7 +764,7 @@ def render(input_path: Path, output_path: Path, tmp_dir: Path, font_dir: Path, b
         pagesize=A4,
         title=TITLE,
         author="Blind Isabelle/HOL reconstruction project",
-        subject="Sealed scoped FreeRTOS V6.1.1 frozen-artifact P2 source-to-abstract refinement",
+        subject="Fixed-instance FreeRTOS V6.1.1 P2 source-to-abstract witness; universal correctness open",
         creator="ReportLab renderer with embedded DejaVu fonts",
         **margins,
     )
