@@ -108,9 +108,60 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_List_Family_Frame_Capstone',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Predecessor',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Cursor',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Keys',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Relabel',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Pre_Rel',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Payload_Frame',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Physical',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Container_Rep',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Key_Rep',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Root_Rep',
+        'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Preservation',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core',
+        'EAL6_FreeRTOS_V611_Scheduler_Node_Kind_Family_Remove_Preservation',
+        'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base',
+        'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core',
+        'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage',
         'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases',
+        'EAL6_FreeRTOS_V611_Scheduler_Due_Prefix_Invariant',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Phases',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Base',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Decoder',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Observation',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Count',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Ownership',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Freshness',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Event',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Core',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Frame',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Steps_Invariant',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Tick_Wrap',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_OR',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Pending_Join',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Quiet_Encoding',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_Interface',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_State',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Step',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Closure',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Program_Step',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Interleaving',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Cutpoint',
+        'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Contract_Interface',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity',
         'EAL6_FreeRTOS_V611_Scheduler_Universal_Geometry',
         'EAL6_FreeRTOS_V611_Scheduler_P2_Insert_Refinement',
@@ -158,6 +209,174 @@ $localSessionRoots = if ($CentralOnly) {
 switch ($session) {
     'EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold' {
         @(Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Base' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold'),
+            (Join-Path $theoryRoot 'scheduler_one_due_task_phases')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Entry' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold'),
+            (Join-Path $theoryRoot 'scheduler_one_due_task_phases')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold'),
+            (Join-Path $theoryRoot 'scheduler_one_due_task_phases')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold'),
+            (Join-Path $theoryRoot 'scheduler_one_due_task_phases')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_unlocked_tick_scaffold'),
+            (Join-Path $theoryRoot 'scheduler_one_due_task_phases')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Due_Prefix_Invariant' {
+        @(Join-Path $theoryRoot 'scheduler_due_prefix_invariant')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage' {
+        @(Join-Path $theoryRoot 'scheduler_generic_root_universe_coverage')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Base' {
+        @(Join-Path $theoryRoot 'scheduler_generic_root_universe_coverage')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage_Core' {
+        @(Join-Path $theoryRoot 'scheduler_generic_root_universe_coverage')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Phases' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Base' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Decoder' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Observation' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Count' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Ownership' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Freshness' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage_Event' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation_Coverage' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate_Relation' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Gate' {
+        @(Join-Path $theoryRoot 'scheduler_resume_pending_drain_phases')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Core' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Frame' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Steps_Invariant' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Tick_Wrap' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_Interface' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_OR' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Pending_Join' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Quiet_Encoding' {
+        @(
+            (Join-Path $theoryRoot 'scheduler_due_prefix_invariant'),
+            (Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool'),
+            (Join-Path $theoryRoot 'scheduler_resume_missed_tick_replay')
+        )
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Contract_Interface' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_State' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Step' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Closure' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Program_Step' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Interleaving' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Concurrent_Cutpoint' {
+        @(Join-Path $theoryRoot 'scheduler_concurrent_contract_interface')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool' {
+        @(Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {
+        @(Join-Path $theoryRoot 'scheduler_family_remove_preservation')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Node_Kind_Family_Remove_Preservation' {
+        @(Join-Path $theoryRoot 'scheduler_family_remove_preservation')
     }
     default { @() }
 }

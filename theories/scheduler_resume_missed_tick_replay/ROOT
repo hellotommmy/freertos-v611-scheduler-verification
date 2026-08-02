@@ -1,0 +1,68 @@
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Core in "core" =
+  EAL6_FreeRTOS_V611_Scheduler_Due_Prefix_Invariant +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    Word_Lib
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Core
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Frame in "frame" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Core +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Frame
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Steps_Invariant in "steps_invariant" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Frame +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Steps_Invariant
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Tick_Wrap in "tick_wrap" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Steps_Invariant +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Tick_Wrap
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_OR in "replay_yield_or" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Tick_Wrap +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Yield_OR
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Pending_Join in "pending_join" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Pending_Drain_Phases +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_OR
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Pending_Join
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Quiet_Encoding in "quiet_encoding" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Pending_Join +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Quiet_Encoding
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_Interface in "yield_interface" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Quiet_Encoding +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay_Yield_Interface
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Missed_Tick_Replay_Yield_Interface +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Missed_Tick_Replay

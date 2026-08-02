@@ -1,0 +1,50 @@
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_State in "state" =
+  EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Generic_Root_Universe_Coverage
+  theories
+    Scheduler_Concurrent_State
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Step in "environment_step" =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_State +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Environment_Step
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Closure in "environment_closure" =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Step +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Environment_Closure
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Program_Step in "program_step" =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_Environment_Closure +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Program_Step
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Interleaving in "interleaving" =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_Program_Step +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Interleaving
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Cutpoint in "cutpoint" =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_Interleaving +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Cutpoint
+
+session EAL6_FreeRTOS_V611_Scheduler_Concurrent_Contract_Interface in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Concurrent_Cutpoint +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Concurrent_Contract_Interface
