@@ -26,6 +26,61 @@ lemma yield_count_unat_add_one:
   by (metis add.commute max_word_wrap unatSuc)
 
 text \<open>
+  The proof-port counter is a 32-bit observation of an unbounded abstract
+  event count.  Relating the word to the low 32 bits of the natural count
+  makes wraparound explicit instead of excluding the maximum word.
+\<close>
+
+definition yield_count_mod_rel :: "32 word \<Rightarrow> nat \<Rightarrow> bool"
+where
+  "yield_count_mod_rel w n \<longleftrightarrow> w = of_nat n"
+
+lemma yield_count_mod_rel_request:
+  assumes rel: "yield_count_mod_rel w n"
+  shows "yield_count_mod_rel (w + 1) (Suc n)"
+  using rel by (simp add: yield_count_mod_rel_def)
+
+definition scheduler_control_mod_rel ::
+  "globals \<Rightarrow> 'tid scheduler_abs \<Rightarrow> bool"
+where
+  "scheduler_control_mod_rel c a \<longleftrightarrow>
+     xTickCount_' c = sa_tick a \<and>
+     unat (uxSchedulerSuspended_' c) = sa_suspend_depth a \<and>
+     unat (uxMissedTicks_' c) = sa_missed_ticks a \<and>
+     xMissedYield_' c = (if sa_missed_yield a then 1 else 0) \<and>
+     yield_count_mod_rel (eal6_port_yield_count_' c) (sa_yield_count a)"
+
+lemma scheduler_control_mod_rel_request_yield:
+  assumes rel: "scheduler_control_mod_rel c a"
+  shows
+    "scheduler_control_mod_rel
+       (eal6_port_yield_count_'_update (\<lambda>n. n + 1) c)
+       (request_yield a)"
+  using rel yield_count_mod_rel_request
+  by (simp add: scheduler_control_mod_rel_def request_yield_def)
+
+theorem eal6_port_yield_mod_refines_request_yield:
+  assumes rel: "scheduler_control_mod_rel c a"
+  shows
+    "eal6_port_yield' \<bullet> c
+     \<lbrace>\<lambda>r t.
+       r = Result () \<and>
+       t = eal6_port_yield_count_'_update (\<lambda>n. n + 1) c \<and>
+       scheduler_control_mod_rel t (request_yield a)
+     \<rbrace>"
+proof -
+  have preserved:
+    "scheduler_control_mod_rel
+       (eal6_port_yield_count_'_update (\<lambda>n. n + 1) c)
+       (request_yield a)"
+    by (rule scheduler_control_mod_rel_request_yield[OF rel])
+  show ?thesis
+    unfolding eal6_port_yield'_def
+    apply runs_to_vcg
+    using preserved by simp
+qed
+
+text \<open>
   A non-vacuity witness aligns all scheduler-control fields and starts the
   proof-port yield ledger at zero.  The zero-delay source path requires no
   heap or current-task validity premise.
