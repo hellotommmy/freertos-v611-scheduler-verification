@@ -1,0 +1,6 @@
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Outer_Quiet_Bool

@@ -1,0 +1,6 @@
+session EAL6_FreeRTOS_V611_Scheduler_Unlocked_Tick_Scaffold in "." = EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Remove_Translation_General
+  theories
+    Scheduler_Unlocked_Tick_Scaffold
