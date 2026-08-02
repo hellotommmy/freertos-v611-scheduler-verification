@@ -1,0 +1,7 @@
+session EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_Generated_Capstone in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Loop +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Ordered_Insert_Composition
+  theories
+    Scheduler_Ordered_Insert_Generated_Capstone

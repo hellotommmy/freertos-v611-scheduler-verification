@@ -1,0 +1,6 @@
+session EAL6_FreeRTOS_V611_Scheduler_Delay_Endpoint_Bridge = EAL6_FreeRTOS_V611_Scheduler_Remove_Unlinked_Ownership +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0, timeout = 120]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Delay_Phases
+  theories
+    Scheduler_Delay_Endpoint_Bridge

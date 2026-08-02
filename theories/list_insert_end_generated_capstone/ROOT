@@ -1,0 +1,7 @@
+session EAL6_FreeRTOS_V611_List_Insert_End_Generated_Capstone in "." =
+  EAL6_FreeRTOS_V611_Scheduler_Ordered_Insert_General_Refinement +
+  options [quick_and_dirty = false, parallel_proofs = 0, timeout = 60]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Universal_Capacity
+  theories
+    List_Insert_End_Generated_Capstone
