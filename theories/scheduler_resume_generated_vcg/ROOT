@@ -257,3 +257,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Pure in "reentry_p
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Reentry_Pure
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Container_Frame in "reentry_container" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Pure +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Container_Frame
