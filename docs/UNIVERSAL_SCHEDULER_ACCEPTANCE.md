@@ -303,6 +303,26 @@ SHA-256.  They also share the frozen evidence hashes:
 - generated address configuration:
   `27F74768E1DB1C3F8DBFCFC85371075192BB7D2544ED324DC81B65A9A2911712`.
 
+#### Pending-ready drain body: generated fragment progress (3 August 2026)
+
+The generated pending-loop body `resume_pending_generated_body` is now
+checker-green along a longer prefix.  Beyond the previously recorded
+event/generic unlink and top-raise cutpoints, the steps below are executed
+from the cutpoint state for an arbitrary head task at an arbitrary in-range
+priority.  No task, priority, live set, heap, address or list population is
+fixed.
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `generated_ready_destination_from_priority_word` and `generated_ready_destination_distinct_from_other_roots`; QAD-false run `20260803Tresume-ready-destination-02` | For every 32-bit priority word `w < 4`, the source expression `array_ptr_index pxReadyTasksLists_' False (unat w)` is the indexed root `sr_ready generated_scheduler_roots (unat w)`; that root belongs to the eight physical scheduler roots, is `c_guard`ed, is distinct from delayed A, delayed B, pending and suspended, and its 20-byte region is disjoint from every other physical root.  The bound is the source's own guard, not an added restriction. | Static layout, guard and separation only; no source statement is executed here. |
+| `resume_pending_generated_ready_select_exact`; QAD-false run `20260803Tresume-ready-select-01` | Executes the generated in-range priority guard, the ready-array guard, and the destination read from `resume_pending_top_raised_state`.  Returns exactly `sr_ready generated_scheduler_roots (rpc_priority C t)`, leaves the state unchanged, and supplies the destination guard and its separation corollaries. | Three source steps of one loop body; no insertion, yield join, or loop closure. |
+| `resume_pending_generated_ready_insert_exact`; QAD-false run `20260803Tresume-ready-insert-03` | Executes generated `vListInsertEnd'` on the selected ready queue with the awakened task's Generic item, reaching the exact post heap `raw_insert_concrete_heap` over the represented target ring.  Both premises of the general generated insert-end theorem are discharged rather than assumed: the target ring relation comes from the post-removal family relation, and freshness is transported from entry freshness, which survives the removal because the removal rewrites only the owner root and that owner root is proved distinct from the destination queue. | No `pxCurrentTCB` guard, yield-required join, next-head read, or loop closure; the body is not composed end to end. |
+
+All three runs have `exit_code=0`, `quick_and_dirty=false`, `timed_out=false`
+and empty stderr, and share the frozen evidence hashes recorded above.  These
+are generated-source execution steps for a fragment of one loop body.  They
+add zero refinement rungs and do not change the **0/5** whole-operation score.
+
 Gate H therefore remains open.  In particular, no accepted generated-source
 theorem yet covers arbitrary pending-ready prefixes, arbitrary missed-tick
 debt, the complete zero/one/$N$ due prefix (including equal-key tasks and the
