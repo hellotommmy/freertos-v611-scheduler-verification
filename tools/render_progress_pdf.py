@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Render the fixed-instance P2 mathematical progress manuscript as a polished PDF.
+"""Render a mathematical progress manuscript as a polished PDF.
 
 The source manuscript is deliberately treated as read-only.  The renderer uses
 ReportLab for the document, Matplotlib only for high-resolution display-math
-images, and embeds the DejaVu font family in the resulting PDF.
+images, and embeds the DejaVu font family in the resulting PDF.  Command-line
+metadata overrides allow the same checked layout pipeline to render the fixed
+P2 witness or the distinct universal-progress report without relabelling either.
 """
 
 from __future__ import annotations
@@ -48,6 +50,11 @@ TITLE = (
 )
 SHORT_TITLE = "FreeRTOS V6.1.1 Fixed P2 Witness"
 STATUS_LINE = "Fixed P2 witness checked; universal functional correctness open"
+STATUS_DATE = "2 August 2026"
+SUBJECT = (
+    "Fixed-instance FreeRTOS V6.1.1 P2 source-to-abstract witness; "
+    "universal correctness open"
+)
 
 NAVY = colors.HexColor("#17324D")
 TEAL = colors.HexColor("#177D7A")
@@ -125,6 +132,7 @@ def tex_to_plain(value: str) -> str:
     replacements = {
         r"\Longleftrightarrow": "\u21d4",
         r"\Longrightarrow": "\u21d2",
+        r"\longmapsto": "\u21a6",
         r"\longrightarrow": "\u27f6",
         r"\Rightarrow": "\u21d2",
         r"\rightarrow": "\u2192",
@@ -166,20 +174,23 @@ def tex_to_plain(value: str) -> str:
         r"\;": " ",
         r"\,": " ",
         r"\!": "",
+        r"\ ": " ",
     }
     # Longest-first avoids prefix collisions such as \ne / \neg and \ge / \gets.
     for source in sorted(replacements, key=len, reverse=True):
         target = replacements[source]
         value = value.replace(source, target)
     command = re.compile(
-        r"\\(?:operatorname|mathrm|mathsf|mathcal|mathbf|text)\{([^{}]*)\}"
+        r"\\(?:operatorname|mathrm|mathsf|mathcal|mathbf|mathit|mathbin|text)"
+        r"\{([^{}]*)\}"
     )
     previous = None
     while previous != value:
         previous = value
         value = command.sub(r"\1", value)
     value = re.sub(
-        r"\\(?:operatorname|mathrm|mathsf|mathcal|mathbf|text)\s+([A-Za-z])",
+        r"\\(?:operatorname|mathrm|mathsf|mathcal|mathbf|mathit|mathbin|text)"
+        r"\s+([A-Za-z])",
         r"\1",
         value,
     )
@@ -737,7 +748,7 @@ def header_footer(canvas, document) -> None:
         canvas.setFont("DejaVuSans", 6.8)
         canvas.setFillColor(MUTED)
         canvas.drawString(left, height - 9.6 * mm, SHORT_TITLE)
-        canvas.drawRightString(right, height - 9.6 * mm, "Status date: 2 August 2026")
+        canvas.drawRightString(right, height - 9.6 * mm, f"Status date: {STATUS_DATE}")
     canvas.setStrokeColor(RULE)
     canvas.setLineWidth(0.45)
     canvas.line(left, 11.5 * mm, right, 11.5 * mm)
@@ -764,7 +775,7 @@ def render(input_path: Path, output_path: Path, tmp_dir: Path, font_dir: Path, b
         pagesize=A4,
         title=TITLE,
         author="Blind Isabelle/HOL reconstruction project",
-        subject="Fixed-instance FreeRTOS V6.1.1 P2 source-to-abstract witness; universal correctness open",
+        subject=SUBJECT,
         creator="ReportLab renderer with embedded DejaVu fonts",
         **margins,
     )
@@ -797,11 +808,22 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--tmp", type=Path, default=repo / "tmp" / "pdfs")
     parser.add_argument("--font-dir", type=Path)
     parser.add_argument("--body-size", type=float, default=8.15)
+    parser.add_argument("--title", default=TITLE)
+    parser.add_argument("--short-title", default=SHORT_TITLE)
+    parser.add_argument("--status-line", default=STATUS_LINE)
+    parser.add_argument("--status-date", default=STATUS_DATE)
+    parser.add_argument("--subject", default=SUBJECT)
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    global TITLE, SHORT_TITLE, STATUS_LINE, STATUS_DATE, SUBJECT
+    TITLE = args.title
+    SHORT_TITLE = args.short_title
+    STATUS_LINE = args.status_line
+    STATUS_DATE = args.status_date
+    SUBJECT = args.subject
     font_dir = find_font_dir(args.font_dir)
     render(args.input.resolve(), args.output.resolve(), args.tmp.resolve(), font_dir, args.body_size)
     print(args.output.resolve())
