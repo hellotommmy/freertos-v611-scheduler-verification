@@ -130,6 +130,7 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Array_ABI',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Destination',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Select',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Insert',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -454,6 +455,9 @@ switch ($session) {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Select' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Insert' {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {

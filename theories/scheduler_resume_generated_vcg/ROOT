@@ -152,3 +152,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Select in "ready_sel
     EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Destination
   theories
     Scheduler_Resume_Generated_Ready_Select
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Insert in "ready_insert" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Select +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Ready_Insert
