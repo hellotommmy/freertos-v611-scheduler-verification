@@ -250,3 +250,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Abs_Preservation in "resume_abs_pres
     timeout = 600]
   theories
     Scheduler_Resume_Abs_Preservation
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Pure in "reentry_pure" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Abs_Preservation +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Reentry_Pure
