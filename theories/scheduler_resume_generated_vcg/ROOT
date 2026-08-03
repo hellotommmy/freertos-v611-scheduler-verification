@@ -187,3 +187,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Next_Head in "next_head" =
     timeout = 240]
   theories
     Scheduler_Resume_Generated_Next_Head
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Body in "body" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Next_Head +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Body
