@@ -264,3 +264,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Container_Frame in "reentr
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Container_Frame
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Abs_Bridge in "reentry_abs_bridge" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Container_Frame +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Reentry_Abs_Bridge
