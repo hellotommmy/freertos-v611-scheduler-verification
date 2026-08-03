@@ -194,3 +194,24 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Body in "body" =
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Body
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Owner_Frame in "insert_owner_frame" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Body +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Insert_Owner_Frame
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Owner_Frames in "drained_observation/owner_frames" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Owner_Frame +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Drained_Owner_Frames
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Observation in "drained_observation" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Owner_Frames +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Drained_Observation
