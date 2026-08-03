@@ -243,3 +243,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Abs_Kit in "resume_abs_kit" =
     timeout = 240]
   theories
     Scheduler_Resume_Abs_Kit
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Abs_Preservation in "resume_abs_preservation" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Abs_Kit +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 600]
+  theories
+    Scheduler_Resume_Abs_Preservation
