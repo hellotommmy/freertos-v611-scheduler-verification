@@ -361,6 +361,12 @@ of the gate relation at the drained state, and supply the abstract-side
 invariant preservation the re-entry theorem needs.  They add zero
 refinement rungs and leave the **0/5** score unchanged.
 
+#### Loop re-entry: the drained state satisfies the gate again
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `resume_pending_gate_reentry` with its supporting chain (`resume_pending_drained_entry_rel`, tail container observations, the abstract bridge with `pending_generic_key_abs t a = rpc_K_G C t`, the five snapshot-to-abstract family matches, `resume_pending_drained_lists_rel` and the scalar/role/current clauses, and the tail ownership/geometry/subset/cross clauses); QAD-false runs `20260803Treentry-pure-06`, `20260803Treentry-container-01`, `20260803Treentry-abs-bridge-04`, `20260803Treentry-lists-01`, `20260803Treentry-rep-04`, `20260803Treentry-fam-03`, `20260803Treentry-gate-01` | The state produced by one checked drain iteration satisfies the **full** gate entry relation again, with explicit witnesses: the tail context (remaining tasks, entry top raised to the awakened priority), the four-phase snapshot, the drained raw families, and the abstract one-task resume `resume_one_pending_abs t a`.  All thirty-three gate clauses are re-derived; the abstractly captured wake key is proved equal to the context key; nothing about the head task, the tail, priorities, rings or the heap is fixed.  Together with `resume_pending_generated_body_exact` the pending-ready loop is a relation-preserving gate-to-gate step, one task per iteration. | One step only: the while-loop induction over an arbitrary pending prefix, the loop-exit case, the missed-tick loop, and the outer `xTaskResumeAll'` wrapper are not yet composed.  Still zero refinement rungs; the **0/5** score stands. |
+
 Gate H therefore remains open.  In particular, no accepted generated-source
 theorem yet covers loop closure over arbitrary pending-ready prefixes (which
 requires re-establishing the gate entry relation at the drained state, with
