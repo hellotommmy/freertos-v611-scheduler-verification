@@ -109,6 +109,25 @@ param(
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Inner_Source',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Scaffold',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Definition_Probe',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Source_Factors',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Event_Unlinked',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Source',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Family',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Event_Heap_Frame',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Event_Family',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Top_Raised',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Storage_Frame',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Raw_Family',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Subset',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Disjoint',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Membership',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Shape',
+        'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Preservation',
+        'EAL6_FreeRTOS_V611_Scheduler_List_All2_Insert_After',
+        'EAL6_FreeRTOS_V611_Scheduler_XList_Relabel_Insert_End',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Array_ABI',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -371,6 +390,63 @@ switch ($session) {
     }
     'EAL6_FreeRTOS_V611_Scheduler_Resume_Outer_Quiet_Bool' {
         @(Join-Path $theoryRoot 'scheduler_resume_outer_quiet_bool')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Definition_Probe' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Source_Factors' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Event_Unlinked' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Source' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Family' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Event_Heap_Frame' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked_Event_Family' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Generic_Unlinked' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Top_Raised' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Storage_Frame' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Raw_Family' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Subset' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Disjoint' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Membership' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Shape' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Preservation' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_List_All2_Insert_After' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_XList_Relabel_Insert_End' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Array_ABI' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {
         @(Join-Path $theoryRoot 'scheduler_family_remove_preservation')
