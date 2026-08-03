@@ -166,3 +166,24 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Yield_Join in "yield_join"
     timeout = 240]
   theories
     Scheduler_Resume_Generated_Yield_Join
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Owner_Frame in "next_head/owner_frame" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Yield_Join +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Owner_Frame
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Event_Family in "next_head/event_family" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Owner_Frame +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Insert_Event_Family
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Next_Head in "next_head" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Event_Family +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Next_Head
