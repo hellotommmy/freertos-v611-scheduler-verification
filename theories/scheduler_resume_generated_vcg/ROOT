@@ -292,3 +292,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Fam in "reentry_fa
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Reentry_Fam
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Gate in "reentry_gate" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Fam +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Reentry_Gate
