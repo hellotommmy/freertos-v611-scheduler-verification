@@ -159,3 +159,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Insert in "ready_ins
     timeout = 240]
   theories
     Scheduler_Resume_Generated_Ready_Insert
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Yield_Join in "yield_join" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Insert +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Yield_Join
