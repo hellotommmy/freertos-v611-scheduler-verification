@@ -229,3 +229,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Relabel in "draine
     timeout = 240]
   theories
     Scheduler_Resume_Generated_Drained_Relabel
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Key_Frame in "insert_key_frame" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Relabel +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Insert_Key_Frame

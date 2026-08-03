@@ -340,6 +340,23 @@ pending-loop body is executed end to end for one arbitrary iteration.  This
 is still zero refinement rungs: no scheduler root's whole-operation theorem
 changes, and the **0/5** score above stands.
 
+#### Loop-closure preparation: relation transport to the drained state
+
+Closing the drain loop requires re-establishing the gate relation at the
+state the body theorem produces.  The following transport bricks are now
+checker-green; each holds for an arbitrary head task, arbitrary live set and
+arbitrary topology, and none of them executes any further source statement.
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `raw_insert_end_family_owner_byte_frame`, per-write owner projections, and `resume_pending_drained_task_observation`; QAD-false run `20260803Tresume-drained-observation-01` | The exact insert-end footprint misses every managed node's owner field (members of the rewritten ready ring, the inserted item, and unrelated live items alike); combined with the removal-side member and sibling frames, the owner projections of both embedded items of every live task survive all three drain writes, and the full `TaskObservationRel` is re-established at the drained heap against the unchanged abstract state. | Observation layer only; no list representation, scalar, or current-task clause of the gate relation is re-established here. |
+| `resume_pending_generic_unlinked_after_removal` and `resume_pending_drained_generic_family`; QAD-false run `20260803Tresume-drained-family-01` | The awakened task's Generic item is proved globally unlinked at the remove-to-insert intermediate state -- the exact null-container membership condition this document requires -- and the accepted insert-end preservation theorem then yields the whole drained Generic family: family relation at the drained heap, membership exactly the selected ready queue, wake key unchanged, container now that queue. | Raw family layer only; no decoder or abstract link. |
+| `resume_pending_drained_generic_relabel`; QAD-false run `20260803Tresume-drained-relabel-01` | At every scheduler-owned Generic root, the drained raw family relabels to the abstract ready-inserted snapshot family: the ready queue gains `Generic t` with the context key exactly where the raw ring gains the task's item, and every other root keeps the removal relabel. | Per-root decoder link only; the assembled gate relation for the drained context, the loop induction, and the outer wrapper remain open. |
+
+These bricks re-establish the observation, family, and decoder layers of
+the gate relation at the drained state.  They add zero refinement rungs and
+leave the **0/5** score unchanged.
+
 Gate H therefore remains open.  In particular, no accepted generated-source
 theorem yet covers loop closure over arbitrary pending-ready prefixes (which
 requires re-establishing the gate entry relation at the drained state, with
