@@ -1063,7 +1063,7 @@ class SourceItpMappingTests(unittest.TestCase):
         self.assertEqual(rung["theorem"], "vTaskDelay_zero_refines")
         self.assertEqual(
             rung["theory_sha256"],
-            "A77DE8F4215AF1EE592858B9232FD8F3EF068D5A2C12C4912C99028FE525D9E4",
+            "41EFB0C3BD4ADB2D73BADAAF951AFEAC4D777EFBDFC5365A2923CDE5D9CAA91A",
         )
         self.assertEqual(
             rung["boundary_conditions"],
