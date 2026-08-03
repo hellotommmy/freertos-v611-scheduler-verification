@@ -149,6 +149,7 @@
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Abs_Bridge',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Lists',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Rep',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Fam',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -530,6 +531,9 @@ switch ($session) {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Rep' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Fam' {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {
