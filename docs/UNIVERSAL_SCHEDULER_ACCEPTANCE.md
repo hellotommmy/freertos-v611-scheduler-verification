@@ -323,15 +323,34 @@ and empty stderr, and share the frozen evidence hashes recorded above.  These
 are generated-source execution steps for a fragment of one loop body.  They
 add zero refinement rungs and do not change the **0/5** whole-operation score.
 
+The drain body's remaining statements are now also checker-green, from the
+same arbitrary gate entry state:
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `resume_pending_generated_yield_join_exact`; QAD-false run `20260803Tresume-yield-join-01` | Executes the generated `pxCurrentTCB` guard and the yield comparison from the ready-inserted cutpoint state.  The current task is whatever the entry relation's current clause designates; the comparison result is the exact conditional word for both outcomes.  A sibling-free insert-end priority byte frame transports both priority observations across the insertion, and `resume_pending_yield_join_word_encoding` ties the returned word to the abstract local-yield flag. | Two source statements of the body; no next-head read and no loop composition. |
+| `raw_remove_member_owner_byte_frame`, insert-side Event storage/item frames, and `resume_pending_generated_head_read_drained_empty` / `_nonempty`; QAD-false run `20260803Tresume-next-head-03` | The exact removal footprint is proved to miss every ring member's owner field (including the removed node and the unlinked head's neighbours), the Event-root family relation is transported across the generated insertion, and the generated head re-read is executed at the drained state: it returns the next pending task's TCB pointer, or NULL when the drained task was the last.  The next task is whatever the arbitrary pending context lists second. | A read-only re-read; no loop closure and no re-established gate entry relation for the drained context. |
+| `resume_pending_generated_body_exact`; QAD-false run `20260803Tresume-body-02` | Executes the complete generated loop body `resume_pending_generated_body` end to end from the gate entry state, in source order: head guard, generated Event and Generic removals, top-priority conditional, in-range and array guards, destination read, generated ready insert-end, current-task guard, yield comparison, and the generated next-head re-read.  Returns the exact loop-carried pair -- the next pending TCB pointer or NULL, and the conditional yield word -- and carries the transported Event family relation, the current-task pointer frame, the exact top-priority word, and the `RP_YieldChecked` phase invariant to the drained state.  Head task, priorities, current task, live set, ring populations and heap remain arbitrary. | One arbitrary iteration of the loop body.  It does not re-establish the gate entry relation for the drained context, does not close the while loop over arbitrary prefixes, and does not execute the generated outer `xTaskResumeAll'` wrapper (suspension word, missed-tick loop, yield flag clear). |
+
+The three continuation runs (`20260803Tresume-yield-join-01`,
+`20260803Tresume-next-head-03`, `20260803Tresume-body-02`) have
+`exit_code=0`, `quick_and_dirty=false`, `timed_out=false`, the standard
+empty stderr, and the same frozen evidence hashes.  With them the generated
+pending-loop body is executed end to end for one arbitrary iteration.  This
+is still zero refinement rungs: no scheduler root's whole-operation theorem
+changes, and the **0/5** score above stands.
+
 Gate H therefore remains open.  In particular, no accepted generated-source
-theorem yet covers arbitrary pending-ready prefixes, arbitrary missed-tick
-debt, the complete zero/one/$N$ due prefix (including equal-key tasks and the
-exact first-not-due stop), Event linked/null branches, tick-wrap role exchange
-with its reachable old-current-empty invariant, both internal and caller yield
-results, or the complete positive-delay `vTaskDelay'` composition.  Concurrent
-interrupt correctness additionally requires the separately declared
-interference or rely/guarantee model; it is not implied by these sequential
-source theorems.
+theorem yet covers loop closure over arbitrary pending-ready prefixes (which
+requires re-establishing the gate entry relation at the drained state, with
+the awakened task's Generic item re-homed to its ready queue), arbitrary
+missed-tick debt, the complete zero/one/$N$ due prefix (including equal-key
+tasks and the exact first-not-due stop), Event linked/null branches,
+tick-wrap role exchange with its reachable old-current-empty invariant, both
+internal and caller yield results, or the complete positive-delay
+`vTaskDelay'` composition.  Concurrent interrupt correctness additionally
+requires the separately declared interference or rely/guarantee model; it is
+not implied by these sequential source theorems.
 
 ### Gate D -- five-root dispatcher and trace gate
 
