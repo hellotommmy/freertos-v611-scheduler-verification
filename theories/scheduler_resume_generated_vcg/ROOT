@@ -136,3 +136,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Array_ABI in "ready_
     EAL6_FreeRTOS_V611_Scheduler_P2_Frozen_Static_Layout
   theories
     Scheduler_Resume_Generated_Ready_Array_ABI
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Destination in "ready_destination" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Array_ABI +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 120]
+  theories
+    Scheduler_Resume_Generated_Ready_Destination
