@@ -143,3 +143,12 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Destination in "read
     timeout = 120]
   theories
     Scheduler_Resume_Generated_Ready_Destination
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Select in "ready_select" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Top_Raised +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  sessions
+    EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Ready_Destination
+  theories
+    Scheduler_Resume_Generated_Ready_Select
