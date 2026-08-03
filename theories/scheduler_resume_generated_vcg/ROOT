@@ -222,3 +222,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Family in "drained
     timeout = 240]
   theories
     Scheduler_Resume_Generated_Drained_Family
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Relabel in "drained_family/relabel" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drained_Family +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 240]
+  theories
+    Scheduler_Resume_Generated_Drained_Relabel
