@@ -353,9 +353,13 @@ arbitrary topology, and none of them executes any further source statement.
 | `resume_pending_generic_unlinked_after_removal` and `resume_pending_drained_generic_family`; QAD-false run `20260803Tresume-drained-family-01` | The awakened task's Generic item is proved globally unlinked at the remove-to-insert intermediate state -- the exact null-container membership condition this document requires -- and the accepted insert-end preservation theorem then yields the whole drained Generic family: family relation at the drained heap, membership exactly the selected ready queue, wake key unchanged, container now that queue. | Raw family layer only; no decoder or abstract link. |
 | `resume_pending_drained_generic_relabel`; QAD-false run `20260803Tresume-drained-relabel-01` | At every scheduler-owned Generic root, the drained raw family relabels to the abstract ready-inserted snapshot family: the ready queue gains `Generic t` with the context key exactly where the raw ring gains the task's item, and every other root keeps the removal relabel. | Per-root decoder link only; the assembled gate relation for the drained context, the loop induction, and the outer wrapper remain open. |
 
-These bricks re-establish the observation, family, and decoder layers of
-the gate relation at the drained state.  They add zero refinement rungs and
-leave the **0/5** score unchanged.
+| `raw_insert_end_family_key_byte_frame` and `resume_pending_drained_keys`; QAD-false run `20260803Tresume-insert-key-frame-02` | The exact insert-end footprint misses every managed node's item-value field, so every live task's wake key survives the drain body's final write; combined with the removal preservation, the gate's key clause is re-established at the drained heap for all live tasks. | Byte layer only. |
+| `core_wf_resume_one_pending_abs` (with the tail-cursor/predecessor kit `Scheduler_Resume_Abs_Kit`); QAD-false runs `20260803Tresume-abs-kit-01`, `20260803Tresume-abs-preservation-10` | The abstract one-task resume preserves the full core well-formedness invariant -- ring shapes, role payloads and tail cursors, the twelve membership clauses, delayed ordering and wake agreement, the ready cache, and the current task -- assuming only a well-formed state and a pending task; liveness, blocked placement, and ready absence are derived from membership well-formedness.  The abstract update aligns field by field with the checked concrete drain (including `sa_top_ready := max`). | A pure abstract theorem; it executes no source statement and is not itself a refinement. |
+
+These bricks re-establish the observation, family, decoder, and key layers
+of the gate relation at the drained state, and supply the abstract-side
+invariant preservation the re-entry theorem needs.  They add zero
+refinement rungs and leave the **0/5** score unchanged.
 
 Gate H therefore remains open.  In particular, no accepted generated-source
 theorem yet covers loop closure over arbitrary pending-ready prefixes (which
