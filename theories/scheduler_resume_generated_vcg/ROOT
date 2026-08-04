@@ -320,3 +320,10 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Missed_Loop in "missed_loo
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Missed_Loop
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Outer_Compose in "outer_compose" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Missed_Loop +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Outer_Compose

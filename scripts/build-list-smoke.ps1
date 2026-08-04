@@ -154,6 +154,7 @@
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Induction',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drain_Abs_Fold',
         'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Missed_Loop',
+        'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Outer_Compose',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -550,6 +551,9 @@ switch ($session) {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Missed_Loop' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Outer_Compose' {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {
