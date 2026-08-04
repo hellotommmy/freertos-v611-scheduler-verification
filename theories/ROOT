@@ -831,6 +831,7 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head in "schedu
     timeout = 300]
   sessions
     EAL6_FreeRTOS_V611_Scheduler_Family_Insert_End_Preservation
+    EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Owner_Frame
   theories
     Scheduler_One_Due_Task_Phases_Delayed_Head
 
