@@ -801,6 +801,13 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_After_Event in "schedul
   theories
     Scheduler_One_Due_Task_Phases_After_Event
 
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Priority_Frame in "scheduler_one_due_task_phases/priority_frame" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_After_Event +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_One_Due_Task_Phases_Priority_Frame
+
 session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated in "scheduler_one_due_task_phases/generated" =
   EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post +
   options [document = false, quick_and_dirty = false, parallel_proofs = 0,
