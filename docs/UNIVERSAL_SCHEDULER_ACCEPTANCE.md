@@ -367,15 +367,20 @@ refinement rungs and leave the **0/5** score unchanged.
 |---|---|---|
 | `resume_pending_gate_reentry` with its supporting chain (`resume_pending_drained_entry_rel`, tail container observations, the abstract bridge with `pending_generic_key_abs t a = rpc_K_G C t`, the five snapshot-to-abstract family matches, `resume_pending_drained_lists_rel` and the scalar/role/current clauses, and the tail ownership/geometry/subset/cross clauses); QAD-false runs `20260803Treentry-pure-06`, `20260803Treentry-container-01`, `20260803Treentry-abs-bridge-04`, `20260803Treentry-lists-01`, `20260803Treentry-rep-04`, `20260803Treentry-fam-03`, `20260803Treentry-gate-01` | The state produced by one checked drain iteration satisfies the **full** gate entry relation again, with explicit witnesses: the tail context (remaining tasks, entry top raised to the awakened priority), the four-phase snapshot, the drained raw families, and the abstract one-task resume `resume_one_pending_abs t a`.  All thirty-three gate clauses are re-derived; the abstractly captured wake key is proved equal to the context key; nothing about the head task, the tail, priorities, rings or the heap is fixed.  Together with `resume_pending_generated_body_exact` the pending-ready loop is a relation-preserving gate-to-gate step, one task per iteration. | One step only: the while-loop induction over an arbitrary pending prefix, the loop-exit case, the missed-tick loop, and the outer `xTaskResumeAll'` wrapper are not yet composed.  Still zero refinement rungs; the **0/5** score stands. |
 
+#### Loop closure: the generated while loop drains any pending list
+
+| Result and evidence | Exact checked scope | Boundary that remains |
+|---|---|---|
+| `resume_pending_generated_loop_drains`; QAD-false run `20260803Treentry-induction-09` | The generated pending-ready while loop, started at the head pointer for an **arbitrary** pending task list and an arbitrary entry yield word, runs to completion by plain list induction over the gate-to-gate step (`resume_pending_generated_body_exact` + `resume_pending_gate_reentry`).  It returns exactly `(NULL, yw)` and exits in a gate state for the empty pending list whose abstract side is `foldl resume_one_pending_abs` over the drained tasks; the exit yield word is proved equivalent to "entry word set, or some drained task's priority reaches the current priority".  Live set, priorities and the priority function are carried unchanged across the whole loop.  No pending length, task identity, priority, ring topology or heap layout is fixed. | The loop theorem alone: its entry pair comes from the initial head read (proved separately in both empty and nonempty forms), and the outer `xTaskResumeAll'` wrapper -- critical section, suspension decrement, missed-tick replay loop, missed-yield branch and final yield -- is not yet composed. |
+
 Gate H therefore remains open.  In particular, no accepted generated-source
-theorem yet covers loop closure over arbitrary pending-ready prefixes (which
-requires re-establishing the gate entry relation at the drained state, with
-the awakened task's Generic item re-homed to its ready queue), arbitrary
-missed-tick debt, the complete zero/one/$N$ due prefix (including equal-key
-tasks and the exact first-not-due stop), Event linked/null branches,
-tick-wrap role exchange with its reachable old-current-empty invariant, both
-internal and caller yield results, or the complete positive-delay
-`vTaskDelay'` composition.  Concurrent interrupt correctness additionally
+theorem yet covers the outer `xTaskResumeAll'` wrapper composition, arbitrary
+missed-tick debt at source level (the unlocked `vTaskIncrementTick'` summary
+is still an explicit premise wherever it appears), the complete zero/one/$N$
+due prefix (including equal-key tasks and the exact first-not-due stop),
+Event linked/null branches, tick-wrap role exchange with its reachable
+old-current-empty invariant, both internal and caller yield results, or the
+complete positive-delay `vTaskDelay'` composition.  Concurrent interrupt correctness additionally
 requires the separately declared interference or rely/guarantee model; it is
 not implied by these sequential source theorems.
 
