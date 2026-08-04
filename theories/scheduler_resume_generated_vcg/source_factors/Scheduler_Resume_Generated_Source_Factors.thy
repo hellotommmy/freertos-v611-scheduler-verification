@@ -31,14 +31,14 @@ where
        (return NULL)"
 
 definition resume_pending_generated_cond ::
-  "(Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> 32 signed word) \<Rightarrow>
+  "(Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> int) \<Rightarrow>
    Scheduler_V611_Parse.globals \<Rightarrow> bool"
 where
   "resume_pending_generated_cond pair s \<longleftrightarrow> fst pair \<noteq> NULL"
 
 definition resume_pending_generated_body ::
-  "(Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> 32 signed word) \<Rightarrow>
-   ((Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> 32 signed word),
+  "(Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> int) \<Rightarrow>
+   ((Scheduler_V611_Parse.tskTaskControlBlock_C ptr \<times> int),
     Scheduler_V611_Parse.globals) res_monad"
 where
   "resume_pending_generated_body pair =

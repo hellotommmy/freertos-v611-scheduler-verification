@@ -320,8 +320,8 @@ qed
 section \<open>Exact generated yield join\<close>
 
 definition resume_pending_generated_yield_join ::
-  "'tid scheduler_decode \<Rightarrow> 'tid \<Rightarrow> 32 signed word \<Rightarrow>
-   (32 signed word, Scheduler_V611_Parse.globals) res_monad"
+  "'tid scheduler_decode \<Rightarrow> 'tid \<Rightarrow> int \<Rightarrow>
+   (int, Scheduler_V611_Parse.globals) res_monad"
 where
   "resume_pending_generated_yield_join D t y = do {
      guard (\<lambda>s. c_guard (Scheduler_V611_Parse.globals.pxCurrentTCB_' s));
@@ -395,7 +395,7 @@ text \<open>
 \<close>
 
 lemma resume_pending_yield_join_word_encoding:
-  fixes y :: "32 signed word"
+  fixes y :: "int"
   assumes encode: "(y \<noteq> 0) = rps_local_yield S'"
   shows
     "((if rpc_current_priority C \<le> rpc_priority C t then 1 else y) \<noteq> 0) =
