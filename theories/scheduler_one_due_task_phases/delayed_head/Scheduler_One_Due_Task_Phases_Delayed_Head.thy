@@ -620,4 +620,117 @@ proof (intro ballI)
     using step1 step2 step3 by simp
 qed
 
+lemma one_due_delayed_root_guard:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "c_guard (Scheduler_V611_Parse.globals.pxDelayedTaskList_' c)"
+proof -
+  have source_root: "odc_delayed_root C \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have source_rel:
+    "raw_xlist_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (odc_delayed_root C)
+       (generic_raw (odc_delayed_root C))"
+    using one_due_gateH_generic_preD[OF rel] source_root
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have abi_guard: "c_guard (odc_delayed_root C)"
+    using source_rel
+    by (simp add: raw_xlist_rel_def raw_xlist_layout_def)
+  show ?thesis
+    using abi_guard one_due_gateH_delayed_root_globalD[OF rel]
+    by (simp add: abi_list_ptr_c_guard)
+qed
+
+lemma one_due_delayed_owner_at_insert:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and nonempty:
+      "ring (list_remove_abs
+         (one_due_generic_raw_ptr D (odc_task C))
+         (generic_raw (odc_delayed_root C))) \<noteq> []"
+  shows
+    "List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (hd (ring (list_remove_abs
+           (one_due_generic_raw_ptr D (odc_task C))
+           (generic_raw (odc_delayed_root C)))))) =
+     List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (hd (ring (list_remove_abs
+           (one_due_generic_raw_ptr D (odc_task C))
+           (generic_raw (odc_delayed_root C))))))"
+proof -
+  let ?q = "hd (ring (list_remove_abs
+    (one_due_generic_raw_ptr D (odc_task C))
+    (generic_raw (odc_delayed_root C))))"
+  have q_in_removed:
+    "?q \<in> set (ring (list_remove_abs
+       (one_due_generic_raw_ptr D (odc_task C))
+       (generic_raw (odc_delayed_root C))))"
+    using nonempty by (rule hd_in_set)
+  have q_member:
+    "?q \<in> set (ring (generic_raw (odc_delayed_root C)))"
+    using q_in_removed
+    by (auto simp: list_remove_abs_def
+        dest!: subsetD[OF set_remove1_subset])
+  have source_rel:
+    "raw_xlist_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (odc_delayed_root C)
+       (generic_raw (odc_delayed_root C))"
+    using one_due_gateH_generic_preD[OF rel]
+      one_due_gateH_source_in_rootsD[OF rel]
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have dist: "distinct (ring (generic_raw (odc_delayed_root C)))"
+    using source_rel
+    by (simp add: raw_xlist_rel_def raw_xlist_view_def xlist_wf_def)
+  have q_ne: "?q \<noteq> one_due_generic_raw_ptr D (odc_task C)"
+    using q_in_removed dist
+    by (auto simp: list_remove_abs_def)
+  have bytes:
+    "\<forall>addr\<in>raw_owner_field_region ?q.
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         addr =
+       hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c) addr"
+    by (rule one_due_source_member_owner_bytes_at_insert[OF rel
+      q_member q_ne])
+  have field_same:
+    "h_val
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (raw_owner_field_ptr ?q) =
+     h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (raw_owner_field_ptr ?q)"
+  proof (rule delay_h_val_region_cong)
+    fix address
+    assume "address \<in>
+      {ptr_val (raw_owner_field_ptr ?q)..+size_of TYPE(unit ptr)}"
+    then show
+      "one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         address =
+       hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c) address"
+      using bytes
+      by (simp add: raw_owner_field_region_def)
+  qed
+  show ?thesis
+    using field_same
+    unfolding raw_owner_field_ptr_def
+    by (simp only:
+      List_V611_Raw_Skip_Translation.xLIST_ITEM_C_h_val_fields(4))
+qed
+
 end
