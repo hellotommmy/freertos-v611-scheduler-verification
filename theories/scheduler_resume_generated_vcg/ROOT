@@ -299,3 +299,24 @@ session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Gate in "reentry_g
     timeout = 300]
   theories
     Scheduler_Resume_Generated_Reentry_Gate
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Induction in "reentry_induction" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Gate +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Reentry_Induction
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drain_Abs_Fold in "drain_abs_fold" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Reentry_Induction +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Drain_Abs_Fold
+
+session EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Missed_Loop in "missed_loop" =
+  EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Drain_Abs_Fold +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_Resume_Generated_Missed_Loop
