@@ -814,4 +814,133 @@ proof -
     done
 qed
 
+lemma one_due_source_member_decode:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and q_member:
+      "q \<in> set (ring (generic_raw (odc_delayed_root C)))"
+  shows "\<exists>u\<in>odc_live C. q = one_due_generic_raw_ptr D u"
+proof -
+  let ?source = "odc_delayed_root C"
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have relabel:
+    "xlist_relabel (sd_node_decode D) (generic_raw ?source)
+       (ods_generic_family S ?source)"
+    using rel source_root
+    unfolding one_due_gateH_entry_rel_def Let_def
+    by blast
+  have shape:
+    "set (ring (ods_generic_family S ?source)) \<subseteq>
+       Generic ` odc_live C"
+    using one_due_gateH_pure_entryD[OF rel] source_root
+    by (auto simp: one_due_entry_rel_def one_due_family_shape_def)
+  have laws: "universal_decoder_laws (odc_live C) D"
+    using rel
+    unfolding one_due_gateH_entry_rel_def Let_def
+    by blast
+  obtain i where i_lt: "i < length (ring (generic_raw ?source))"
+    and i_eq: "ring (generic_raw ?source) ! i = q"
+    using q_member by (auto simp: in_set_conv_nth)
+  have all2:
+    "list_all2 (\<lambda>p n. sd_node_decode D p = Some n)
+       (ring (generic_raw ?source))
+       (ring (ods_generic_family S ?source))"
+    using relabel by (simp add: xlist_relabel_def)
+  have decode_q:
+    "sd_node_decode D q =
+       Some (ring (ods_generic_family S ?source) ! i)"
+    using list_all2_nthD[OF all2 i_lt] i_eq by simp
+  have n_in:
+    "ring (ods_generic_family S ?source) ! i \<in>
+       set (ring (ods_generic_family S ?source))"
+    using i_lt list_all2_lengthD[OF all2] by auto
+  obtain u where u_live: "u \<in> odc_live C"
+    and n_eq: "ring (ods_generic_family S ?source) ! i = Generic u"
+    using shape n_in by auto
+  have managed:
+    "q \<in> universal_managed_nodes (odc_live C) D"
+    using one_due_gateH_generic_preD[OF rel] source_root q_member
+    by (auto simp: scheduler_family_pre_rel_def)
+  obtain v where v_live: "v \<in> odc_live C"
+    and v_cases:
+      "q = abi_generic_list_item_ptr (sd_tcb_ptr D v) \<or>
+       q = abi_event_list_item_ptr (sd_tcb_ptr D v)"
+    using managed by (auto simp: universal_managed_nodes_def)
+  show ?thesis
+  proof (cases "q = abi_generic_list_item_ptr (sd_tcb_ptr D v)")
+    case True
+    then show ?thesis
+      using v_live
+      by (auto simp: one_due_generic_raw_ptr_def)
+  next
+    case False
+    have q_event: "q = abi_event_list_item_ptr (sd_tcb_ptr D v)"
+      using v_cases False by simp
+    have "sd_node_decode D q = Some (Event v)"
+      using laws v_live q_event
+      by (auto simp: universal_decoder_laws_def)
+    then have "Generic u = Event v"
+      using decode_q n_eq by simp
+    then show ?thesis by simp
+  qed
+qed
+
+theorem one_due_next_head_owner_decode:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and nonempty:
+      "ring (list_remove_abs
+         (one_due_generic_raw_ptr D (odc_task C))
+         (generic_raw (odc_delayed_root C))) \<noteq> []"
+  shows
+    "\<exists>u\<in>odc_live C.
+       hd (ring (list_remove_abs
+         (one_due_generic_raw_ptr D (odc_task C))
+         (generic_raw (odc_delayed_root C)))) =
+         one_due_generic_raw_ptr D u \<and>
+       PTR_COERCE(unit \<rightarrow>
+           Scheduler_V611_Parse.tskTaskControlBlock_C)
+         (List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+           (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+             (hd (ring (list_remove_abs
+               (one_due_generic_raw_ptr D (odc_task C))
+               (generic_raw (odc_delayed_root C))))))) =
+         sd_tcb_ptr D u"
+proof -
+  let ?q = "hd (ring (list_remove_abs
+    (one_due_generic_raw_ptr D (odc_task C))
+    (generic_raw (odc_delayed_root C))))"
+  have q_member:
+    "?q \<in> set (ring (generic_raw (odc_delayed_root C)))"
+    using hd_in_set[OF nonempty]
+    by (auto simp: list_remove_abs_def
+        dest!: subsetD[OF set_remove1_subset])
+  obtain u where u_live: "u \<in> odc_live C"
+    and q_eq: "?q = one_due_generic_raw_ptr D u"
+    using one_due_source_member_decode[OF rel q_member] by blast
+  have live_abs: "u \<in> sa_live a"
+    using u_live one_due_gateH_live_absD[OF rel] by simp
+  have owner_parse:
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+         unit) (sd_tcb_ptr D u)"
+    using one_due_gateH_task_observationD[OF rel] live_abs
+    by (simp add: TaskObservationRel_def)
+  have owner_raw:
+    "List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         ?q) =
+     PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+         unit) (sd_tcb_ptr D u)"
+    using owner_parse q_eq
+    by (simp add: one_due_generic_raw_ptr_def
+        abi_item_owner_h_val[symmetric,
+          where p="scheduler_generic_item_ptr (sd_tcb_ptr D u)"])
+  show ?thesis
+    using u_live q_eq owner_raw by auto
+qed
+
 end
