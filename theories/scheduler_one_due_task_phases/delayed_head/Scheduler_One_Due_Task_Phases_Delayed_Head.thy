@@ -258,4 +258,98 @@ proof -
         one_due_generic_raw_after_remove_def)
 qed
 
+lemma raw_ring_links_end_next:
+  assumes links: "raw_ring_links h lp rs"
+  shows
+    "List_V611_Raw_Skip_Translation.xMINI_LIST_ITEM_C.pxNext_C
+       (List_V611_Raw_Skip_Translation.xLIST_C.xListEnd_C
+         (h_val h lp)) =
+     (if rs = [] then raw_end_item lp else hd rs)"
+  using links
+  by (cases rs)
+     (auto simp: raw_ring_links_def raw_edge_pairs_def raw_next_at_def)
+
+lemma one_due_gateH_delayed_root_globalD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "odc_delayed_root C =
+       abi_list_ptr (Scheduler_V611_Parse.globals.pxDelayedTaskList_' c)"
+  using rel
+  unfolding one_due_gateH_entry_rel_def Let_def
+  by blast
+
+lemma one_due_delayed_count_at_insert:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "unat (Scheduler_V611_Parse.xLIST_C.uxNumberOfItems_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (Scheduler_V611_Parse.globals.pxDelayedTaskList_' c))) =
+     length (ring (list_remove_abs
+       (one_due_generic_raw_ptr D (odc_task C))
+       (generic_raw (odc_delayed_root C))))"
+proof -
+  have raw_count:
+    "unat (List_V611_Raw_Skip_Translation.xLIST_C.uxNumberOfItems_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (odc_delayed_root C))) =
+     length (ring (list_remove_abs
+       (one_due_generic_raw_ptr D (odc_task C))
+       (generic_raw (odc_delayed_root C))))"
+    using one_due_source_rel_at_insert[OF rel]
+    by (simp add: raw_xlist_rel_def raw_xlist_view_def)
+  show ?thesis
+    using raw_count one_due_gateH_delayed_root_globalD[OF rel]
+    by (simp add: abi_list_count_h_val)
+qed
+
+lemma one_due_delayed_end_next_at_insert:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "abi_item_ptr
+       (Scheduler_V611_Parse.xMINI_LIST_ITEM_C.pxNext_C
+         (Scheduler_V611_Parse.xLIST_C.xListEnd_C
+           (h_val
+             (one_due_ready_insert_heap D C generic_raw
+               (one_due_event_remove_heap D C branch
+                 (one_due_generic_remove_heap D C
+                   (hrs_mem
+                     (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+             (Scheduler_V611_Parse.globals.pxDelayedTaskList_' c)))) =
+     (if ring (list_remove_abs
+          (one_due_generic_raw_ptr D (odc_task C))
+          (generic_raw (odc_delayed_root C))) = []
+      then raw_end_item (odc_delayed_root C)
+      else hd (ring (list_remove_abs
+          (one_due_generic_raw_ptr D (odc_task C))
+          (generic_raw (odc_delayed_root C)))))"
+proof -
+  have links:
+    "raw_ring_links
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_delayed_root C)
+       (ring (list_remove_abs
+         (one_due_generic_raw_ptr D (odc_task C))
+         (generic_raw (odc_delayed_root C))))"
+    using one_due_source_rel_at_insert[OF rel]
+    by (simp add: raw_xlist_rel_def raw_xlist_view_def)
+  show ?thesis
+    using raw_ring_links_end_next[OF links]
+      one_due_gateH_delayed_root_globalD[OF rel]
+    by (simp add: abi_sentinel_next_h_val)
+qed
+
 end
