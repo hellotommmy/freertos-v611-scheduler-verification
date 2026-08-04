@@ -835,6 +835,13 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head in "schedu
   theories
     Scheduler_One_Due_Task_Phases_Delayed_Head
 
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_Pure in "scheduler_one_due_task_phases/reentry_pure" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_One_Due_Task_Phases_Reentry_Pure
+
 session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases in "scheduler_one_due_task_phases" =
   EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated +
   options [document = false, quick_and_dirty = false, parallel_proofs = 0,
