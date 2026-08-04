@@ -733,4 +733,85 @@ proof -
       List_V611_Raw_Skip_Translation.xLIST_ITEM_C_h_val_fields(4))
 qed
 
+lemma one_due_sentinel_mini_guard:
+  assumes lp: "c_guard (lp :: Scheduler_V611_Parse.xLIST_C ptr)"
+  shows
+    "c_guard (PTR(Scheduler_V611_Parse.xMINI_LIST_ITEM_C)
+       &(lp\<rightarrow>[''xListEnd_C'']))"
+  by (rule c_guard_field_lvalue[OF lp
+      Scheduler_V611_Parse.xLIST_C_xListEnd_C_fl]) simp
+
+theorem one_due_tick_delayed_remainder_exact:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and t_heap:
+      "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t) =
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))"
+    and t_delayed:
+      "Scheduler_V611_Parse.globals.pxDelayedTaskList_' t =
+       Scheduler_V611_Parse.globals.pxDelayedTaskList_' c"
+  shows
+    "one_due_tick_delayed_remainder \<bullet> t
+     \<lbrace>\<lambda>r s. s = t \<and> r = Result (
+        if ring (list_remove_abs
+             (one_due_generic_raw_ptr D (odc_task C))
+             (generic_raw (odc_delayed_root C))) = []
+        then NULL
+        else PTR_COERCE(unit \<rightarrow>
+               Scheduler_V611_Parse.tskTaskControlBlock_C)
+          (List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+            (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+              (hd (ring (list_remove_abs
+                (one_due_generic_raw_ptr D (odc_task C))
+                (generic_raw (odc_delayed_root C))))))))\<rbrace>"
+proof -
+  let ?removed = "list_remove_abs
+    (one_due_generic_raw_ptr D (odc_task C))
+    (generic_raw (odc_delayed_root C))"
+  have count_u:
+    "unat (Scheduler_V611_Parse.xLIST_C.uxNumberOfItems_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+         (Scheduler_V611_Parse.globals.pxDelayedTaskList_' t))) =
+     length (ring ?removed)"
+    using one_due_delayed_count_at_insert[OF rel] t_heap t_delayed
+    by simp
+  have endnext_t:
+    "abi_item_ptr
+       (Scheduler_V611_Parse.xMINI_LIST_ITEM_C.pxNext_C
+         (Scheduler_V611_Parse.xLIST_C.xListEnd_C
+           (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+             (Scheduler_V611_Parse.globals.pxDelayedTaskList_' t)))) =
+     (if ring ?removed = []
+      then raw_end_item (odc_delayed_root C)
+      else hd (ring ?removed))"
+    using one_due_delayed_end_next_at_insert[OF rel] t_heap t_delayed
+    by simp
+  have rootg_t:
+    "c_guard (Scheduler_V611_Parse.globals.pxDelayedTaskList_' t)"
+    using one_due_delayed_root_guard[OF rel] t_delayed by simp
+  show ?thesis
+    unfolding one_due_tick_delayed_remainder_def
+    apply runs_to_vcg
+    subgoal by (rule rootg_t)
+    subgoal using count_u by (simp add: unat_eq_zero)
+    subgoal using count_u by (simp add: unat_eq_zero)
+    subgoal using count_u by (simp add: unat_eq_zero)
+    subgoal by (rule rootg_t)
+    subgoal
+      using endnext_t one_due_delayed_head_guard_at_insert[OF rel]
+      by (metis (no_types, lifting) abi_item_ptr_c_guard if_False)
+    subgoal
+      using t_delayed one_due_sentinel_mini_guard[OF
+        one_due_delayed_root_guard[OF rel]]
+      by simp
+    subgoal
+      using endnext_t one_due_delayed_owner_at_insert[OF rel] t_heap
+      by (simp add: abi_item_owner_h_val[symmetric])
+    subgoal using count_u by simp
+    done
+qed
+
 end
