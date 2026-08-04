@@ -158,6 +158,7 @@
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_After_Event',
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Priority_Frame',
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Tail_Insert',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -567,6 +568,9 @@ switch ($session) {
     }
     'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Tail_Insert' {
         @()
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {
         @(Join-Path $theoryRoot 'scheduler_family_remove_preservation')
