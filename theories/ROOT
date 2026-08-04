@@ -794,6 +794,13 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post in "scheduler_one_
   theories
     Scheduler_One_Due_Task_Phases_Post
 
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_After_Event in "scheduler_one_due_task_phases/after_event" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_One_Due_Task_Phases_After_Event
+
 session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated in "scheduler_one_due_task_phases/generated" =
   EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Post +
   options [document = false, quick_and_dirty = false, parallel_proofs = 0,
