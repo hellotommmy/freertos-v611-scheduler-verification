@@ -108,4 +108,154 @@ proof -
     by (simp add: scheduler_family_pre_rel_def)
 qed
 
+lemma one_due_absent_after_removal:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "raw_family_members (odc_generic_roots C)
+       (one_due_generic_raw_after_remove D C generic_raw)
+       (one_due_generic_raw_ptr D (odc_task C)) = {}"
+proof -
+  let ?source = "odc_delayed_root C"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  have owner:
+    "scheduler_delay_owner_entry_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (odc_generic_roots C) generic_raw ?source ?p"
+    using rel
+    unfolding one_due_gateH_entry_rel_def Let_def
+    by blast
+  have members:
+    "raw_family_members (odc_generic_roots C) generic_raw ?p =
+       {?source}"
+    using owner
+    by (simp add: scheduler_delay_owner_entry_rel_def)
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have source_rel:
+    "raw_xlist_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       ?source (generic_raw ?source)"
+    using one_due_gateH_generic_preD[OF rel] source_root
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have dist: "distinct (ring (generic_raw ?source))"
+    using source_rel
+    by (simp add: raw_xlist_rel_def raw_xlist_view_def xlist_wf_def)
+  have not_in_removed:
+    "?p \<notin> set (ring (one_due_generic_raw_after_remove D C
+        generic_raw ?source))"
+    using dist
+    by (simp add: one_due_generic_raw_after_remove_def
+        list_remove_abs_def)
+  show ?thesis
+  proof (rule equals0I)
+    fix g
+    assume g_in:
+      "g \<in> raw_family_members (odc_generic_roots C)
+        (one_due_generic_raw_after_remove D C generic_raw) ?p"
+    have g_root: "g \<in> odc_generic_roots C"
+      and g_member:
+        "?p \<in> set (ring (one_due_generic_raw_after_remove D C
+           generic_raw g))"
+      using g_in by (auto simp: raw_family_members_def)
+    show False
+    proof (cases "g = ?source")
+      case True
+      then show False
+        using g_member not_in_removed by simp
+    next
+      case False
+      have "?p \<in> set (ring (generic_raw g))"
+        using g_member False
+        by (simp add: one_due_generic_raw_after_remove_def)
+      then have "g \<in> raw_family_members (odc_generic_roots C)
+          generic_raw ?p"
+        using g_root by (simp add: raw_family_members_def)
+      then show False
+        using members False by simp
+    qed
+  qed
+qed
+
+theorem one_due_insert_family_pre_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "scheduler_family_pre_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_generic_roots C)
+       (scheduler_family_insert_end_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (one_due_generic_raw_after_remove D C generic_raw)
+         (one_due_target_root C)
+         (one_due_generic_raw_ptr D (odc_task C)))
+       (odc_live C) D"
+proof -
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  let ?fam = "one_due_generic_raw_after_remove D C generic_raw"
+  let ?target = "one_due_target_root C"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  have task_live: "odc_task C \<in> odc_live C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have target_ne: "?target \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have fam_target: "?fam ?target = generic_raw ?target"
+    using target_ne
+    by (simp add: one_due_generic_raw_after_remove_def)
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  have fresh:
+    "raw_fresh_for_insert ?target (ring (?fam ?target)) ?p"
+    using after_event fam_target
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have managed: "?p \<in> universal_managed_nodes (odc_live C) D"
+    using task_live
+    by (auto simp: universal_managed_nodes_def
+        one_due_generic_raw_ptr_def)
+  have heap_eq:
+    "raw_insert_concrete_heap ?he ?target (?fam ?target) ?p =
+     one_due_ready_insert_heap D C generic_raw ?he"
+    using fam_target
+    by (simp add: one_due_ready_insert_heap_def)
+  note result = scheduler_family_insert_end_pre_rel_and_linked[
+    OF one_due_after_event_pre_rel[OF rel]
+      one_due_gateH_target_in_rootsD[OF rel] fresh managed
+      one_due_absent_after_removal[OF rel]]
+  show ?thesis
+    using result heap_eq by simp
+qed
+
+corollary one_due_source_rel_at_insert:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "raw_xlist_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_delayed_root C)
+       (list_remove_abs (one_due_generic_raw_ptr D (odc_task C))
+         (generic_raw (odc_delayed_root C)))"
+proof -
+  have target_ne: "one_due_target_root C \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have source_root: "odc_delayed_root C \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  show ?thesis
+    using one_due_insert_family_pre_rel[OF rel] source_root target_ne
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def
+        scheduler_family_insert_end_raw_def
+        one_due_generic_raw_after_remove_def)
+qed
+
 end
