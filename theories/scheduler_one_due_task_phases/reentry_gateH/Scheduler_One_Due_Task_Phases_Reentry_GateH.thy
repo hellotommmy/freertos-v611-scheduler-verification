@@ -646,6 +646,271 @@ proof -
     by (rule one_due_generic_decode_inj[OF laws du du'])
 qed
 
+text \<open>
+  The moved node's key chain.  Through its own removal the key field
+  survives: the unlink writes touch neighbour link fields, the suffix
+  writes touch the list header and only the container field of the
+  node itself.  Through the branch's Event removal the whole Generic
+  item is outside the exact write footprint by storage separation.
+\<close>
+
+lemma one_due_gateH_generic_keysD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "t \<in> odc_live C"
+  shows
+    "raw_key_at (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (one_due_generic_raw_ptr D t) = ods_generic_payload S t"
+  using rel live
+  unfolding one_due_gateH_entry_rel_def Let_def
+  by blast
+
+lemma raw_remove_container_heap_key_at_removed:
+  "raw_key_at (raw_remove_container_heap h p) p = raw_key_at h p"
+  by (simp add: raw_remove_container_heap_def raw_key_at_def
+      h_val_heap_update)
+
+lemma raw_remove_taken_suffix_heap_key_at_removed:
+  assumes layout: "raw_xlist_layout lp rs"
+    and removed: "p \<in> set rs"
+  shows
+    "raw_key_at (raw_remove_taken_suffix_heap h lp p) p =
+       raw_key_at h p"
+proof -
+  let ?hi = "raw_remove_taken_index_heap h lp p"
+  let ?hc = "raw_remove_container_heap ?hi p"
+  have index_same: "h_val ?hi p = h_val h p"
+    by (rule raw_remove_taken_index_heap_preserves_live_item[
+        OF layout removed])
+  have container_key: "raw_key_at ?hc p = raw_key_at ?hi p"
+    by (rule raw_remove_container_heap_key_at_removed)
+  have count_same:
+    "h_val (raw_remove_count_heap ?hc lp) p = h_val ?hc p"
+    by (rule raw_remove_count_heap_preserves_live_item[
+        OF layout removed])
+  show ?thesis
+    using index_same container_key count_same
+    by (simp add: raw_remove_taken_suffix_heap_def raw_key_at_def)
+qed
+
+lemma raw_remove_plain_suffix_heap_key_at_removed:
+  assumes layout: "raw_xlist_layout lp rs"
+    and removed: "p \<in> set rs"
+  shows
+    "raw_key_at (raw_remove_plain_suffix_heap h lp p) p =
+       raw_key_at h p"
+proof -
+  let ?hc = "raw_remove_container_heap h p"
+  have container_key: "raw_key_at ?hc p = raw_key_at h p"
+    by (rule raw_remove_container_heap_key_at_removed)
+  have count_same:
+    "h_val (raw_remove_count_heap ?hc lp) p = h_val ?hc p"
+    by (rule raw_remove_count_heap_preserves_live_item[
+        OF layout removed])
+  show ?thesis
+    using container_key count_same
+    by (simp add: raw_remove_plain_suffix_heap_def raw_key_at_def)
+qed
+
+lemma raw_remove_concrete_heap_key_at_removed:
+  assumes rel: "raw_xlist_rel h lp xs"
+    and member: "p \<in> set (ring xs)"
+  shows
+    "raw_key_at (raw_remove_concrete_heap h p) p = raw_key_at h p"
+proof -
+  have layout: "raw_xlist_layout lp (ring xs)"
+    using rel by (simp add: raw_xlist_rel_def)
+  have unlink_key:
+    "raw_key_at (raw_source_unlink_two h p) p = raw_key_at h p"
+    using raw_source_unlink_two_preserves_live_payload[
+        OF rel member member]
+    by blast
+  show ?thesis
+  proof (cases
+      "pxIndex_C (h_val (raw_source_unlink_two h p) lp) = p")
+    case True
+    have cast:
+      "PTR_COERCE(unit \<rightarrow> xLIST_C)
+         (pvContainer_C (h_val (raw_source_unlink_two h p) p)) = lp"
+      by (rule raw_source_unlink_two_container_cast[OF rel member])
+    have heap_eq:
+      "raw_remove_concrete_heap h p =
+         raw_remove_taken_suffix_heap
+           (raw_source_unlink_two h p) lp p"
+      using True cast
+      by (simp add: raw_remove_concrete_heap_def
+          raw_remove_suffix_heap_def raw_remove_index_heap_def
+          raw_remove_taken_index_heap_def
+          raw_remove_taken_suffix_heap_def Let_def)
+    show ?thesis
+      using heap_eq unlink_key
+        raw_remove_taken_suffix_heap_key_at_removed[
+          OF layout member]
+      by simp
+  next
+    case False
+    have cast:
+      "PTR_COERCE(unit \<rightarrow> xLIST_C)
+         (pvContainer_C (h_val (raw_source_unlink_two h p) p)) = lp"
+      by (rule raw_source_unlink_two_container_cast[OF rel member])
+    have heap_eq:
+      "raw_remove_concrete_heap h p =
+         raw_remove_plain_suffix_heap
+           (raw_source_unlink_two h p) lp p"
+      using False cast
+      by (simp add: raw_remove_concrete_heap_def
+          raw_remove_suffix_heap_def raw_remove_index_heap_def
+          raw_remove_plain_suffix_heap_def Let_def)
+    show ?thesis
+      using heap_eq unlink_key
+        raw_remove_plain_suffix_heap_key_at_removed[
+          OF layout member]
+      by simp
+  qed
+qed
+
+lemma one_due_event_remove_source_item_bytes_frame:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and q_member:
+      "q \<in> set (ring (generic_raw (odc_delayed_root C)))"
+    and addr: "addr \<in> raw_item_region q"
+  shows
+    "one_due_event_remove_heap D C branch
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) addr =
+     one_due_generic_remove_heap D C
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)) addr"
+proof -
+  let ?h = "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)"
+  let ?hg = "one_due_generic_remove_heap D C ?h"
+  let ?source = "odc_delayed_root C"
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have q_in_source_storage:
+    "addr \<in> raw_xlist_storage ?source (generic_raw ?source)"
+    using addr q_member
+    by (auto simp: raw_xlist_storage_def)
+  show ?thesis
+  proof (cases branch)
+    case DueEventNull
+    then show ?thesis
+      by (simp add: one_due_event_remove_heap_def)
+  next
+    case (DueEventLinked owner)
+    have rel_linked:
+      "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+         generic_raw event_raw"
+      using rel DueEventLinked by simp
+    have owner_facts:
+      "raw_xlist_rel ?hg owner (event_raw owner) \<and>
+       event_item_raw_ptr D (odc_task C) \<in>
+         set (ring (event_raw owner))"
+      by (rule one_due_gateH_linked_event_after_genericD[
+          OF rel_linked])
+    have owner_root: "owner \<in> odc_event_roots C"
+      by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+    have footprint:
+      "raw_remove_exact_write_footprint ?hg owner
+         (event_item_raw_ptr D (odc_task C)) \<subseteq>
+       raw_xlist_storage owner (event_raw owner)"
+      using owner_facts
+      by (intro raw_remove_exact_footprint_subset_storage) blast+
+    have disj:
+      "raw_xlist_storage ?source (generic_raw ?source) \<inter>
+         raw_xlist_storage owner (event_raw owner) = {}"
+      by (rule one_due_gateH_storage_disjointD[OF rel source_root
+        owner_root])
+    have outside:
+      "addr \<notin> raw_remove_exact_write_footprint ?hg owner
+         (event_item_raw_ptr D (odc_task C))"
+      using footprint disj q_in_source_storage by blast
+    show ?thesis
+      using owner_facts DueEventLinked
+      by (auto simp: one_due_event_remove_heap_def
+          intro: raw_remove_concrete_heap_exact_external_frame[
+            OF _ _ outside])
+  qed
+qed
+
+lemma one_due_event_remove_key_at_source_member:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and q_member:
+      "q \<in> set (ring (generic_raw (odc_delayed_root C)))"
+  shows
+    "raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))) q =
+     raw_key_at
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) q"
+proof -
+  have item_same:
+    "h_val
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))) q =
+     h_val
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) q"
+  proof (rule delay_h_val_region_cong)
+    fix a
+    assume "a \<in> {ptr_val q..+size_of TYPE(xLIST_ITEM_C)}"
+    then show
+      "one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) a =
+       one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)) a"
+      using one_due_event_remove_source_item_bytes_frame[
+          OF rel q_member]
+      by (simp add: raw_item_region_def)
+  qed
+  then show ?thesis by (simp add: raw_key_at_def)
+qed
+
+theorem one_due_reentry_key_he:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       (one_due_generic_raw_ptr D (odc_task C)) =
+     ods_generic_payload S (odc_task C)"
+proof -
+  let ?h = "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  let ?source = "odc_delayed_root C"
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have key_h: "raw_key_at ?h ?p = ods_generic_payload S (odc_task C)"
+    by (rule one_due_gateH_generic_keysD[OF rel task_live])
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have source_rel: "raw_xlist_rel ?h ?source (generic_raw ?source)"
+    by (rule one_due_gateH_raw_xlist_relD[OF rel source_root])
+  have p_member: "?p \<in> set (ring (generic_raw ?source))"
+    by (rule one_due_gateH_source_memberD[OF rel])
+  have key_hg:
+    "raw_key_at (one_due_generic_remove_heap D C ?h) ?p =
+       raw_key_at ?h ?p"
+    unfolding one_due_generic_remove_heap_def
+    by (rule raw_remove_concrete_heap_key_at_removed[
+        OF source_rel p_member])
+  have key_he:
+    "raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C ?h)) ?p =
+     raw_key_at (one_due_generic_remove_heap D C ?h) ?p"
+    by (rule one_due_event_remove_key_at_source_member[
+        OF rel p_member])
+  show ?thesis using key_h key_hg key_he by simp
+qed
+
 theorem one_due_reentry_relabel:
   assumes rel:
     "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
@@ -756,5 +1021,22 @@ proof -
           one_due_reentry_snapshot_generic_at Let_def)
   qed
 qed
+
+
+corollary one_due_reentry_relabel_closed:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and r_root: "r \<in> odc_generic_roots C"
+  shows
+    "xlist_relabel (sd_node_decode D)
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw r)
+       (ods_generic_family
+         (one_due_reentry_snapshot C branch S) r)"
+  by (rule one_due_reentry_relabel[OF rel
+      one_due_reentry_key_he[OF rel] r_root])
 
 end
