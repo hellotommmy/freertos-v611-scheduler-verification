@@ -2517,4 +2517,133 @@ proof -
     by (simp add: event_family_key_rep_def)
 qed
 
+text \<open>
+  The packaged event pre-relation and the family relation at the
+  insert heap.  The container representation stays an explicit premise
+  here; its per-item transport is the next rung.
+\<close>
+
+lemma one_due_reentry_event_pre_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "scheduler_family_pre_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_event_roots C)
+       (one_due_event_raw_after_remove D C branch event_raw)
+       (odc_live C) D"
+proof -
+  have base:
+    "scheduler_family_pre_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (odc_event_roots C) event_raw (odc_live C) D"
+    by (rule one_due_gateH_event_preD[OF rel])
+  have ring_sub:
+    "\<And>e. set (ring (one_due_event_raw_after_remove D C branch
+       event_raw e)) \<subseteq> set (ring (event_raw e))"
+    by (cases branch)
+      (auto simp: one_due_event_raw_after_remove_def
+        dest!: subsetD[OF list_remove_abs_ring_subset])
+  have fam_hi:
+    "raw_family_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_event_roots C)
+       (one_due_event_raw_after_remove D C branch event_raw)"
+    using base one_due_reentry_event_root_raw_rel[OF rel]
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  have managed_sub:
+    "\<forall>lp\<in>odc_event_roots C.
+       set (ring (one_due_event_raw_after_remove D C branch
+         event_raw lp)) \<subseteq>
+       universal_managed_nodes (odc_live C) D"
+  proof
+    fix lp
+    assume lp_root: "lp \<in> odc_event_roots C"
+    have base_sub:
+      "set (ring (event_raw lp)) \<subseteq>
+         universal_managed_nodes (odc_live C) D"
+      using base lp_root
+      by (auto simp: scheduler_family_pre_rel_def)
+    show "set (ring (one_due_event_raw_after_remove D C branch
+        event_raw lp)) \<subseteq>
+        universal_managed_nodes (odc_live C) D"
+      using ring_sub[of lp] base_sub by blast
+  qed
+  have ring_pairwise:
+    "\<forall>lp\<in>odc_event_roots C. \<forall>lq\<in>odc_event_roots C.
+       lp \<noteq> lq \<longrightarrow>
+       set (ring (one_due_event_raw_after_remove D C branch
+         event_raw lp)) \<inter>
+       set (ring (one_due_event_raw_after_remove D C branch
+         event_raw lq)) = {}"
+  proof (intro ballI impI)
+    fix lp lq
+    assume lp_root: "lp \<in> odc_event_roots C"
+      and lq_root: "lq \<in> odc_event_roots C"
+      and ne: "lp \<noteq> lq"
+    have base_disj:
+      "set (ring (event_raw lp)) \<inter>
+         set (ring (event_raw lq)) = {}"
+      using base lp_root lq_root ne
+      by (auto simp: scheduler_family_pre_rel_def)
+    show "set (ring (one_due_event_raw_after_remove D C branch
+        event_raw lp)) \<inter>
+        set (ring (one_due_event_raw_after_remove D C branch
+          event_raw lq)) = {}"
+      using ring_sub[of lp] ring_sub[of lq] base_disj by blast
+  qed
+  show ?thesis
+    using base fam_hi managed_sub ring_pairwise
+    by (simp add: scheduler_family_pre_rel_def)
+qed
+
+theorem one_due_reentry_event_family_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and container:
+      "event_family_container_rep D
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (odc_event_roots C)
+         (one_due_event_raw_after_remove D C branch event_raw)
+         (odc_live C)"
+  shows
+    "scheduler_event_root_family_rel D
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_event_roots C) (odc_pending_root C)
+       (one_due_event_raw_after_remove D C branch event_raw)
+       (ods_event_family (one_due_reentry_snapshot C branch S))
+       (odc_live C) (odc_K_E C)"
+proof -
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have pending:
+    "odc_pending_root C \<in> odc_event_roots C"
+    using one_due_gateH_event_relD[OF rel]
+    unfolding scheduler_event_root_family_rel_def
+    by blast
+  have reps:
+    "\<forall>lp\<in>odc_event_roots C.
+       event_family_root_rep D
+         (one_due_event_raw_after_remove D C branch event_raw)
+         (ods_event_family (one_due_reentry_snapshot C branch S))
+         (odc_live C) lp"
+    using one_due_reentry_event_root_rep[OF rel] by blast
+  show ?thesis
+    using one_due_reentry_event_pre_rel[OF rel] laws pending reps
+      container one_due_reentry_event_key_rep[OF rel]
+    by (simp add: scheduler_event_root_family_rel_def)
+qed
+
 end
