@@ -2205,4 +2205,316 @@ proof -
   qed
 qed
 
+text \<open>
+  The event key representation at the insert heap: every live task's
+  Event key byte survives all three writes, and the abstract per-ring
+  keys transport through the snapshot equations.
+\<close>
+
+lemma one_due_gateH_event_keysD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "t \<in> odc_live C"
+  shows
+    "raw_key_at (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (event_item_raw_ptr D t) = odc_K_E C t"
+  using one_due_gateH_event_relD[OF rel] live
+  unfolding scheduler_event_root_family_rel_def
+    event_family_key_rep_def
+  by blast
+
+lemma one_due_event_remove_key_at_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       (event_item_raw_ptr D u) =
+     raw_key_at
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (event_item_raw_ptr D u)"
+proof (cases branch)
+  case DueEventNull
+  then show ?thesis by (simp add: one_due_event_remove_heap_def)
+next
+  case (DueEventLinked owner)
+  let ?hg = "one_due_generic_remove_heap D C
+    (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))"
+  let ?qt = "event_item_raw_ptr D (odc_task C)"
+  let ?q = "event_item_raw_ptr D u"
+  have rel_linked:
+    "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+       generic_raw event_raw"
+    using rel DueEventLinked by simp
+  have owner_facts:
+    "raw_xlist_rel ?hg owner (event_raw owner) \<and>
+     ?qt \<in> set (ring (event_raw owner))"
+    by (rule one_due_gateH_linked_event_after_genericD[
+        OF rel_linked])
+  have owner_root: "owner \<in> odc_event_roots C"
+    by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+  have owner_rel: "raw_xlist_rel ?hg owner (event_raw owner)"
+    and qt_member: "?qt \<in> set (ring (event_raw owner))"
+    using owner_facts by blast+
+  have key_eq:
+    "raw_key_at (raw_remove_concrete_heap ?hg ?qt) ?q =
+       raw_key_at ?hg ?q"
+  proof (cases "?q = ?qt")
+    case True
+    then show ?thesis
+      using raw_remove_concrete_heap_key_at_removed[
+        OF owner_rel qt_member]
+      by simp
+  next
+    case False
+    show ?thesis
+    proof (cases "?q \<in> set (ring (event_raw owner))")
+      case True
+      have q_survivor:
+        "?q \<in> set (remove1 ?qt (ring (event_raw owner)))"
+        using True False
+        by (simp add: in_set_remove1)
+      show ?thesis
+        using raw_remove_concrete_heap_payload_effect[
+          OF owner_rel qt_member] q_survivor
+        by blast
+    next
+      case False'': False
+      have pre_hg:
+        "scheduler_family_pre_rel ?hg (odc_event_roots C)
+           event_raw (odc_live C) D"
+        by (rule one_due_gateH_event_pre_after_genericD[OF rel])
+      have q_managed:
+        "?q \<in> universal_managed_nodes (odc_live C) D"
+        using live
+        by (auto simp: event_item_raw_ptr_def
+            universal_managed_nodes_def)
+      have item_bytes:
+        "\<forall>a\<in>raw_item_region ?q.
+           raw_remove_concrete_heap ?hg ?qt a = ?hg a"
+        using raw_remove_family_sibling_item_priority_byte_frame[
+          OF pre_hg owner_root qt_member q_managed False'' live]
+        by blast
+      have item_same:
+        "h_val (raw_remove_concrete_heap ?hg ?qt) ?q =
+           h_val ?hg ?q"
+      proof (rule delay_h_val_region_cong)
+        fix a
+        assume "a \<in> {ptr_val ?q..+size_of TYPE(xLIST_ITEM_C)}"
+        then show
+          "raw_remove_concrete_heap ?hg ?qt a = ?hg a"
+          using item_bytes by (simp add: raw_item_region_def)
+      qed
+      then show ?thesis by (simp add: raw_key_at_def)
+    qed
+  qed
+  show ?thesis
+    using key_eq DueEventLinked
+    by (simp add: one_due_event_remove_heap_def)
+qed
+
+lemma one_due_ready_insert_key_at_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and w_managed: "w \<in> universal_managed_nodes (odc_live C) D"
+  shows
+    "raw_key_at
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       w =
+     raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       w"
+proof -
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  let ?target = "one_due_target_root C"
+  let ?fam = "one_due_generic_raw_after_remove D C generic_raw"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have target_root: "?target \<in> odc_generic_roots C"
+    by (rule one_due_gateH_target_in_rootsD[OF rel])
+  note after_pre = one_due_after_event_pre_rel[OF rel]
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  have target_ne: "?target \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have fam_target: "?fam ?target = generic_raw ?target"
+    using target_ne
+    by (simp add: one_due_generic_raw_after_remove_def)
+  have fresh0:
+    "raw_fresh_for_insert ?target (ring (generic_raw ?target)) ?p"
+    using after_event
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have fresh:
+    "raw_fresh_for_insert ?target (ring (?fam ?target)) ?p"
+    using fresh0 fam_target by simp
+  have p_managed: "?p \<in> universal_managed_nodes (odc_live C) D"
+    using task_live
+    by (auto simp: one_due_generic_raw_ptr_def
+        universal_managed_nodes_def)
+  have bytes:
+    "\<forall>a\<in>raw_key_field_region w.
+       raw_insert_concrete_heap ?he ?target (?fam ?target) ?p a =
+         ?he a"
+    by (rule raw_insert_end_family_key_byte_frame[
+      OF after_pre target_root fresh p_managed w_managed])
+  have proj:
+    "raw_key_at
+       (raw_insert_concrete_heap ?he ?target (?fam ?target) ?p) w =
+     raw_key_at ?he w"
+    by (rule raw_key_bytes_to_projection[OF bytes])
+  show ?thesis
+    using proj
+    by (simp add: one_due_ready_insert_heap_def fam_target)
+qed
+
+lemma one_due_reentry_event_key_raw:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "raw_key_at
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (event_item_raw_ptr D u) = odc_K_E C u"
+proof -
+  have key_h:
+    "raw_key_at (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (event_item_raw_ptr D u) = odc_K_E C u"
+    by (rule one_due_gateH_event_keysD[OF rel live])
+  have key_hg:
+    "raw_key_at
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (event_item_raw_ptr D u) =
+     raw_key_at (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (event_item_raw_ptr D u)"
+    using one_due_gateH_generic_remove_event_item_frameD[
+      OF rel live]
+    by (simp add: raw_key_at_def)
+  have key_he:
+    "raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       (event_item_raw_ptr D u) =
+     raw_key_at
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (event_item_raw_ptr D u)"
+    by (rule one_due_event_remove_key_at_live[OF rel live])
+  have q_managed:
+    "event_item_raw_ptr D u \<in>
+       universal_managed_nodes (odc_live C) D"
+    using live
+    by (auto simp: event_item_raw_ptr_def
+        universal_managed_nodes_def)
+  have key_hi:
+    "raw_key_at
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (event_item_raw_ptr D u) =
+     raw_key_at
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       (event_item_raw_ptr D u)"
+    by (rule one_due_ready_insert_key_at_live[OF rel q_managed])
+  show ?thesis using key_h key_hg key_he key_hi by simp
+qed
+
+theorem one_due_reentry_event_key_rep:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "event_family_key_rep D
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_event_roots C)
+       (one_due_event_raw_after_remove D C branch event_raw)
+       (ods_event_family (one_due_reentry_snapshot C branch S))
+       (odc_live C) (odc_K_E C)"
+proof -
+  have raw_keys:
+    "\<forall>t\<in>odc_live C.
+       raw_key_at
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (event_item_raw_ptr D t) = odc_K_E C t"
+    using one_due_reentry_event_key_raw[OF rel] by blast
+  have base_abs:
+    "\<forall>lp\<in>odc_event_roots C. \<forall>t\<in>odc_live C.
+       Event t \<in> set (ring (ods_event_family S lp)) \<longrightarrow>
+       item_key (ods_event_family S lp) (Event t) = odc_K_E C t"
+    using one_due_gateH_event_relD[OF rel]
+    unfolding scheduler_event_root_family_rel_def
+      event_family_key_rep_def
+    by blast
+  have abs_keys:
+    "\<forall>lp\<in>odc_event_roots C. \<forall>t\<in>odc_live C.
+       Event t \<in> set (ring (ods_event_family
+         (one_due_reentry_snapshot C branch S) lp)) \<longrightarrow>
+       item_key (ods_event_family
+         (one_due_reentry_snapshot C branch S) lp) (Event t) =
+         odc_K_E C t"
+  proof (intro ballI impI)
+    fix lp t
+    assume lp_root: "lp \<in> odc_event_roots C"
+      and t_live: "t \<in> odc_live C"
+      and t_in: "Event t \<in> set (ring (ods_event_family
+        (one_due_reentry_snapshot C branch S) lp))"
+    show "item_key (ods_event_family
+       (one_due_reentry_snapshot C branch S) lp) (Event t) =
+       odc_K_E C t"
+    proof (cases branch)
+      case DueEventNull
+      then show ?thesis
+        using base_abs lp_root t_live t_in
+        by (simp add: one_due_reentry_snapshot_event_at)
+    next
+      case (DueEventLinked owner)
+      show ?thesis
+      proof (cases "lp = owner")
+        case True
+        have t_in_old:
+          "Event t \<in> set (ring (ods_event_family S lp))"
+          using t_in True DueEventLinked
+          by (auto simp: one_due_reentry_snapshot_event_at
+              dest!: subsetD[OF list_remove_abs_ring_subset])
+        then show ?thesis
+          using base_abs lp_root t_live True DueEventLinked
+          by (simp add: one_due_reentry_snapshot_event_at
+              list_remove_abs_item_key)
+      next
+        case False
+        then show ?thesis
+          using base_abs lp_root t_live t_in DueEventLinked
+          by (simp add: one_due_reentry_snapshot_event_at)
+      qed
+    qed
+  qed
+  show ?thesis
+    using raw_keys abs_keys
+    by (simp add: event_family_key_rep_def)
+qed
+
 end
