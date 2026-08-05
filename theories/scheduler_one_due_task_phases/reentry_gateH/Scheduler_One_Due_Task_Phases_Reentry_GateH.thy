@@ -4120,4 +4120,242 @@ proof -
     using generic_sub event_sub base_g base_src by blast
 qed
 
+text \<open>
+  The gate re-entry.  A state pinned by the tail-insert continuation
+  satisfies the full gate entry relation again, with the advanced
+  context at the decoded next head, the completed five-phase snapshot,
+  the re-entry raw families and the unchanged abstract state.
+\<close>
+
+lemma one_due_reentry_top_word:
+  "unat (if (w :: 32 word) < v then v else w) =
+     max (unat w) (unat v)"
+  by (simp add: word_less_nat_alt max_def)
+
+theorem one_due_gateH_reentry:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and u_live: "u \<in> odc_live C"
+    and u_raw_member:
+      "one_due_generic_raw_ptr D u \<in>
+         set (ring (list_remove_abs
+           (one_due_generic_raw_ptr D (odc_task C))
+           (generic_raw (odc_delayed_root C))))"
+    and head_shape:
+      "\<exists>rest. ring (list_remove_abs (Generic (odc_task C))
+         (ods_generic_family S (odc_delayed_root C))) =
+       Generic u # rest"
+    and u_due:
+      "ods_generic_payload S u \<le> odc_tick C"
+    and target'_root:
+      "odc_ready_root C (odc_priority C u) \<in> odc_generic_roots C"
+    and target'_ne:
+      "odc_delayed_root C \<noteq> odc_ready_root C (odc_priority C u)"
+    and branch':
+      "one_due_event_branch_at (one_due_reentry_context C u)
+         (one_due_reentry_snapshot C branch S) branch'"
+    and hrs_t:
+      "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t) =
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))"
+    and delayed_t:
+      "Scheduler_V611_Parse.globals.pxDelayedTaskList_' t =
+       Scheduler_V611_Parse.globals.pxDelayedTaskList_' c"
+    and top_t:
+      "Scheduler_V611_Parse.globals.uxTopReadyPriority_' t =
+       (if Scheduler_V611_Parse.globals.uxTopReadyPriority_' c <
+          Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+            (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+              (sd_tcb_ptr D (odc_task C)))
+        then Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+            (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+              (sd_tcb_ptr D (odc_task C)))
+        else Scheduler_V611_Parse.globals.uxTopReadyPriority_' c)"
+    and tick_t:
+      "Scheduler_V611_Parse.globals.xTickCount_' t =
+       Scheduler_V611_Parse.globals.xTickCount_' c"
+  shows
+    "one_due_gateH_entry_rel D R t a
+       (one_due_reentry_context C u) branch'
+       (one_due_reentry_snapshot C branch S)
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw)
+       (one_due_event_raw_after_remove D C branch event_raw)"
+proof -
+  let ?C' = "one_due_reentry_context C u"
+  let ?S' = "one_due_reentry_snapshot C branch S"
+  let ?fam' = "one_due_reentry_generic_raw D C
+    (one_due_event_remove_heap D C branch
+      (one_due_generic_remove_heap D C
+        (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+    generic_raw"
+  let ?ev' = "one_due_event_raw_after_remove D C branch event_raw"
+  have pure':
+    "one_due_entry_rel ?C' branch' ?S'"
+    by (rule one_due_reentry_entry_rel[OF
+      one_due_gateH_pure_entryD[OF rel] u_live head_shape u_due
+      target'_root target'_ne branch'])
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have obs':
+    "TaskObservationRel D
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t)) a"
+    using one_due_reentry_task_observation[OF rel] hrs_t by simp
+  note base = rel[unfolded one_due_gateH_entry_rel_def Let_def]
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have live_abs: "odc_live C = sa_live a"
+    by (rule one_due_gateH_live_absD[OF rel])
+  have priorities:
+    "\<forall>v\<in>odc_live C. odc_priority C v = sa_priority a v"
+    using base by blast
+  have tick_c:
+    "odc_tick C = Scheduler_V611_Parse.globals.xTickCount_' c"
+    using base by blast
+  have top_c:
+    "odc_entry_top C =
+       unat (Scheduler_V611_Parse.globals.uxTopReadyPriority_' c)"
+    using base by blast
+  have delayed_c:
+    "odc_delayed_root C =
+       abi_list_ptr (Scheduler_V611_Parse.globals.pxDelayedTaskList_' c)"
+    using base by blast
+  have pending_c:
+    "odc_pending_root C = abi_list_ptr (sr_pending R)"
+    using base by blast
+  have ready_c:
+    "\<forall>v\<in>odc_live C.
+       odc_ready_root C (odc_priority C v) =
+         abi_list_ptr (sr_ready R (odc_priority C v))"
+    using base by blast
+  have roots_disjoint:
+    "odc_generic_roots C \<inter> odc_event_roots C = {}"
+    using base by blast
+  have obs_h:
+    "TaskObservationRel D
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)) a"
+    by (rule one_due_gateH_task_observationD[OF rel])
+  have task_abs: "odc_task C \<in> sa_live a"
+    using task_live live_abs by simp
+  have pri_word:
+    "unat (Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (sd_tcb_ptr D (odc_task C)))) =
+     sa_priority a (odc_task C)"
+    using TaskObservationRel_liveD[OF obs_h task_abs] by blast
+  have pri_task:
+    "odc_priority C (odc_task C) = sa_priority a (odc_task C)"
+    using priorities task_live by blast
+  have top':
+    "odc_entry_top ?C' =
+       unat (Scheduler_V611_Parse.globals.uxTopReadyPriority_' t)"
+    using top_t top_c pri_word pri_task
+    by (simp add: one_due_reentry_context_components
+        word_less_nat_alt max_def)
+  show ?thesis
+    unfolding one_due_gateH_entry_rel_def Let_def
+  proof (intro conjI)
+    show "one_due_entry_rel ?C' branch' ?S'" by (rule pure')
+  next
+    show "TaskObservationRel D
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t)) a"
+      by (rule obs')
+  next
+    show "universal_decoder_laws (odc_live ?C') D"
+      using laws by (simp add: one_due_reentry_context_components)
+  next
+    show "odc_live ?C' = sa_live a"
+      using live_abs
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>v\<in>odc_live ?C'.
+       odc_priority ?C' v = sa_priority a v"
+      using priorities
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "odc_tick ?C' =
+       Scheduler_V611_Parse.globals.xTickCount_' t"
+      using tick_c tick_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "odc_entry_top ?C' =
+       unat (Scheduler_V611_Parse.globals.uxTopReadyPriority_' t)"
+      by (rule top')
+  next
+    show "odc_delayed_root ?C' =
+       abi_list_ptr (Scheduler_V611_Parse.globals.pxDelayedTaskList_' t)"
+      using delayed_c delayed_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "odc_pending_root ?C' = abi_list_ptr (sr_pending R)"
+      using pending_c
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>v\<in>odc_live ?C'.
+       odc_ready_root ?C' (odc_priority ?C' v) =
+         abi_list_ptr (sr_ready R (odc_priority ?C' v))"
+      using ready_c
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "scheduler_family_pre_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+       (odc_generic_roots ?C') ?fam' (odc_live ?C') D"
+      using one_due_reentry_generic_pre_rel[OF rel] hrs_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>r\<in>odc_generic_roots ?C'.
+       set (ring (?fam' r)) \<subseteq>
+         one_due_generic_raw_set (odc_live ?C') D"
+      using one_due_reentry_generic_ring_subset[OF rel]
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>r\<in>odc_generic_roots ?C'.
+       xlist_relabel (sd_node_decode D) (?fam' r)
+         (ods_generic_family ?S' r)"
+      using one_due_reentry_relabel_closed[OF rel]
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "scheduler_delay_owner_entry_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+       (odc_generic_roots ?C') ?fam' (odc_delayed_root ?C')
+       (one_due_generic_raw_ptr D (odc_task ?C'))"
+      using one_due_reentry_delay_owner[OF rel u_raw_member] hrs_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "raw_family_insert_geometry (odc_generic_roots ?C') ?fam'
+       (one_due_generic_raw_ptr D (odc_task ?C'))"
+      using one_due_reentry_insert_geometry[OF rel u_live]
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "scheduler_event_root_family_rel D
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+       (odc_event_roots ?C') (odc_pending_root ?C') ?ev'
+       (ods_event_family ?S') (odc_live ?C') (odc_K_E ?C')"
+      using one_due_reentry_event_family_rel_closed[OF rel] hrs_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>v\<in>odc_live ?C'.
+       raw_key_at (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t))
+         (one_due_generic_raw_ptr D v) =
+       ods_generic_payload ?S' v"
+      using one_due_reentry_generic_keys[OF rel] hrs_t
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "odc_generic_roots ?C' \<inter> odc_event_roots ?C' = {}"
+      using roots_disjoint
+      by (simp add: one_due_reentry_context_components)
+  next
+    show "\<forall>g\<in>odc_generic_roots ?C'. \<forall>e\<in>odc_event_roots ?C'.
+       raw_xlist_storage g (?fam' g) \<inter>
+         raw_xlist_storage e (?ev' e) = {}"
+      using one_due_reentry_storage_disjoint[OF rel]
+      by (simp add: one_due_reentry_context_components)
+  qed
+qed
+
 end
