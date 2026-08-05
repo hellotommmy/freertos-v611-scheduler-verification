@@ -557,4 +557,204 @@ proof -
   ultimately show ?thesis by simp
 qed
 
+text \<open>
+  Per-root relabel at the insert heap.  The moved node's raw key at the
+  after-event heap equal to its abstract payload is taken as an explicit
+  premise here; the field-region frame chain that discharges it is a
+  separate rung.
+\<close>
+
+lemma one_due_gateH_relabelD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and r_root: "r \<in> odc_generic_roots C"
+  shows
+    "xlist_relabel (sd_node_decode D) (generic_raw r)
+       (ods_generic_family S r)"
+  using rel r_root
+  unfolding one_due_gateH_entry_rel_def Let_def
+  by blast
+
+lemma one_due_gateH_raw_xlist_relD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and r_root: "r \<in> odc_generic_roots C"
+  shows
+    "raw_xlist_rel (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       r (generic_raw r)"
+  using one_due_gateH_generic_preD[OF rel] r_root
+  by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+
+lemma one_due_gateH_task_ptr_decode:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "sd_node_decode D (one_due_generic_raw_ptr D (odc_task C)) =
+       Some (Generic (odc_task C))"
+proof -
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have bullets:
+    "\<forall>t\<in>odc_live C.
+       sd_tcb_decode D (sd_tcb_ptr D t) = Some t \<and>
+       sd_node_decode D
+         (abi_generic_list_item_ptr (sd_tcb_ptr D t)) =
+         Some (Generic t) \<and>
+       sd_node_decode D
+         (abi_event_list_item_ptr (sd_tcb_ptr D t)) =
+         Some (Event t)"
+    using laws by (simp add: universal_decoder_laws_def)
+  show ?thesis
+    using bspec[OF bullets task_live]
+    by (simp add: one_due_generic_raw_ptr_def)
+qed
+
+lemma one_due_gateH_ring_decode_inj:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and r_root: "r \<in> odc_generic_roots C"
+    and u_in: "u \<in> insert (one_due_generic_raw_ptr D (odc_task C))
+      (set (ring (generic_raw r)))"
+    and u'_in: "u' \<in> insert (one_due_generic_raw_ptr D (odc_task C))
+      (set (ring (generic_raw r)))"
+    and eq: "sd_node_decode D u = sd_node_decode D u'"
+  shows "u = u'"
+proof -
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have p_set:
+    "one_due_generic_raw_ptr D (odc_task C) \<in>
+       one_due_generic_raw_set (odc_live C) D"
+    using task_live by (auto simp: one_due_generic_raw_set_def)
+  have ring_sub:
+    "set (ring (generic_raw r)) \<subseteq>
+       one_due_generic_raw_set (odc_live C) D"
+    using one_due_gateH_generic_ring_subsetD[OF rel] r_root by blast
+  have u_set: "u \<in> one_due_generic_raw_set (odc_live C) D"
+    using u_in p_set ring_sub by blast
+  have u'_set: "u' \<in> one_due_generic_raw_set (odc_live C) D"
+    using u'_in p_set ring_sub by blast
+  obtain t where du: "sd_node_decode D u = Some (Generic t)"
+    using one_due_generic_raw_set_decode[OF laws u_set] by blast
+  have du': "sd_node_decode D u' = Some (Generic t)"
+    using eq du by simp
+  show ?thesis
+    by (rule one_due_generic_decode_inj[OF laws du du'])
+qed
+
+theorem one_due_reentry_relabel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and key_he:
+      "raw_key_at
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (one_due_generic_raw_ptr D (odc_task C)) =
+       ods_generic_payload S (odc_task C)"
+    and r_root: "r \<in> odc_generic_roots C"
+  shows
+    "xlist_relabel (sd_node_decode D)
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw r)
+       (ods_generic_family
+         (one_due_reentry_snapshot C branch S) r)"
+proof -
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  let ?task = "odc_task C"
+  let ?source = "odc_delayed_root C"
+  let ?target = "one_due_target_root C"
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  have pn: "sd_node_decode D ?p = Some (Generic ?task)"
+    by (rule one_due_gateH_task_ptr_decode[OF rel])
+  have source_root: "?source \<in> odc_generic_roots C"
+    and target_root: "?target \<in> odc_generic_roots C"
+    and source_target_ne: "?source \<noteq> ?target"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have shape: "one_due_family_shape C S"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (simp add: one_due_entry_rel_def)
+  consider (T) "r = ?target"
+    | (S) "r \<noteq> ?target" "r = ?source"
+    | (O) "r \<noteq> ?target" "r \<noteq> ?source"
+    by blast
+  then show ?thesis
+  proof cases
+    case T
+    have base: "xlist_relabel (sd_node_decode D)
+       (generic_raw ?target) (ods_generic_family S ?target)"
+      by (rule one_due_gateH_relabelD[OF rel target_root])
+    have wf_raw: "xlist_wf (generic_raw ?target)"
+      by (rule raw_xlist_rel_wf[OF
+          one_due_gateH_raw_xlist_relD[OF rel target_root]])
+    note after_event = one_due_gateH_after_event_obligations[OF rel]
+    have fam_target:
+      "one_due_generic_raw_after_remove D C generic_raw ?target =
+         generic_raw ?target"
+      using source_target_ne
+      by (simp add: one_due_generic_raw_after_remove_def)
+    have fresh0:
+      "raw_fresh_for_insert ?target (ring (generic_raw ?target)) ?p"
+      using after_event fam_target
+      by (simp add: one_due_after_event_obligations_def Let_def)
+    have fresh: "?p \<notin> set (ring (generic_raw ?target))"
+      using fresh0 by (simp add: raw_fresh_for_insert_def)
+    have step: "xlist_relabel (sd_node_decode D)
+       (list_insert_end_abs ?p (ods_generic_payload S ?task)
+         (generic_raw ?target))
+       (list_insert_end_abs (Generic ?task)
+         (ods_generic_payload S ?task)
+         (ods_generic_family S ?target))"
+      by (rule xlist_relabel_insert_end[OF base wf_raw pn fresh
+          one_due_gateH_ring_decode_inj[OF rel target_root]])
+    show ?thesis
+      using step T source_target_ne key_he
+      by (simp add: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          one_due_reentry_snapshot_generic_at Let_def)
+  next
+    case S
+    have base: "xlist_relabel (sd_node_decode D)
+       (generic_raw ?source) (ods_generic_family S ?source)"
+      by (rule one_due_gateH_relabelD[OF rel source_root])
+    have wf_raw: "xlist_wf (generic_raw ?source)"
+      by (rule raw_xlist_rel_wf[OF
+          one_due_gateH_raw_xlist_relD[OF rel source_root]])
+    have step: "xlist_relabel (sd_node_decode D)
+       (list_remove_abs ?p (generic_raw ?source))
+       (list_remove_abs (Generic ?task)
+         (ods_generic_family S ?source))"
+      by (rule xlist_relabel_remove[OF base wf_raw pn
+          one_due_gateH_ring_decode_inj[OF rel source_root]])
+    show ?thesis
+      using step S
+      by (simp add: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          one_due_reentry_snapshot_generic_at Let_def)
+  next
+    case O
+    have base: "xlist_relabel (sd_node_decode D)
+       (generic_raw r) (ods_generic_family S r)"
+      by (rule one_due_gateH_relabelD[OF rel r_root])
+    show ?thesis
+      using base O
+      by (simp add: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          one_due_reentry_snapshot_generic_at Let_def)
+  qed
+qed
+
 end

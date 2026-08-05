@@ -142,6 +142,22 @@ theorem one_due_tick_tail_insert_composed:
                    (Scheduler_V611_Parse.globals.t_hrs_' c)))) \<Longrightarrow>
          Scheduler_V611_Parse.globals.pxDelayedTaskList_' t =
            Scheduler_V611_Parse.globals.pxDelayedTaskList_' c \<Longrightarrow>
+         Scheduler_V611_Parse.globals.uxTopReadyPriority_' t =
+           (if Scheduler_V611_Parse.globals.uxTopReadyPriority_' c <
+              Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+                (h_val
+                  (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+                  (sd_tcb_ptr D (odc_task C)))
+            then
+              Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+                (h_val
+                  (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+                  (sd_tcb_ptr D (odc_task C)))
+            else
+              Scheduler_V611_Parse.globals.uxTopReadyPriority_' c)
+           \<Longrightarrow>
+         Scheduler_V611_Parse.globals.xTickCount_' t =
+           Scheduler_V611_Parse.globals.xTickCount_' c \<Longrightarrow>
          one_due_tick_delayed_remainder \<bullet> t \<lbrace>Q\<rbrace>"
   shows
     "one_due_tick_top_ready_tail_source (sd_tcb_ptr D (odc_task C)) \<bullet>
@@ -214,9 +230,12 @@ proof -
          one_due_generic_raw_ptr_def)
       apply (clarsimp split: exception_or_result_splits)
       apply (rule cont)
-       apply (simp add: scheduler_mem_state_def hrs_reduce pri_he
-         target_sel[symmetric] item_abi
-         one_due_generic_raw_ptr_def one_due_ready_insert_heap_def)
+         apply (simp add: scheduler_mem_state_def hrs_reduce pri_he
+           target_sel[symmetric] item_abi
+           one_due_generic_raw_ptr_def
+           one_due_ready_insert_heap_def)
+        apply (simp add: scheduler_mem_state_def)
+       apply (simp add: scheduler_mem_state_def pri_he)
       apply (simp add: scheduler_mem_state_def)
       done
     subgoal by (simp add: pri_he pri_lt)
@@ -232,9 +251,12 @@ proof -
          one_due_generic_raw_ptr_def)
       apply (clarsimp split: exception_or_result_splits)
       apply (rule cont)
-       apply (simp add: scheduler_mem_state_def hrs_reduce pri_he
-         target_sel[symmetric] item_abi
-         one_due_generic_raw_ptr_def one_due_ready_insert_heap_def)
+         apply (simp add: scheduler_mem_state_def hrs_reduce pri_he
+           target_sel[symmetric] item_abi
+           one_due_generic_raw_ptr_def
+           one_due_ready_insert_heap_def)
+        apply (simp add: scheduler_mem_state_def)
+       apply (simp add: scheduler_mem_state_def pri_he)
       apply (simp add: scheduler_mem_state_def)
       done
     done
