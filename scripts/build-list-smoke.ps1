@@ -161,6 +161,7 @@
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Delayed_Head',
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_Pure',
         'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_GateH',
+        'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Tick_Loop',
         'EAL6_FreeRTOS_V611_Scheduler_Task_Observation_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Rel',
         'EAL6_FreeRTOS_V611_Scheduler_Event_Root_Family_Remove_Decoder_Remove1',
@@ -578,6 +579,9 @@ switch ($session) {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_GateH' {
+        @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
+    }
+    'EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Tick_Loop' {
         @(Join-Path $theoryRoot 'scheduler_resume_generated_vcg')
     }
     'EAL6_FreeRTOS_V611_Scheduler_Family_Remove_Core' {

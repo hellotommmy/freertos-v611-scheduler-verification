@@ -853,6 +853,13 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_GateH in "sched
   theories
     Scheduler_One_Due_Task_Phases_Reentry_GateH
 
+session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Tick_Loop in "scheduler_one_due_task_phases/tick_loop" =
+  EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_GateH +
+  options [document = false, quick_and_dirty = false, parallel_proofs = 0,
+    timeout = 300]
+  theories
+    Scheduler_One_Due_Task_Phases_Tick_Loop
+
 session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases in "scheduler_one_due_task_phases" =
   EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Generated +
   options [document = false, quick_and_dirty = false, parallel_proofs = 0,
