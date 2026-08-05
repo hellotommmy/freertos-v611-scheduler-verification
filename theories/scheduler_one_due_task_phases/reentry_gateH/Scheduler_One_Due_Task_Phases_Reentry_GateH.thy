@@ -4015,4 +4015,109 @@ proof -
     by (simp add: scheduler_delay_owner_entry_rel_def)
 qed
 
+text \<open>
+  Storage separation between the re-entry generic family and the
+  after-removal event family: the shrunk source and unchanged rings
+  stay inside their entry storages, and the grown target adds only
+  the moved node's region, which lives in the source storage.
+\<close>
+
+lemma raw_xlist_storage_insert_end_subset:
+  "raw_xlist_storage lp (list_insert_end_abs p k xs) \<subseteq>
+     raw_xlist_storage lp xs \<union> raw_item_region p"
+  by (auto simp: raw_xlist_storage_def
+      dest!: subsetD[OF list_insert_end_abs_ring_subset])
+
+theorem one_due_reentry_storage_disjoint:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and g_root: "g \<in> odc_generic_roots C"
+    and e_root: "e \<in> odc_event_roots C"
+  shows
+    "raw_xlist_storage g
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw g) \<inter>
+     raw_xlist_storage e
+       (one_due_event_raw_after_remove D C branch event_raw e) = {}"
+proof -
+  let ?source = "odc_delayed_root C"
+  let ?target = "one_due_target_root C"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have target_ne: "?target \<noteq> ?source"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have p_member: "?p \<in> set (ring (generic_raw ?source))"
+    by (rule one_due_gateH_source_memberD[OF rel])
+  have p_in_source_storage:
+    "raw_item_region ?p \<subseteq>
+       raw_xlist_storage ?source (generic_raw ?source)"
+    using p_member by (auto simp: raw_xlist_storage_def)
+  have base_g:
+    "raw_xlist_storage g (generic_raw g) \<inter>
+       raw_xlist_storage e (event_raw e) = {}"
+    by (rule one_due_gateH_storage_disjointD[OF rel g_root e_root])
+  have base_src:
+    "raw_xlist_storage ?source (generic_raw ?source) \<inter>
+       raw_xlist_storage e (event_raw e) = {}"
+    by (rule one_due_gateH_storage_disjointD[OF rel source_root
+      e_root])
+  have event_sub:
+    "raw_xlist_storage e
+       (one_due_event_raw_after_remove D C branch event_raw e) \<subseteq>
+     raw_xlist_storage e (event_raw e)"
+    by (cases branch)
+      (auto simp: one_due_event_raw_after_remove_def
+        intro: raw_xlist_storage_remove_subset[THEN subsetD])
+  have generic_sub:
+    "raw_xlist_storage g
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw g) \<subseteq>
+     raw_xlist_storage g (generic_raw g) \<union>
+       raw_xlist_storage ?source (generic_raw ?source)"
+  proof (cases "g = ?target")
+    case True
+    have "raw_xlist_storage g
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw g) \<subseteq>
+       raw_xlist_storage g (generic_raw g) \<union> raw_item_region ?p"
+      using True target_ne
+        raw_xlist_storage_insert_end_subset[of g _ _
+          "generic_raw ?target"]
+      by (simp add: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def)
+    then show ?thesis
+      using p_in_source_storage by blast
+  next
+    case False
+    have "raw_xlist_storage g
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw g) \<subseteq>
+       raw_xlist_storage g (generic_raw g)"
+      using False
+      by (cases "g = ?source")
+        (auto simp: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          intro: raw_xlist_storage_remove_subset[THEN subsetD])
+    then show ?thesis by blast
+  qed
+  show ?thesis
+    using generic_sub event_sub base_g base_src by blast
+qed
+
 end
