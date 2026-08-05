@@ -849,6 +849,7 @@ session EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_GateH in "sched
   sessions
     EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Owner_Frame
     EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Key_Frame
+    EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Container_Frame
   theories
     Scheduler_One_Due_Task_Phases_Reentry_GateH
 
