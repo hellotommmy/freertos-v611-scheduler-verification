@@ -2005,4 +2005,204 @@ proof -
     by (rule delay_raw_xlist_rel_storage_frame[OF he_rel frame])
 qed
 
+text \<open>
+  Per-root event representation at the re-entry family: the ring
+  subset, the relabel to the re-entry snapshot family, and the
+  abstract well-formedness and kind clauses.
+\<close>
+
+lemma one_due_gateH_event_root_repD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+  shows
+    "event_family_root_rep D event_raw (ods_event_family S)
+       (odc_live C) e"
+  using one_due_gateH_event_relD[OF rel] root
+  unfolding scheduler_event_root_family_rel_def
+  by blast
+
+lemma one_due_event_raw_set_decode:
+  assumes laws: "universal_decoder_laws live D"
+    and mem: "u \<in> event_item_raw_set live D"
+  shows "\<exists>t\<in>live. u = event_item_raw_ptr D t \<and>
+     sd_node_decode D u = Some (Event t)"
+  using laws mem
+  by (auto simp: event_item_raw_set_def event_item_raw_ptr_def
+      universal_decoder_laws_def)
+
+lemma one_due_event_decode_inj:
+  assumes laws: "universal_decoder_laws live D"
+    and u: "sd_node_decode D u = Some (Event t)"
+    and u': "sd_node_decode D u' = Some (Event t)"
+  shows "u = u'"
+proof -
+  have ev_law:
+    "\<forall>p t. sd_node_decode D p = Some (Event t) \<longrightarrow>
+       t \<in> live \<and>
+       p = abi_event_list_item_ptr (sd_tcb_ptr D t)"
+    using laws by (simp add: universal_decoder_laws_def)
+  have "u = abi_event_list_item_ptr (sd_tcb_ptr D t)"
+    using ev_law u by blast
+  moreover have
+    "u' = abi_event_list_item_ptr (sd_tcb_ptr D t)"
+    using ev_law u' by blast
+  ultimately show ?thesis by simp
+qed
+
+lemma one_due_gateH_task_event_ptr_decode:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "sd_node_decode D (event_item_raw_ptr D (odc_task C)) =
+       Some (Event (odc_task C))"
+proof -
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have bullets:
+    "\<forall>t\<in>odc_live C.
+       sd_tcb_decode D (sd_tcb_ptr D t) = Some t \<and>
+       sd_node_decode D
+         (abi_generic_list_item_ptr (sd_tcb_ptr D t)) =
+         Some (Generic t) \<and>
+       sd_node_decode D
+         (abi_event_list_item_ptr (sd_tcb_ptr D t)) =
+         Some (Event t)"
+    using laws by (simp add: universal_decoder_laws_def)
+  show ?thesis
+    using bspec[OF bullets task_live]
+    by (simp add: event_item_raw_ptr_def)
+qed
+
+lemma one_due_gateH_event_ring_decode_inj:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+    and u_in: "u \<in> insert (event_item_raw_ptr D (odc_task C))
+      (set (ring (event_raw e)))"
+    and u'_in: "u' \<in> insert (event_item_raw_ptr D (odc_task C))
+      (set (ring (event_raw e)))"
+    and eq: "sd_node_decode D u = sd_node_decode D u'"
+  shows "u = u'"
+proof -
+  have laws: "universal_decoder_laws (odc_live C) D"
+    by (rule one_due_gateH_decoder_lawsD[OF rel])
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have qt_set:
+    "event_item_raw_ptr D (odc_task C) \<in>
+       event_item_raw_set (odc_live C) D"
+    using task_live by (auto simp: event_item_raw_set_def)
+  have ring_sub:
+    "set (ring (event_raw e)) \<subseteq>
+       event_item_raw_set (odc_live C) D"
+    using one_due_gateH_event_root_repD[OF rel root]
+    by (simp add: event_family_root_rep_def)
+  have u_set: "u \<in> event_item_raw_set (odc_live C) D"
+    using u_in qt_set ring_sub by blast
+  have u'_set: "u' \<in> event_item_raw_set (odc_live C) D"
+    using u'_in qt_set ring_sub by blast
+  obtain t where du: "sd_node_decode D u = Some (Event t)"
+    using one_due_event_raw_set_decode[OF laws u_set] by blast
+  have du': "sd_node_decode D u' = Some (Event t)"
+    using eq du by simp
+  show ?thesis
+    by (rule one_due_event_decode_inj[OF laws du du'])
+qed
+
+theorem one_due_reentry_event_root_rep:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+  shows
+    "event_family_root_rep D
+       (one_due_event_raw_after_remove D C branch event_raw)
+       (ods_event_family (one_due_reentry_snapshot C branch S))
+       (odc_live C) e"
+proof -
+  note base = one_due_gateH_event_root_repD[OF rel root]
+  have shape': "one_due_family_shape
+     (one_due_reentry_context C (odc_task C))
+     (one_due_reentry_snapshot C branch S)"
+    by (rule one_due_reentry_family_shape[
+      OF one_due_gateH_pure_entryD[OF rel]])
+  have abs_wf:
+    "xlist_wf (ods_event_family
+       (one_due_reentry_snapshot C branch S) e)"
+    using shape' root
+    by (auto simp: one_due_family_shape_def
+        one_due_reentry_context_components)
+  have abs_kind:
+    "event_ring (ods_event_family
+       (one_due_reentry_snapshot C branch S) e)"
+    using shape' root
+    by (auto simp: one_due_family_shape_def
+        one_due_reentry_context_components)
+  show ?thesis
+  proof (cases branch)
+    case DueEventNull
+    then show ?thesis
+      using base abs_wf abs_kind
+      by (simp add: event_family_root_rep_def
+          one_due_event_raw_after_remove_def
+          one_due_reentry_snapshot_event_at)
+  next
+    case (DueEventLinked owner)
+    show ?thesis
+    proof (cases "e = owner")
+      case True
+      have rel_linked:
+        "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+           generic_raw event_raw"
+        using rel DueEventLinked by simp
+      have owner_root: "owner \<in> odc_event_roots C"
+        by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+      have base_sub:
+        "set (ring (event_raw e)) \<subseteq>
+           event_item_raw_set (odc_live C) D"
+        using base by (simp add: event_family_root_rep_def)
+      have sub':
+        "set (ring (list_remove_abs
+           (event_item_raw_ptr D (odc_task C)) (event_raw e))) \<subseteq>
+         event_item_raw_set (odc_live C) D"
+        using base_sub
+        by (auto dest!: subsetD[OF list_remove_abs_ring_subset])
+      have base_relabel:
+        "xlist_relabel (sd_node_decode D) (event_raw e)
+           (ods_event_family S e)"
+        using base by (simp add: event_family_root_rep_def)
+      have wf_raw: "xlist_wf (event_raw e)"
+        by (rule raw_xlist_rel_wf[OF
+            scheduler_event_root_family_raw_rootD[OF
+              one_due_gateH_event_relD[OF rel] root]])
+      have pn:
+        "sd_node_decode D (event_item_raw_ptr D (odc_task C)) =
+           Some (Event (odc_task C))"
+        by (rule one_due_gateH_task_event_ptr_decode[OF rel])
+      have relabel':
+        "xlist_relabel (sd_node_decode D)
+           (list_remove_abs (event_item_raw_ptr D (odc_task C))
+             (event_raw e))
+           (list_remove_abs (Event (odc_task C))
+             (ods_event_family S e))"
+        by (rule xlist_relabel_remove[OF base_relabel wf_raw pn
+            one_due_gateH_event_ring_decode_inj[OF rel root]])
+      show ?thesis
+        using sub' relabel' abs_wf abs_kind True DueEventLinked
+        by (simp add: event_family_root_rep_def
+            one_due_event_raw_after_remove_def
+            one_due_reentry_snapshot_event_at)
+    next
+      case False
+      then show ?thesis
+        using base abs_wf abs_kind DueEventLinked
+        by (simp add: event_family_root_rep_def
+            one_due_event_raw_after_remove_def
+            one_due_reentry_snapshot_event_at)
+    qed
+  qed
+qed
+
 end
