@@ -137,4 +137,88 @@ proof -
     done
 qed
 
+definition one_due_tick_body_post ::
+  "'tid scheduler_decode \<Rightarrow>
+   ('tid, xLIST_C ptr) one_due_context \<Rightarrow>
+   xLIST_C ptr one_due_event_branch \<Rightarrow>
+   (xLIST_C ptr \<Rightarrow> (raw_node_id, raw_key) xlist_abs) \<Rightarrow>
+   Scheduler_V611_Parse.globals \<Rightarrow>
+   (unit, Scheduler_V611_Parse.tskTaskControlBlock_C ptr)
+     exception_or_result \<Rightarrow>
+   Scheduler_V611_Parse.globals \<Rightarrow> bool"
+where
+  "one_due_tick_body_post D C branch generic_raw c r t \<longleftrightarrow>
+     hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t) =
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))) \<and>
+     Scheduler_V611_Parse.globals.pxDelayedTaskList_' t =
+       Scheduler_V611_Parse.globals.pxDelayedTaskList_' c \<and>
+     Scheduler_V611_Parse.globals.uxTopReadyPriority_' t =
+       (if Scheduler_V611_Parse.globals.uxTopReadyPriority_' c <
+          Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+            (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+              (sd_tcb_ptr D (odc_task C)))
+        then Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+            (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+              (sd_tcb_ptr D (odc_task C)))
+        else Scheduler_V611_Parse.globals.uxTopReadyPriority_' c)
+     \<and>
+     Scheduler_V611_Parse.globals.xTickCount_' t =
+       Scheduler_V611_Parse.globals.xTickCount_' c \<and>
+     r = Result (
+       if ring (list_remove_abs
+            (one_due_generic_raw_ptr D (odc_task C))
+            (generic_raw (odc_delayed_root C))) = []
+       then NULL
+       else PTR_COERCE(unit \<rightarrow>
+              Scheduler_V611_Parse.tskTaskControlBlock_C)
+         (List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+           (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+             (hd (ring (list_remove_abs
+               (one_due_generic_raw_ptr D (odc_task C))
+               (generic_raw (odc_delayed_root C))))))))"
+
+theorem one_due_tick_body_exact:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and roots: "R = generated_scheduler_roots"
+  shows
+    "one_due_tick_loop_body_source (sd_tcb_ptr D (odc_task C)) \<bullet> c
+     \<lbrace>\<lambda>r t. \<exists>v. r = Result v \<and>
+        one_due_tick_body_post D C branch generic_raw c
+          (Result v) t\<rbrace>"
+proof (rule one_due_tick_body_composed[OF rel roots])
+  fix t :: "Scheduler_V611_Parse.globals"
+  assume h:
+    "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' t) =
+     one_due_ready_insert_heap D C generic_raw
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))"
+    and d:
+    "Scheduler_V611_Parse.globals.pxDelayedTaskList_' t =
+     Scheduler_V611_Parse.globals.pxDelayedTaskList_' c"
+    and p:
+    "Scheduler_V611_Parse.globals.uxTopReadyPriority_' t =
+     (if Scheduler_V611_Parse.globals.uxTopReadyPriority_' c <
+        Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+          (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+            (sd_tcb_ptr D (odc_task C)))
+      then Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+          (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+            (sd_tcb_ptr D (odc_task C)))
+      else Scheduler_V611_Parse.globals.uxTopReadyPriority_' c)"
+    and k:
+    "Scheduler_V611_Parse.globals.xTickCount_' t =
+     Scheduler_V611_Parse.globals.xTickCount_' c"
+  show "one_due_tick_delayed_remainder \<bullet> t
+     \<lbrace>one_due_tick_body_post D C branch generic_raw c\<rbrace>"
+    apply (rule runs_to_weaken[OF
+      one_due_tick_delayed_remainder_exact[OF rel h d]])
+    using h d p k
+    by (auto simp: one_due_tick_body_post_def)
+qed
+
 end
