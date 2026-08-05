@@ -1,0 +1,560 @@
+theory Scheduler_One_Due_Task_Phases_Reentry_GateH
+  imports
+    "EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_Pure.Scheduler_One_Due_Task_Phases_Reentry_Pure"
+begin
+
+text \<open>
+  Concrete re-entry clauses at the insert heap.  The raw generic family
+  after one completed tick-body iteration is the insert-end family over
+  the after-remove family; this file re-establishes the gate-level
+  clauses of the entry relation at that family and heap, one clause per
+  lemma, so the loop-invariant assembly can consume them without
+  re-proving heap facts.
+\<close>
+
+lemma set_insert_after_subset:
+  "set (insert_after c x ys) \<subseteq> insert x (set ys)"
+  by (induction ys) auto
+
+lemma list_insert_end_abs_ring_subset:
+  "set (ring (list_insert_end_abs x k xs)) \<subseteq>
+     insert x (set (ring xs))"
+  by (cases "cursor xs")
+     (auto simp: list_insert_end_abs_def
+       dest!: subsetD[OF set_insert_after_subset])
+
+definition one_due_reentry_generic_raw ::
+  "'tid scheduler_decode \<Rightarrow>
+   ('tid, xLIST_C ptr) one_due_context \<Rightarrow>
+   heap_mem \<Rightarrow>
+   (xLIST_C ptr \<Rightarrow> (raw_node_id, raw_key) xlist_abs) \<Rightarrow>
+   (xLIST_C ptr \<Rightarrow> (raw_node_id, raw_key) xlist_abs)"
+where
+  "one_due_reentry_generic_raw D C h fam =
+     scheduler_family_insert_end_raw h
+       (one_due_generic_raw_after_remove D C fam)
+       (one_due_target_root C)
+       (one_due_generic_raw_ptr D (odc_task C))"
+
+lemma one_due_reentry_generic_pre_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "scheduler_family_pre_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       (odc_generic_roots C)
+       (one_due_reentry_generic_raw D C
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         generic_raw)
+       (odc_live C) D"
+  using one_due_insert_family_pre_rel[OF rel]
+  by (simp add: one_due_reentry_generic_raw_def)
+
+lemma one_due_gateH_generic_ring_subsetD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "\<forall>r\<in>odc_generic_roots C.
+       set (ring (generic_raw r)) \<subseteq>
+         one_due_generic_raw_set (odc_live C) D"
+  using rel
+  unfolding one_due_gateH_entry_rel_def Let_def
+  by blast
+
+lemma one_due_reentry_generic_ring_subset:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "\<forall>r\<in>odc_generic_roots C.
+       set (ring (one_due_reentry_generic_raw D C h generic_raw r))
+         \<subseteq> one_due_generic_raw_set (odc_live C) D"
+proof
+  fix r
+  assume r_root: "r \<in> odc_generic_roots C"
+  note base = one_due_gateH_generic_ring_subsetD[OF rel]
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have p_in:
+    "one_due_generic_raw_ptr D (odc_task C) \<in>
+       one_due_generic_raw_set (odc_live C) D"
+    using task_live by (auto simp: one_due_generic_raw_set_def)
+  have source_root: "odc_delayed_root C \<in> odc_generic_roots C"
+    and target_ne: "one_due_target_root C \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have base_r: "set (ring (generic_raw r)) \<subseteq>
+    one_due_generic_raw_set (odc_live C) D"
+    using base r_root by blast
+  have base_src: "set (ring (generic_raw (odc_delayed_root C))) \<subseteq>
+    one_due_generic_raw_set (odc_live C) D"
+    using base source_root by blast
+  show "set (ring (one_due_reentry_generic_raw D C h generic_raw r))
+      \<subseteq> one_due_generic_raw_set (odc_live C) D"
+  proof (cases "r = one_due_target_root C")
+    case True
+    then show ?thesis
+      using base_r p_in target_ne
+      by (auto simp: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          dest!: subsetD[OF list_insert_end_abs_ring_subset])
+  next
+    case False
+    then show ?thesis
+      using base_r base_src
+      by (auto simp: one_due_reentry_generic_raw_def
+          scheduler_family_insert_end_raw_def
+          one_due_generic_raw_after_remove_def
+          dest!: subsetD[OF list_remove_abs_ring_subset])
+  qed
+qed
+
+text \<open>
+  Relabel transport through the model-level remove and insert-end
+  operations.  Decode injectivity on the ring extended by the moved
+  node aligns the two removals positionally; the cursor branch is
+  matched through the predecessor walk.
+\<close>
+
+lemma list_all2_decode_remove1:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and pn: "dec p = Some n"
+    and uniq: "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some n \<Longrightarrow> u = p"
+  shows "list_all2 (\<lambda>u w. dec u = Some w)
+     (remove1 p xs) (remove1 n ys)"
+  using all2 uniq
+proof (induction xs arbitrary: ys)
+  case Nil
+  then show ?case by simp
+next
+  case (Cons x xs)
+  obtain y ys' where ys_eq: "ys = y # ys'"
+    and hx: "dec x = Some y"
+    and rest: "list_all2 (\<lambda>u w. dec u = Some w) xs ys'"
+    using Cons.prems(1) by (auto simp: list_all2_Cons1)
+  show ?case
+  proof (cases "x = p")
+    case True
+    have "y = n" using hx pn True by simp
+    then show ?thesis using rest ys_eq True by simp
+  next
+    case False
+    have y_ne: "y \<noteq> n"
+    proof
+      assume "y = n"
+      then have "dec x = Some n" using hx by simp
+      then have "x = p" using Cons.prems(2) by simp
+      then show False using False by simp
+    qed
+    have uniq': "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some n \<Longrightarrow>
+       u = p"
+      using Cons.prems(2) by simp
+    have ih: "list_all2 (\<lambda>u w. dec u = Some w)
+       (remove1 p xs) (remove1 n ys')"
+      by (rule Cons.IH[OF rest uniq'])
+    then show ?thesis using ys_eq hx False y_ne by simp
+  qed
+qed
+
+lemma predecessor_aux_decode:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and pn: "dec p = Some n"
+    and uniq: "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some n \<Longrightarrow> u = p"
+    and prev: "dec u0 = Some w0"
+  shows "rel_option (\<lambda>u w. dec u = Some w)
+     (predecessor_aux u0 p xs) (predecessor_aux w0 n ys)"
+  using all2 uniq prev
+proof (induction xs arbitrary: ys u0 w0)
+  case Nil
+  then show ?case by simp
+next
+  case (Cons x xs)
+  obtain y ys' where ys_eq: "ys = y # ys'"
+    and hx: "dec x = Some y"
+    and rest: "list_all2 (\<lambda>u w. dec u = Some w) xs ys'"
+    using Cons.prems(1) by (auto simp: list_all2_Cons1)
+  show ?case
+  proof (cases "x = p")
+    case True
+    have "y = n" using hx pn True by simp
+    then show ?thesis
+      using ys_eq True Cons.prems(3) by simp
+  next
+    case False
+    have y_ne: "y \<noteq> n"
+    proof
+      assume "y = n"
+      then have "x = p" using hx Cons.prems(2) by simp
+      then show False using False by simp
+    qed
+    have uniq': "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some n \<Longrightarrow>
+       u = p"
+      using Cons.prems(2) by simp
+    show ?thesis
+      using ys_eq False y_ne Cons.IH[OF rest uniq' hx]
+      by simp
+  qed
+qed
+
+lemma predecessor_decode:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and pn: "dec p = Some n"
+    and uniq: "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some n \<Longrightarrow> u = p"
+  shows "rel_option (\<lambda>u w. dec u = Some w)
+     (predecessor p xs) (predecessor n ys)"
+proof (cases xs)
+  case Nil
+  then have "ys = []" using all2 by simp
+  then show ?thesis using Nil by simp
+next
+  case (Cons x xs')
+  obtain y ys' where ys_eq: "ys = y # ys'"
+    and hx: "dec x = Some y"
+    and rest: "list_all2 (\<lambda>u w. dec u = Some w) xs' ys'"
+    using all2 Cons by (auto simp: list_all2_Cons1)
+  show ?thesis
+  proof (cases "x = p")
+    case True
+    have "y = n" using hx pn True by simp
+    then show ?thesis using Cons ys_eq True by simp
+  next
+    case False
+    have y_ne: "y \<noteq> n"
+    proof
+      assume "y = n"
+      then have "x = p" using hx uniq Cons by simp
+      then show False using False by simp
+    qed
+    have uniq': "\<And>u. u \<in> set xs' \<Longrightarrow> dec u = Some n \<Longrightarrow> u = p"
+      using uniq Cons by simp
+    show ?thesis
+      using Cons ys_eq False y_ne
+        predecessor_aux_decode[OF rest pn uniq' hx]
+      by simp
+  qed
+qed
+
+lemma insert_after_decode:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and pn: "dec p = Some n"
+    and cm: "dec c = Some m"
+    and uniq_c: "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some m \<Longrightarrow> u = c"
+  shows "list_all2 (\<lambda>u w. dec u = Some w)
+     (insert_after c p xs) (insert_after m n ys)"
+  using all2 uniq_c
+proof (induction xs arbitrary: ys)
+  case Nil
+  then show ?case by simp
+next
+  case (Cons x xs)
+  obtain y ys' where ys_eq: "ys = y # ys'"
+    and hx: "dec x = Some y"
+    and rest: "list_all2 (\<lambda>u w. dec u = Some w) xs ys'"
+    using Cons.prems(1) by (auto simp: list_all2_Cons1)
+  show ?case
+  proof (cases "x = c")
+    case True
+    have "y = m" using hx cm True by simp
+    then show ?thesis using ys_eq True hx pn rest by simp
+  next
+    case False
+    have y_ne: "y \<noteq> m"
+    proof
+      assume "y = m"
+      then have "x = c" using hx Cons.prems(2) by simp
+      then show False using False by simp
+    qed
+    have uniq': "\<And>u. u \<in> set xs \<Longrightarrow> dec u = Some m \<Longrightarrow>
+       u = c"
+      using Cons.prems(2) by simp
+    show ?thesis
+      using ys_eq False y_ne hx Cons.IH[OF rest uniq']
+      by simp
+  qed
+qed
+
+theorem xlist_relabel_remove:
+  assumes rel: "xlist_relabel dec rx q"
+    and wf_rx: "xlist_wf rx"
+    and pn: "dec p = Some n"
+    and inj: "\<And>u u'. u \<in> insert p (set (ring rx)) \<Longrightarrow>
+       u' \<in> insert p (set (ring rx)) \<Longrightarrow> dec u = dec u' \<Longrightarrow>
+       u = u'"
+  shows "xlist_relabel dec
+     (list_remove_abs p rx) (list_remove_abs n q)"
+proof -
+  have ring2: "list_all2 (\<lambda>u w. dec u = Some w) (ring rx) (ring q)"
+    and cur2: "rel_option (\<lambda>u w. dec u = Some w)
+      (cursor rx) (cursor q)"
+    and keys: "\<forall>u\<in>set (ring rx). \<forall>w. dec u = Some w \<longrightarrow>
+      item_key rx u = item_key q w"
+    using rel by (simp_all add: xlist_relabel_def)
+  have uniq: "\<And>u. u \<in> set (ring rx) \<Longrightarrow> dec u = Some n \<Longrightarrow> u = p"
+  proof -
+    fix u
+    assume u_in: "u \<in> set (ring rx)" and un: "dec u = Some n"
+    show "u = p"
+      by (rule inj) (use u_in un pn in auto)
+  qed
+  have ring2': "list_all2 (\<lambda>u w. dec u = Some w)
+     (remove1 p (ring rx)) (remove1 n (ring q))"
+    by (rule list_all2_decode_remove1[OF ring2 pn uniq])
+  have cur_iff: "(cursor rx = Some p) = (cursor q = Some n)"
+  proof
+    assume cp: "cursor rx = Some p"
+    obtain w where "cursor q = Some w" and "dec p = Some w"
+      using cur2 cp by (cases "cursor q") auto
+    then show "cursor q = Some n" using pn by simp
+  next
+    assume cq: "cursor q = Some n"
+    obtain u where cu: "cursor rx = Some u" and un: "dec u = Some n"
+      using cur2 cq by (cases "cursor rx") auto
+    have "u \<in> set (ring rx)"
+      using wf_rx cu by (simp add: xlist_wf_def)
+    then have "u = p" using uniq un by simp
+    then show "cursor rx = Some p" using cu by simp
+  qed
+  have cur2': "rel_option (\<lambda>u w. dec u = Some w)
+     (if cursor rx = Some p then predecessor p (ring rx)
+      else cursor rx)
+     (if cursor q = Some n then predecessor n (ring q)
+      else cursor q)"
+    using cur_iff cur2 predecessor_decode[OF ring2 pn uniq]
+    by simp
+  show ?thesis
+    unfolding xlist_relabel_def
+  proof (intro conjI)
+    show "list_all2 (\<lambda>u w. dec u = Some w)
+       (ring (list_remove_abs p rx)) (ring (list_remove_abs n q))"
+      using ring2' by (simp add: list_remove_abs_def)
+  next
+    show "rel_option (\<lambda>u w. dec u = Some w)
+       (cursor (list_remove_abs p rx))
+       (cursor (list_remove_abs n q))"
+      using cur2' by (simp add: list_remove_abs_def)
+  next
+    show "\<forall>u\<in>set (ring (list_remove_abs p rx)). \<forall>w.
+       dec u = Some w \<longrightarrow>
+       item_key (list_remove_abs p rx) u =
+         item_key (list_remove_abs n q) w"
+    proof (intro ballI allI impI)
+      fix u w
+      assume u_in: "u \<in> set (ring (list_remove_abs p rx))"
+        and uw: "dec u = Some w"
+      have u_ring: "u \<in> set (ring rx)"
+        using u_in
+        by (auto simp: list_remove_abs_def
+            dest!: subsetD[OF set_remove1_subset])
+      have "item_key rx u = item_key q w"
+        by (rule keys[rule_format, OF u_ring uw])
+      then show "item_key (list_remove_abs p rx) u =
+         item_key (list_remove_abs n q) w"
+        by (simp add: list_remove_abs_def)
+    qed
+  qed
+qed
+
+lemma list_all2_decode_image:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and u_in: "u \<in> set xs"
+    and uw: "dec u = Some w"
+  shows "w \<in> set ys"
+proof -
+  obtain i where i_lt: "i < length xs" and u_eq: "xs ! i = u"
+    using u_in unfolding in_set_conv_nth by blast
+  have pair: "dec (xs ! i) = Some (ys ! i)"
+    using all2 i_lt by (simp add: list_all2_conv_all_nth)
+  have "w = ys ! i" using pair u_eq uw by simp
+  moreover have "ys ! i \<in> set ys"
+    using all2 i_lt by (simp add: list_all2_conv_all_nth)
+  ultimately show ?thesis by simp
+qed
+
+lemma list_all2_decode_preimage:
+  fixes dec :: "'a \<Rightarrow> 'b option"
+  assumes all2: "list_all2 (\<lambda>u w. dec u = Some w) xs ys"
+    and w_in: "w \<in> set ys"
+  shows "\<exists>u\<in>set xs. dec u = Some w"
+proof -
+  obtain j where j_lt: "j < length ys" and w_eq: "ys ! j = w"
+    using w_in unfolding in_set_conv_nth by blast
+  have len: "length xs = length ys"
+    using all2 by (simp add: list_all2_conv_all_nth)
+  have pair: "dec (xs ! j) = Some (ys ! j)"
+    using all2 j_lt len by (simp add: list_all2_conv_all_nth)
+  have "xs ! j \<in> set xs" using j_lt len by simp
+  then show ?thesis using pair w_eq by auto
+qed
+
+theorem xlist_relabel_insert_end:
+  assumes rel: "xlist_relabel dec rx q"
+    and wf_rx: "xlist_wf rx"
+    and pn: "dec p = Some n"
+    and fresh: "p \<notin> set (ring rx)"
+    and inj: "\<And>u u'. u \<in> insert p (set (ring rx)) \<Longrightarrow>
+       u' \<in> insert p (set (ring rx)) \<Longrightarrow> dec u = dec u' \<Longrightarrow>
+       u = u'"
+  shows "xlist_relabel dec
+     (list_insert_end_abs p k rx) (list_insert_end_abs n k q)"
+proof -
+  have ring2: "list_all2 (\<lambda>u w. dec u = Some w) (ring rx) (ring q)"
+    and cur2: "rel_option (\<lambda>u w. dec u = Some w)
+      (cursor rx) (cursor q)"
+    and keys: "\<forall>u\<in>set (ring rx). \<forall>w. dec u = Some w \<longrightarrow>
+      item_key rx u = item_key q w"
+    using rel by (simp_all add: xlist_relabel_def)
+  have uniq_n: "\<And>u. u \<in> set (ring rx) \<Longrightarrow> dec u = Some n \<Longrightarrow>
+     u = p"
+  proof -
+    fix u
+    assume u_in: "u \<in> set (ring rx)" and un: "dec u = Some n"
+    show "u = p"
+      by (rule inj) (use u_in un pn in auto)
+  qed
+  have n_absent: "\<And>w. w \<in> set (ring q) \<Longrightarrow> w \<noteq> n"
+  proof
+    fix w
+    assume w_in: "w \<in> set (ring q)" and wn: "w = n"
+    obtain u where u_in: "u \<in> set (ring rx)"
+      and uw: "dec u = Some w"
+      using list_all2_decode_preimage[OF ring2 w_in] by blast
+    have "u = p" using uniq_n u_in uw wn by simp
+    then show False using fresh u_in by simp
+  qed
+  have ring2': "list_all2 (\<lambda>u w. dec u = Some w)
+     (case cursor rx of
+        None \<Rightarrow> p # ring rx
+      | Some c \<Rightarrow> insert_after c p (ring rx))
+     (case cursor q of
+        None \<Rightarrow> n # ring q
+      | Some m \<Rightarrow> insert_after m n (ring q))"
+  proof (cases "cursor rx")
+    case None
+    then have "cursor q = None"
+      using cur2 by (cases "cursor q") auto
+    then show ?thesis using None pn ring2 by simp
+  next
+    case (Some c)
+    obtain m where cq: "cursor q = Some m" and cm: "dec c = Some m"
+      using cur2 Some by (cases "cursor q") auto
+    have c_in: "c \<in> set (ring rx)"
+      using wf_rx Some by (simp add: xlist_wf_def)
+    have uniq_c: "\<And>u. u \<in> set (ring rx) \<Longrightarrow> dec u = Some m \<Longrightarrow>
+       u = c"
+    proof -
+      fix u
+      assume u_in: "u \<in> set (ring rx)" and um: "dec u = Some m"
+      show "u = c"
+        by (rule inj) (use u_in um cm c_in in auto)
+    qed
+    show ?thesis
+      using Some cq insert_after_decode[OF ring2 pn cm uniq_c]
+      by simp
+  qed
+  have keys': "\<forall>u\<in>set (case cursor rx of
+        None \<Rightarrow> p # ring rx
+      | Some c \<Rightarrow> insert_after c p (ring rx)).
+     \<forall>w. dec u = Some w \<longrightarrow>
+       ((item_key rx)(p := k)) u = ((item_key q)(n := k)) w"
+  proof (intro ballI allI impI)
+    fix u w
+    assume u_in: "u \<in> set (case cursor rx of
+        None \<Rightarrow> p # ring rx
+      | Some c \<Rightarrow> insert_after c p (ring rx))"
+      and uw: "dec u = Some w"
+    have u_cases: "u = p \<or> u \<in> set (ring rx)"
+      using u_in
+      by (cases "cursor rx")
+        (auto dest!: subsetD[OF set_insert_after_subset])
+    show "((item_key rx)(p := k)) u = ((item_key q)(n := k)) w"
+    proof (cases "u = p")
+      case True
+      then have "w = n" using uw pn by simp
+      then show ?thesis using True by simp
+    next
+      case False
+      have u_ring: "u \<in> set (ring rx)" using u_cases False by simp
+      have w_in: "w \<in> set (ring q)"
+        by (rule list_all2_decode_image[OF ring2 u_ring uw])
+      have "w \<noteq> n" using n_absent w_in by simp
+      then show ?thesis
+        using False u_ring uw keys by simp
+    qed
+  qed
+  show ?thesis
+    unfolding xlist_relabel_def
+  proof (intro conjI)
+    show "list_all2 (\<lambda>u w. dec u = Some w)
+       (ring (list_insert_end_abs p k rx))
+       (ring (list_insert_end_abs n k q))"
+      using ring2' by (simp add: list_insert_end_abs_def)
+  next
+    show "rel_option (\<lambda>u w. dec u = Some w)
+       (cursor (list_insert_end_abs p k rx))
+       (cursor (list_insert_end_abs n k q))"
+      using pn by (simp add: list_insert_end_abs_def)
+  next
+    show "\<forall>u\<in>set (ring (list_insert_end_abs p k rx)). \<forall>w.
+       dec u = Some w \<longrightarrow>
+       item_key (list_insert_end_abs p k rx) u =
+         item_key (list_insert_end_abs n k q) w"
+    proof (intro ballI allI impI)
+      fix u w
+      assume u_in: "u \<in> set (ring (list_insert_end_abs p k rx))"
+        and uw: "dec u = Some w"
+      have u_in': "u \<in> set (case cursor rx of
+          None \<Rightarrow> p # ring rx
+        | Some c \<Rightarrow> insert_after c p (ring rx))"
+        using u_in by (simp add: list_insert_end_abs_def)
+      have "((item_key rx)(p := k)) u = ((item_key q)(n := k)) w"
+        by (rule keys'[rule_format, OF u_in' uw])
+      then show "item_key (list_insert_end_abs p k rx) u =
+         item_key (list_insert_end_abs n k q) w"
+        by (simp add: list_insert_end_abs_def)
+    qed
+  qed
+qed
+
+lemma raw_xlist_rel_wf:
+  "raw_xlist_rel h lp xs \<Longrightarrow> xlist_wf xs"
+  by (simp add: raw_xlist_rel_def raw_xlist_view_def)
+
+lemma one_due_generic_raw_set_decode:
+  assumes laws: "universal_decoder_laws live D"
+    and mem: "u \<in> one_due_generic_raw_set live D"
+  shows "\<exists>t\<in>live. u = one_due_generic_raw_ptr D t \<and>
+     sd_node_decode D u = Some (Generic t)"
+  using laws mem
+  by (auto simp: one_due_generic_raw_set_def
+      one_due_generic_raw_ptr_def universal_decoder_laws_def)
+
+lemma one_due_generic_decode_inj:
+  assumes laws: "universal_decoder_laws live D"
+    and u: "sd_node_decode D u = Some (Generic t)"
+    and u': "sd_node_decode D u' = Some (Generic t)"
+  shows "u = u'"
+proof -
+  have gen_law:
+    "\<forall>p t. sd_node_decode D p = Some (Generic t) \<longrightarrow>
+       t \<in> live \<and>
+       p = abi_generic_list_item_ptr (sd_tcb_ptr D t)"
+    using laws by (simp add: universal_decoder_laws_def)
+  have "u = abi_generic_list_item_ptr (sd_tcb_ptr D t)"
+    using gen_law u by blast
+  moreover have
+    "u' = abi_generic_list_item_ptr (sd_tcb_ptr D t)"
+    using gen_law u' by blast
+  ultimately show ?thesis by simp
+qed
+
+end
