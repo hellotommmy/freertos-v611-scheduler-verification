@@ -2,6 +2,7 @@ theory Scheduler_One_Due_Task_Phases_Reentry_GateH
   imports
     "EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_Pure.Scheduler_One_Due_Task_Phases_Reentry_Pure"
     "EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Owner_Frame.Scheduler_Resume_Generated_Insert_Owner_Frame"
+    "EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Key_Frame.Scheduler_Resume_Generated_Insert_Key_Frame"
 begin
 
 text \<open>
@@ -1775,6 +1776,233 @@ proof -
   show ?thesis
     unfolding TaskObservationRel_def
     using fin per by blast
+qed
+
+text \<open>
+  The event families at the insert heap.  Every event root's ring
+  relation is carried through both removals and the insertion: the
+  linked owner loses exactly the due task's Event item, every other
+  event ring is untouched, and the insertion's exact footprint lies in
+  the generic side by storage separation.
+\<close>
+
+lemma one_due_ready_insert_event_storage_frame:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+    and address:
+      "address \<in> raw_xlist_storage e (event_raw e)"
+  shows
+    "one_due_ready_insert_heap D C generic_raw
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       address =
+     one_due_event_remove_heap D C branch
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       address"
+proof -
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  let ?target = "one_due_target_root C"
+  let ?fam = "one_due_generic_raw_after_remove D C generic_raw"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  let ?source = "odc_delayed_root C"
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have target_root: "?target \<in> odc_generic_roots C"
+    by (rule one_due_gateH_target_in_rootsD[OF rel])
+  have target_ne: "?target \<noteq> ?source"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have fam_target: "?fam ?target = generic_raw ?target"
+    using target_ne
+    by (simp add: one_due_generic_raw_after_remove_def)
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  have ring_rel: "raw_xlist_rel ?he ?target (generic_raw ?target)"
+    using after_event
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have fresh0:
+    "raw_fresh_for_insert ?target (ring (generic_raw ?target)) ?p"
+    using after_event
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have footprint:
+    "raw_insert_end_exact_write_footprint ?he ?target
+       (generic_raw ?target) ?p \<subseteq>
+     raw_xlist_storage ?target (generic_raw ?target) \<union>
+       raw_item_region ?p"
+    by (rule raw_insert_end_exact_footprint_subset_storage[
+      OF ring_rel])
+  have cross_target:
+    "raw_xlist_storage ?target (generic_raw ?target) \<inter>
+       raw_xlist_storage e (event_raw e) = {}"
+    by (rule one_due_gateH_storage_disjointD[OF rel target_root
+      root])
+  have p_member: "?p \<in> set (ring (generic_raw ?source))"
+    by (rule one_due_gateH_source_memberD[OF rel])
+  have p_in_source_storage:
+    "raw_item_region ?p \<subseteq>
+       raw_xlist_storage ?source (generic_raw ?source)"
+    using p_member by (auto simp: raw_xlist_storage_def)
+  have cross_source:
+    "raw_xlist_storage ?source (generic_raw ?source) \<inter>
+       raw_xlist_storage e (event_raw e) = {}"
+    by (rule one_due_gateH_storage_disjointD[OF rel source_root
+      root])
+  have outside:
+    "address \<notin> raw_insert_end_exact_write_footprint ?he ?target
+       (generic_raw ?target) ?p"
+    using footprint cross_target p_in_source_storage cross_source
+      address by blast
+  have byte:
+    "raw_insert_concrete_heap ?he ?target (generic_raw ?target) ?p
+       address = ?he address"
+    by (rule raw_insert_concrete_heap_exact_external_frame[
+      OF ring_rel fresh0 outside])
+  show ?thesis
+    using byte
+    by (simp add: one_due_ready_insert_heap_def)
+qed
+
+lemma one_due_event_remove_event_root_raw_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+  shows
+    "raw_xlist_rel
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       e (one_due_event_raw_after_remove D C branch event_raw e)"
+proof -
+  let ?hg = "one_due_generic_remove_heap D C
+    (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))"
+  let ?qt = "event_item_raw_ptr D (odc_task C)"
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  show ?thesis
+  proof (cases branch)
+    case DueEventNull
+    then show ?thesis
+      using after_event root
+      by (simp add: one_due_after_event_obligations_def Let_def
+          one_due_event_raw_after_remove_def)
+  next
+    case (DueEventLinked owner)
+    have rel_linked:
+      "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+         generic_raw event_raw"
+      using rel DueEventLinked by simp
+    have owner_root: "owner \<in> odc_event_roots C"
+      by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+    show ?thesis
+    proof (cases "e = owner")
+      case True
+      have owner_rel:
+        "raw_xlist_rel
+           (one_due_event_remove_heap D C (DueEventLinked owner) ?hg)
+           owner (list_remove_abs ?qt (event_raw owner))"
+        using after_event DueEventLinked
+        by (simp add: one_due_after_event_obligations_def Let_def)
+      then show ?thesis
+        using True DueEventLinked
+        by (simp add: one_due_event_raw_after_remove_def)
+    next
+      case False
+      have hg_rel: "raw_xlist_rel ?hg e (event_raw e)"
+        by (rule one_due_gateH_event_root_after_genericD[OF rel
+          root])
+      have pre_hg:
+        "scheduler_family_pre_rel ?hg (odc_event_roots C) event_raw
+           (odc_live C) D"
+        by (rule one_due_gateH_event_pre_after_genericD[OF rel])
+      have owner_facts:
+        "raw_xlist_rel ?hg owner (event_raw owner) \<and>
+         ?qt \<in> set (ring (event_raw owner))"
+        by (rule one_due_gateH_linked_event_after_genericD[
+            OF rel_linked])
+      have footprint:
+        "raw_remove_exact_write_footprint ?hg owner ?qt \<subseteq>
+           raw_xlist_storage owner (event_raw owner)"
+        using owner_facts
+        by (intro raw_remove_exact_footprint_subset_storage) blast+
+      have disj:
+        "raw_xlist_storage e (event_raw e) \<inter>
+           raw_xlist_storage owner (event_raw owner) = {}"
+        by (rule scheduler_family_pre_rel_storage_disjoint[
+          OF pre_hg root owner_root False])
+      have frame:
+        "\<And>a. a \<in> raw_xlist_storage e (event_raw e) \<Longrightarrow>
+           one_due_event_remove_heap D C (DueEventLinked owner)
+             ?hg a = ?hg a"
+      proof -
+        fix a
+        assume a_in: "a \<in> raw_xlist_storage e (event_raw e)"
+        have outside:
+          "a \<notin> raw_remove_exact_write_footprint ?hg owner ?qt"
+          using footprint disj a_in by blast
+        show "one_due_event_remove_heap D C (DueEventLinked owner)
+            ?hg a = ?hg a"
+          using owner_facts
+          by (auto simp: one_due_event_remove_heap_def
+              intro: raw_remove_concrete_heap_exact_external_frame[
+                OF _ _ outside])
+      qed
+      have he_rel:
+        "raw_xlist_rel
+           (one_due_event_remove_heap D C (DueEventLinked owner)
+             ?hg) e (event_raw e)"
+        by (rule delay_raw_xlist_rel_storage_frame[OF hg_rel frame])
+      then show ?thesis
+        using False DueEventLinked
+        by (simp add: one_due_event_raw_after_remove_def)
+    qed
+  qed
+qed
+
+lemma one_due_reentry_event_root_raw_rel:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and root: "e \<in> odc_event_roots C"
+  shows
+    "raw_xlist_rel
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       e (one_due_event_raw_after_remove D C branch event_raw e)"
+proof -
+  have he_rel:
+    "raw_xlist_rel
+       (one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+       e (one_due_event_raw_after_remove D C branch event_raw e)"
+    by (rule one_due_event_remove_event_root_raw_rel[OF rel root])
+  have storage_sub:
+    "raw_xlist_storage e
+       (one_due_event_raw_after_remove D C branch event_raw e) \<subseteq>
+     raw_xlist_storage e (event_raw e)"
+    by (cases branch)
+      (auto simp: one_due_event_raw_after_remove_def
+        intro: raw_xlist_storage_remove_subset[THEN subsetD])
+  have frame:
+    "\<And>a. a \<in> raw_xlist_storage e
+        (one_due_event_raw_after_remove D C branch event_raw e) \<Longrightarrow>
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         a =
+       one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) a"
+    using storage_sub
+    by (intro one_due_ready_insert_event_storage_frame[OF rel root])
+      blast
+  show ?thesis
+    by (rule delay_raw_xlist_rel_storage_frame[OF he_rel frame])
 qed
 
 end
