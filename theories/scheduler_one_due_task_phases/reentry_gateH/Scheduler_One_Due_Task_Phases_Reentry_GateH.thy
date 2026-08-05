@@ -1,6 +1,7 @@
 theory Scheduler_One_Due_Task_Phases_Reentry_GateH
   imports
     "EAL6_FreeRTOS_V611_Scheduler_One_Due_Task_Phases_Reentry_Pure.Scheduler_One_Due_Task_Phases_Reentry_Pure"
+    "EAL6_FreeRTOS_V611_Scheduler_Resume_Generated_Insert_Owner_Frame.Scheduler_Resume_Generated_Insert_Owner_Frame"
 begin
 
 text \<open>
@@ -1038,5 +1039,742 @@ corollary one_due_reentry_relabel_closed:
          (one_due_reentry_snapshot C branch S) r)"
   by (rule one_due_reentry_relabel[OF rel
       one_due_reentry_key_he[OF rel] r_root])
+
+text \<open>
+  Task observation at the insert heap.  Guards and abstract priorities
+  are heap-independent; priority words and both embedded owner
+  projections survive the two removals and the insertion through the
+  field-region frames.
+\<close>
+
+lemma raw_owner_bytes_to_projection:
+  assumes bytes: "\<forall>a\<in>raw_owner_field_region q. h' a = h a"
+  shows
+    "List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h' q) =
+     List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h q)"
+proof -
+  have field_same:
+    "h_val h' (raw_owner_field_ptr q) =
+       h_val h (raw_owner_field_ptr q)"
+  proof (rule delay_h_val_region_cong)
+    fix address
+    assume "address \<in>
+      {ptr_val (raw_owner_field_ptr q)..+size_of TYPE(unit ptr)}"
+    then show "h' address = h address"
+      using bytes by (simp add: raw_owner_field_region_def)
+  qed
+  show ?thesis
+    using field_same
+    unfolding raw_owner_field_ptr_def
+    by (simp only:
+      List_V611_Raw_Skip_Translation.xLIST_ITEM_C_h_val_fields(4))
+qed
+
+lemma one_due_event_owner_projection_transport:
+  assumes proj:
+    "List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h' (event_item_raw_ptr D u)) =
+     List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h (event_item_raw_ptr D u))"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val h' (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val h (scheduler_event_item_ptr (sd_tcb_ptr D u)))"
+  using proj
+  by (simp add: event_item_raw_ptr_def abi_event_list_item_ptr_def
+      scheduler_event_item_ptr_def flip: abi_item_owner_h_val)
+
+lemma one_due_generic_owner_projection_transport:
+  assumes proj:
+    "List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h' (one_due_generic_raw_ptr D u)) =
+     List_V611_Raw_Skip_Translation.xLIST_ITEM_C.pvOwner_C
+       (h_val h (one_due_generic_raw_ptr D u))"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val h' (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val h (scheduler_generic_item_ptr (sd_tcb_ptr D u)))"
+  using proj
+  by (simp add: one_due_generic_raw_ptr_def
+      abi_generic_list_item_ptr_def scheduler_generic_item_ptr_def
+      flip: abi_item_owner_h_val)
+
+lemma one_due_gateH_generic_notin_event_ringD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and generic_live: "u \<in> odc_live C"
+    and root: "e \<in> odc_event_roots C"
+  shows
+    "one_due_generic_raw_ptr D u \<notin> set (ring (event_raw e))"
+proof
+  assume member:
+    "one_due_generic_raw_ptr D u \<in> set (ring (event_raw e))"
+  have subset:
+    "set (ring (event_raw e)) \<subseteq>
+       event_item_raw_set (odc_live C) D"
+    using one_due_gateH_event_relD[OF rel] root
+    by (auto simp: scheduler_event_root_family_rel_def
+        event_family_root_rep_def)
+  then obtain t where t_live: "t \<in> odc_live C"
+    and equal:
+      "one_due_generic_raw_ptr D u = event_item_raw_ptr D t"
+    using member
+    by (auto simp: event_item_raw_set_def event_item_raw_ptr_def)
+  have distinct:
+    "one_due_generic_raw_ptr D u \<noteq> event_item_raw_ptr D t"
+    by (rule one_due_gateH_generic_event_ptr_distinct[
+      OF rel generic_live t_live])
+  show False using equal distinct by simp
+qed
+
+lemma one_due_generic_remove_generic_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u)))"
+proof -
+  let ?h = "hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)"
+  let ?source = "odc_delayed_root C"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  let ?q = "one_due_generic_raw_ptr D u"
+  have source_root: "?source \<in> odc_generic_roots C"
+    by (rule one_due_gateH_source_in_rootsD[OF rel])
+  have source_rel: "raw_xlist_rel ?h ?source (generic_raw ?source)"
+    by (rule one_due_gateH_raw_xlist_relD[OF rel source_root])
+  have p_member: "?p \<in> set (ring (generic_raw ?source))"
+    by (rule one_due_gateH_source_memberD[OF rel])
+  have bytes:
+    "\<forall>a\<in>raw_owner_field_region ?q.
+       raw_remove_concrete_heap ?h ?p a = ?h a"
+  proof (cases "?q \<in> set (ring (generic_raw ?source))")
+    case True
+    show ?thesis
+      by (rule raw_remove_member_owner_byte_frame[
+        OF source_rel p_member True])
+  next
+    case False
+    have q_managed: "?q \<in> universal_managed_nodes (odc_live C) D"
+      using live
+      by (auto simp: one_due_generic_raw_ptr_def
+          universal_managed_nodes_def)
+    have item_bytes:
+      "\<forall>a\<in>raw_item_region ?q.
+         raw_remove_concrete_heap ?h ?p a = ?h a"
+      using raw_remove_family_sibling_item_priority_byte_frame[
+        OF one_due_gateH_generic_preD[OF rel] source_root p_member
+          q_managed False live]
+      by blast
+    show ?thesis
+      using item_bytes raw_owner_field_region_subset_item[where p="?q"]
+      by blast
+  qed
+  show ?thesis
+    unfolding one_due_generic_remove_heap_def
+    by (rule one_due_generic_owner_projection_transport[
+      OF raw_owner_bytes_to_projection[OF bytes]])
+qed
+
+lemma one_due_generic_remove_event_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u)))"
+proof -
+  have whole:
+    "h_val
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (event_item_raw_ptr D u) =
+     h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (event_item_raw_ptr D u)"
+    by (rule one_due_gateH_generic_remove_event_item_frameD[
+      OF rel live])
+  show ?thesis
+    by (rule one_due_event_owner_projection_transport)
+       (simp add: whole)
+qed
+
+lemma one_due_gateH_event_pre_after_genericD:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "scheduler_family_pre_rel
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (odc_event_roots C) event_raw (odc_live C) D"
+proof -
+  have base:
+    "scheduler_family_pre_rel
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+       (odc_event_roots C) event_raw (odc_live C) D"
+    by (rule one_due_gateH_event_preD[OF rel])
+  have fam_hg:
+    "raw_family_rel
+       (one_due_generic_remove_heap D C
+         (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+       (odc_event_roots C) event_raw"
+    using base one_due_gateH_event_root_after_genericD[OF rel]
+    by (auto simp: scheduler_family_pre_rel_def raw_family_rel_def)
+  show ?thesis
+    using base fam_hg
+    by (simp add: scheduler_family_pre_rel_def raw_family_rel_def)
+qed
+
+lemma one_due_event_remove_event_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u)))"
+proof (cases branch)
+  case DueEventNull
+  then show ?thesis by (simp add: one_due_event_remove_heap_def)
+next
+  case (DueEventLinked owner)
+  let ?hg = "one_due_generic_remove_heap D C
+    (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))"
+  let ?pt = "event_item_raw_ptr D (odc_task C)"
+  let ?q = "event_item_raw_ptr D u"
+  have rel_linked:
+    "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+       generic_raw event_raw"
+    using rel DueEventLinked by simp
+  have owner_facts:
+    "raw_xlist_rel ?hg owner (event_raw owner) \<and>
+     ?pt \<in> set (ring (event_raw owner))"
+    by (rule one_due_gateH_linked_event_after_genericD[
+        OF rel_linked])
+  have owner_root: "owner \<in> odc_event_roots C"
+    by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+  have bytes:
+    "\<forall>a\<in>raw_owner_field_region ?q.
+       raw_remove_concrete_heap ?hg ?pt a = ?hg a"
+  proof (cases "?q \<in> set (ring (event_raw owner))")
+    case True
+    show ?thesis
+      using owner_facts
+      by (intro raw_remove_member_owner_byte_frame[of ?hg owner
+          "event_raw owner" ?pt ?q] True) blast+
+  next
+    case False
+    have pre_hg:
+      "scheduler_family_pre_rel ?hg (odc_event_roots C) event_raw
+         (odc_live C) D"
+      by (rule one_due_gateH_event_pre_after_genericD[OF rel])
+    have q_managed: "?q \<in> universal_managed_nodes (odc_live C) D"
+      using live
+      by (auto simp: event_item_raw_ptr_def
+          universal_managed_nodes_def)
+    have pt_member: "?pt \<in> set (ring (event_raw owner))"
+      using owner_facts by blast
+    have item_bytes:
+      "\<forall>a\<in>raw_item_region ?q.
+         raw_remove_concrete_heap ?hg ?pt a = ?hg a"
+      using raw_remove_family_sibling_item_priority_byte_frame[
+        OF pre_hg owner_root pt_member q_managed False live]
+      by blast
+    show ?thesis
+      using item_bytes
+        raw_owner_field_region_subset_item[where p="?q"]
+      by blast
+  qed
+  show ?thesis
+    using DueEventLinked
+      one_due_event_owner_projection_transport[
+        OF raw_owner_bytes_to_projection[OF bytes]]
+    by (simp add: one_due_event_remove_heap_def)
+qed
+
+lemma one_due_event_remove_generic_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u)))"
+proof (cases branch)
+  case DueEventNull
+  then show ?thesis by (simp add: one_due_event_remove_heap_def)
+next
+  case (DueEventLinked owner)
+  let ?hg = "one_due_generic_remove_heap D C
+    (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))"
+  let ?pt = "event_item_raw_ptr D (odc_task C)"
+  let ?q = "one_due_generic_raw_ptr D u"
+  have rel_linked:
+    "one_due_gateH_entry_rel D R c a C (DueEventLinked owner) S
+       generic_raw event_raw"
+    using rel DueEventLinked by simp
+  have owner_facts:
+    "raw_xlist_rel ?hg owner (event_raw owner) \<and>
+     ?pt \<in> set (ring (event_raw owner))"
+    by (rule one_due_gateH_linked_event_after_genericD[
+        OF rel_linked])
+  have owner_root: "owner \<in> odc_event_roots C"
+    by (rule one_due_gateH_linked_ownerD[OF rel_linked])
+  have pre_hg:
+    "scheduler_family_pre_rel ?hg (odc_event_roots C) event_raw
+       (odc_live C) D"
+    by (rule one_due_gateH_event_pre_after_genericD[OF rel])
+  have q_managed: "?q \<in> universal_managed_nodes (odc_live C) D"
+    using live
+    by (auto simp: one_due_generic_raw_ptr_def
+        universal_managed_nodes_def)
+  have pt_member: "?pt \<in> set (ring (event_raw owner))"
+    using owner_facts by blast
+  have nonmember: "?q \<notin> set (ring (event_raw owner))"
+    by (rule one_due_gateH_generic_notin_event_ringD[
+        OF rel live owner_root])
+  have item_bytes:
+    "\<forall>a\<in>raw_item_region ?q.
+       raw_remove_concrete_heap ?hg ?pt a = ?hg a"
+    using raw_remove_family_sibling_item_priority_byte_frame[
+      OF pre_hg owner_root pt_member q_managed nonmember live]
+    by blast
+  have bytes:
+    "\<forall>a\<in>raw_owner_field_region ?q.
+       raw_remove_concrete_heap ?hg ?pt a = ?hg a"
+    using item_bytes
+      raw_owner_field_region_subset_item[where p="?q"]
+    by blast
+  show ?thesis
+    using DueEventLinked
+      one_due_generic_owner_projection_transport[
+        OF raw_owner_bytes_to_projection[OF bytes]]
+    by (simp add: one_due_event_remove_heap_def)
+qed
+
+lemma one_due_ready_insert_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and w_managed: "w \<in> universal_managed_nodes (odc_live C) D"
+  shows
+    "\<forall>a\<in>raw_owner_field_region w.
+       one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))) a =
+       one_due_event_remove_heap D C branch
+         (one_due_generic_remove_heap D C
+           (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))) a"
+proof -
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  let ?target = "one_due_target_root C"
+  let ?fam = "one_due_generic_raw_after_remove D C generic_raw"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have target_root: "?target \<in> odc_generic_roots C"
+    by (rule one_due_gateH_target_in_rootsD[OF rel])
+  note after_pre = one_due_after_event_pre_rel[OF rel]
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  have target_ne: "?target \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have fam_target: "?fam ?target = generic_raw ?target"
+    using target_ne
+    by (simp add: one_due_generic_raw_after_remove_def)
+  have fresh0:
+    "raw_fresh_for_insert ?target (ring (generic_raw ?target)) ?p"
+    using after_event
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have fresh:
+    "raw_fresh_for_insert ?target (ring (?fam ?target)) ?p"
+    using fresh0 fam_target by simp
+  have p_managed: "?p \<in> universal_managed_nodes (odc_live C) D"
+    using task_live
+    by (auto simp: one_due_generic_raw_ptr_def
+        universal_managed_nodes_def)
+  have bytes:
+    "\<forall>a\<in>raw_owner_field_region w.
+       raw_insert_concrete_heap ?he ?target (?fam ?target) ?p a =
+         ?he a"
+    by (rule raw_insert_end_family_owner_byte_frame[
+      OF after_pre target_root fresh p_managed w_managed])
+  show ?thesis
+    using bytes
+    by (simp add: one_due_ready_insert_heap_def fam_target)
+qed
+
+lemma one_due_ready_insert_generic_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u)))"
+proof -
+  have q_managed:
+    "one_due_generic_raw_ptr D u \<in>
+       universal_managed_nodes (odc_live C) D"
+    using live
+    by (auto simp: one_due_generic_raw_ptr_def
+        universal_managed_nodes_def)
+  show ?thesis
+    by (rule one_due_generic_owner_projection_transport[
+      OF raw_owner_bytes_to_projection[
+        OF one_due_ready_insert_owner_live[OF rel q_managed]]])
+qed
+
+lemma one_due_ready_insert_event_owner_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u)))"
+proof -
+  have q_managed:
+    "event_item_raw_ptr D u \<in>
+       universal_managed_nodes (odc_live C) D"
+    using live
+    by (auto simp: event_item_raw_ptr_def
+        universal_managed_nodes_def)
+  show ?thesis
+    by (rule one_due_event_owner_projection_transport[
+      OF raw_owner_bytes_to_projection[
+        OF one_due_ready_insert_owner_live[OF rel q_managed]]])
+qed
+
+lemma one_due_ready_insert_priority_live:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (sd_tcb_ptr D u)) =
+     Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+       (h_val
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))))
+         (sd_tcb_ptr D u))"
+proof -
+  let ?he = "one_due_event_remove_heap D C branch
+    (one_due_generic_remove_heap D C
+      (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))"
+  let ?target = "one_due_target_root C"
+  let ?fam = "one_due_generic_raw_after_remove D C generic_raw"
+  let ?p = "one_due_generic_raw_ptr D (odc_task C)"
+  let ?sib = "event_item_raw_ptr D (odc_task C)"
+  have task_live: "odc_task C \<in> odc_live C"
+    by (rule one_due_gateH_task_liveD[OF rel])
+  have target_root: "?target \<in> odc_generic_roots C"
+    by (rule one_due_gateH_target_in_rootsD[OF rel])
+  note after_pre = one_due_after_event_pre_rel[OF rel]
+  note after_event = one_due_gateH_after_event_obligations[OF rel]
+  have target_ne: "?target \<noteq> odc_delayed_root C"
+    using one_due_gateH_pure_entryD[OF rel]
+    by (auto simp: one_due_entry_rel_def one_due_context_wf_def)
+  have fam_target: "?fam ?target = generic_raw ?target"
+    using target_ne
+    by (simp add: one_due_generic_raw_after_remove_def)
+  have fresh0:
+    "raw_fresh_for_insert ?target (ring (generic_raw ?target)) ?p"
+    using after_event
+    by (simp add: one_due_after_event_obligations_def Let_def)
+  have fresh:
+    "raw_fresh_for_insert ?target (ring (?fam ?target)) ?p"
+    using fresh0 fam_target by simp
+  have p_managed: "?p \<in> universal_managed_nodes (odc_live C) D"
+    using task_live
+    by (auto simp: one_due_generic_raw_ptr_def
+        universal_managed_nodes_def)
+  have sib_managed:
+    "?sib \<in> universal_managed_nodes (odc_live C) D"
+    using task_live
+    by (auto simp: event_item_raw_ptr_def
+        universal_managed_nodes_def)
+  have p_sib: "?p \<noteq> ?sib"
+    by (rule one_due_gateH_generic_event_ptr_distinct[
+      OF rel task_live task_live])
+  have sib_nonmember0:
+    "?sib \<notin> set (ring (generic_raw ?target))"
+    by (rule one_due_gateH_event_notin_generic_rootD[
+      OF rel task_live target_root])
+  have sib_nonmember:
+    "?sib \<notin> set (ring (?fam ?target))"
+    using sib_nonmember0 fam_target by simp
+  have bytes:
+    "\<forall>a\<in>universal_priority_field_region (sd_tcb_ptr D u).
+       raw_insert_concrete_heap ?he ?target (?fam ?target) ?p a =
+         ?he a"
+    using raw_insert_end_family_sibling_owner_priority_byte_frame[
+      OF after_pre target_root fresh p_managed sib_managed p_sib
+        sib_nonmember live]
+    by blast
+  have field_same:
+    "h_val (one_due_ready_insert_heap D C generic_raw ?he)
+       (universal_priority_field_ptr (sd_tcb_ptr D u)) =
+     h_val ?he (universal_priority_field_ptr (sd_tcb_ptr D u))"
+  proof (rule delay_h_val_region_cong)
+    fix address
+    assume "address \<in>
+      {ptr_val (universal_priority_field_ptr (sd_tcb_ptr D u))..+
+         size_of TYPE(32 word)}"
+    then show
+      "one_due_ready_insert_heap D C generic_raw ?he address =
+         ?he address"
+      using bytes
+      by (simp add: universal_priority_field_region_def
+          one_due_ready_insert_heap_def fam_target)
+  qed
+  show ?thesis
+    using field_same
+    unfolding universal_priority_field_ptr_def
+    by (simp only:
+      Scheduler_V611_Parse.tskTaskControlBlock_C_h_val_fields(4)
+      one_due_ready_insert_heap_def)
+qed
+
+lemma one_due_reentry_priority_chain:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (sd_tcb_ptr D u)) =
+     Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (sd_tcb_ptr D u))"
+  using one_due_ready_insert_priority_live[OF rel live]
+    one_due_gateH_priority_after_eventD[OF rel live]
+  by simp
+
+lemma one_due_reentry_generic_owner_chain:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (scheduler_generic_item_ptr (sd_tcb_ptr D u)))"
+  using one_due_ready_insert_generic_owner_live[OF rel live]
+    one_due_event_remove_generic_owner_live[OF rel live]
+    one_due_generic_remove_generic_owner_live[OF rel live]
+  by simp
+
+lemma one_due_reentry_event_owner_chain:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+    and live: "u \<in> odc_live C"
+  shows
+    "Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val
+         (one_due_ready_insert_heap D C generic_raw
+           (one_due_event_remove_heap D C branch
+             (one_due_generic_remove_heap D C
+               (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+     Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+       (h_val (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c))
+         (scheduler_event_item_ptr (sd_tcb_ptr D u)))"
+  using one_due_ready_insert_event_owner_live[OF rel live]
+    one_due_event_remove_event_owner_live[OF rel live]
+    one_due_generic_remove_event_owner_live[OF rel live]
+  by simp
+
+theorem one_due_reentry_task_observation:
+  assumes rel:
+    "one_due_gateH_entry_rel D R c a C branch S generic_raw event_raw"
+  shows
+    "TaskObservationRel D
+       (one_due_ready_insert_heap D C generic_raw
+         (one_due_event_remove_heap D C branch
+           (one_due_generic_remove_heap D C
+             (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+       a"
+proof -
+  have observation:
+    "TaskObservationRel D
+       (hrs_mem (Scheduler_V611_Parse.globals.t_hrs_' c)) a"
+    by (rule one_due_gateH_task_observationD[OF rel])
+  have live_eq: "odc_live C = sa_live a"
+    by (rule one_due_gateH_live_absD[OF rel])
+  have fin: "finite (sa_live a)"
+    using observation by (simp add: TaskObservationRel_def)
+  have per:
+    "\<forall>u\<in>sa_live a.
+       c_guard (sd_tcb_ptr D u) \<and>
+       c_guard (scheduler_generic_item_ptr (sd_tcb_ptr D u)) \<and>
+       c_guard (scheduler_event_item_ptr (sd_tcb_ptr D u)) \<and>
+       sa_priority a u < 4 \<and>
+       unat (Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (sd_tcb_ptr D u))) = sa_priority a u \<and>
+       Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (sd_tcb_ptr D u)) < 4 \<and>
+       Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+         PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+           unit) (sd_tcb_ptr D u) \<and>
+       Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+         PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+           unit) (sd_tcb_ptr D u)"
+  proof (intro ballI)
+    fix u
+    assume u_abs: "u \<in> sa_live a"
+    have u_live: "u \<in> odc_live C"
+      using live_eq u_abs by simp
+    note entry = TaskObservationRel_liveD[OF observation u_abs]
+    note priority_chain =
+      one_due_reentry_priority_chain[OF rel u_live]
+    note generic_owner_chain =
+      one_due_reentry_generic_owner_chain[OF rel u_live]
+    note event_owner_chain =
+      one_due_reentry_event_owner_chain[OF rel u_live]
+    show
+      "c_guard (sd_tcb_ptr D u) \<and>
+       c_guard (scheduler_generic_item_ptr (sd_tcb_ptr D u)) \<and>
+       c_guard (scheduler_event_item_ptr (sd_tcb_ptr D u)) \<and>
+       sa_priority a u < 4 \<and>
+       unat (Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (sd_tcb_ptr D u))) = sa_priority a u \<and>
+       Scheduler_V611_Parse.tskTaskControlBlock_C.uxPriority_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (sd_tcb_ptr D u)) < 4 \<and>
+       Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (scheduler_generic_item_ptr (sd_tcb_ptr D u))) =
+         PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+           unit) (sd_tcb_ptr D u) \<and>
+       Scheduler_V611_Parse.xLIST_ITEM_C.pvOwner_C
+         (h_val
+           (one_due_ready_insert_heap D C generic_raw
+             (one_due_event_remove_heap D C branch
+               (one_due_generic_remove_heap D C
+                 (hrs_mem
+                   (Scheduler_V611_Parse.globals.t_hrs_' c)))))
+           (scheduler_event_item_ptr (sd_tcb_ptr D u))) =
+         PTR_COERCE(Scheduler_V611_Parse.tskTaskControlBlock_C \<rightarrow>
+           unit) (sd_tcb_ptr D u)"
+      using entry priority_chain generic_owner_chain
+        event_owner_chain
+      by simp
+  qed
+  show ?thesis
+    unfolding TaskObservationRel_def
+    using fin per by blast
+qed
 
 end
